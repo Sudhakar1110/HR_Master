@@ -1,0 +1,15 @@
+{
+ "content": "<div style=\"padding: 20px 0; border-bottom: 3px solid #2563eb; margin-bottom: 20px;\">\n    <div style=\"display: flex; justify-content: space-between; align-items: center;\">\n        <div style=\"font-size: 24px; font-weight: 700; color: #2563eb;\">HR Master</div>\n        <div style=\"font-size: 12px; color: #64748b; text-align: right;\">\n            Recruitment Management System<br>\n            Powered by ERPNext\n        </div>\n    </div>\n</div>",
+ "disabled": 0,
+ "docstatus": 0,
+ "doctype": "Letter Head",
+ "footer": "<div style=\"border-top: 2px solid #2563eb; padding: 10px 0; margin-top: 30px; font-size: 11px; color: #94a3b8; text-align: center;\">\n    <p>HR Master — Confidential Document</p>\n    <p>Generated on {{ frappe.utils.now_datetime() }}</p>\n</div>",
+ "image": "",
+ "is_default": 1,
+ "letter_head_name": "Standard",
+ "module": "HR Master",
+ "name": "Standard",
+ "owner": "Administrator",
+ "source": "",
+ "standard": "Yes"
+}

@@ -33,6 +33,9 @@ doc_events = {
     },
     "Interview Feedback": {
         "after_insert": "hr_master.doctype.interview_feedback.interview_feedback.after_insert"
+    },
+    "Candidate": {
+        "after_insert": "hr_master.doctype.candidate.candidate.after_insert"
     }
 }
 
@@ -51,10 +54,28 @@ scheduler_events = {
     ],
     "cron": {
         "0 2 * * 1": [
-            "hr_master.tasks.weekly.generate_weekly_report"
+            "hr_master.tasks.report_generation.generate_weekly_report"
         ],
         "0 3 * * 0": [
             "hr_master.tasks.duplicate_detection.scan_for_duplicates"
+        ],
+        "0 4 * * *": [
+            "hr_master.tasks.ai_ranking.ai_rank_candidates"
+        ],
+        "0 6 * * 0": [
+            "hr_master.tasks.search_index.rebuild_search_index"
+        ],
+        "30 6 * * 0": [
+            "hr_master.tasks.search_index.optimize_search_queries"
+        ],
+        "0 7 * * *": [
+            "hr_master.tasks.report_generation.generate_daily_report"
+        ],
+        "0 8 * * 1": [
+            "hr_master.tasks.report_generation.generate_weekly_report"
+        ],
+        "0 */6 * * *": [
+            "hr_master.tasks.email_queue.process_email_queue"
         ]
     }
 }
@@ -74,6 +95,21 @@ scheduled_tasks = {
         "type": "method",
         "method": "hr_master.tasks.resume_queue.process_resume_parsing",
         "queue": "long"
+    },
+    "ai_rank_single_candidate": {
+        "type": "method",
+        "method": "hr_master.tasks.ai_ranking.ai_rank_single_candidate",
+        "queue": "long"
+    },
+    "send_hr_notification": {
+        "type": "method",
+        "method": "hr_master.tasks.email_queue.send_hr_notification",
+        "queue": "short"
+    },
+    "enqueue_notification_email": {
+        "type": "method",
+        "method": "hr_master.tasks.email_queue.enqueue_notification_email",
+        "queue": "short"
     }
 }
 
@@ -87,6 +123,25 @@ fixtures = [
     {"dt": "Workflow Action"},
     {"dt": "Email Template Config"},
     {"dt": "Recruitment Settings"},
+    {"dt": "Notification", "filters": [["name", "in", [
+        "Candidate Shortlisted",
+        "Interview Scheduled",
+        "Resume Uploaded",
+        "Candidate Ranked",
+        "Interview Feedback Submitted",
+        "Offer Generated",
+        "Offer Accepted",
+        "Candidate Hired"
+    ]]},
+    {"dt": "Print Format", "filters": [["name", "in", [
+        "Interview Feedback Form",
+        "Candidate Profile",
+        "Offer Letter"
+    ]]},
+    {"dt": "Letter Head", "filters": [["name", "in", [
+        "Standard",
+        "Official"
+    ]]},
 ]
 
 website_route_rules = [

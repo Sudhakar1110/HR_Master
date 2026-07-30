@@ -1,0 +1,37 @@
+{
+ "attach_print": 0,
+ "channel": "System Notification",
+ "creation": "2026-01-01 00:00:00",
+ "date_changed": "uploaded_on",
+ "days_in_advance": 0,
+ "docstatus": 0,
+ "doctype": "Notification",
+ "document_type": "Resume",
+ "enabled": 1,
+ "event": "Submit",
+ "is_standard": 1,
+ "message": "<h3>Resume Uploaded</h3>\n<p>Dear {{ doc.owner }},</p>\n<p>A new resume has been uploaded for candidate <strong>{{ doc.candidate_name }}</strong>.</p>\n<p><strong>File:</strong> {{ doc.resume_file }}</p>\n<p><strong>Type:</strong> {{ doc.file_type }}</p>\n<p><strong>Status:</strong> {{ doc.parsing_status }}</p>\n<br>\n<p>View Resume: <a href=\"/app/resume/{{ doc.name }}\">{{ doc.name }}</a></p>",
+ "method": "",
+ "modified": "2026-01-01 00:00:00",
+ "modified_by": "Administrator",
+ "module": "HR Master",
+ "name": "Resume Uploaded",
+ "name_field": "candidate_name",
+ "owner": "Administrator",
+ "recipients": [
+  {
+   "receiver_by_document_field": "owner"
+  },
+  {
+   "receiver_by_role": "HR Master Admin"
+  },
+  {
+   "receiver_by_role": "HR Master Recruiter"
+  }
+ ],
+ "sender": "HR Master System",
+ "send_system_notification": 1,
+ "send_to_all_assignees": 0,
+ "subject": "Resume Uploaded: {{ doc.candidate_name }}",
+ "value_changed": ""
+}

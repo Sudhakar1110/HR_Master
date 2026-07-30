@@ -1,0 +1,15 @@
+{
+ "content": "<div style=\"padding: 20px 0; border-bottom: 3px solid #dc2626; margin-bottom: 20px;\">\n    <div style=\"display: flex; justify-content: space-between; align-items: center;\">\n        <div>\n            <div style=\"font-size: 22px; font-weight: 700; color: #dc2626;\">{{ doc.company_name or 'Company Name' }}</div>\n            <div style=\"font-size: 12px; color: #64748b; margin-top: 4px;\">Official Communication</div>\n        </div>\n        <div style=\"font-size: 11px; color: #64748b; text-align: right;\">\n            Confidential<br>\n            HR Department\n        </div>\n    </div>\n</div>",
+ "disabled": 0,
+ "docstatus": 0,
+ "doctype": "Letter Head",
+ "footer": "<div style=\"border-top: 2px solid #dc2626; padding: 10px 0; margin-top: 30px; font-size: 11px; color: #94a3b8; text-align: center;\">\n    <p>This is a computer-generated document issued by {{ doc.company_name or 'the Company' }} | HR Department</p>\n</div>",
+ "image": "",
+ "is_default": 0,
+ "letter_head_name": "Official",
+ "module": "HR Master",
+ "name": "Official",
+ "owner": "Administrator",
+ "source": "",
+ "standard": "Yes"
+}

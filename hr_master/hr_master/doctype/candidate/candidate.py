@@ -55,6 +55,18 @@ class Candidate(Document):
         return skills
 
 
+def after_insert(doc, method):
+    """Log activity when a new candidate is created."""
+    from hr_master.doctype.candidate_activity_log.candidate_activity_log import log_activity
+    log_activity(
+        candidate=doc.name,
+        activity_type="Created",
+        description=f"Candidate {doc.candidate_name} created via {doc.source or 'Manual Entry'}",
+        reference_doctype="Candidate",
+        reference_name=doc.name
+    )
+
+
 def get_permission_query_conditions(user=None):
     """Return permission query conditions for Candidate."""
     if not user:

@@ -1,0 +1,15 @@
+{
+ "content": "<h3>Interview Invitation</h3>\n<p>Dear {{ candidate_name }},</p>\n<p>We are pleased to invite you for an interview for the position of <strong>{{ job_title }}</strong> at {{ company_name }}.</p>\n<p><strong>Interview Details:</strong></p>\n<ul>\n<li><strong>Date:</strong> {{ scheduled_date }}</li>\n<li><strong>Time:</strong> {{ scheduled_time }}</li>\n<li><strong>Mode:</strong> {{ interview_mode }}</li>\n<li><strong>Interviewer:</strong> {{ interviewer_name }}</li>\n{% if interview_link %}\n<li><strong>Meeting Link:</strong> <a href=\"{{ interview_link }}\">{{ interview_link }}</a></li>\n{% endif %}\n</ul>\n<p>Please confirm your availability for this scheduled interview.</p>\n<br>\n<p>Best regards,<br><strong>{{ recruiter_name }}</strong><br>HR Department, {{ company_name }}</p>",
+ "context": "candidate_name, job_title, company_name, scheduled_date, scheduled_time, interview_mode, interviewer_name, interview_link, recruiter_name",
+ "creation": "2026-01-01 00:00:00",
+ "docstatus": 0,
+ "doctype": "Email Template",
+ "enabled": 1,
+ "modified": "2026-01-01 00:00:00",
+ "module": "HR Master",
+ "name": "Interview Invitation",
+ "owner": "Administrator",
+ "response": "",
+ "subject": "Interview Invitation: {{ job_title }} at {{ company_name }}",
+ "use_html": 1
+}

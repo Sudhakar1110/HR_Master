@@ -1,0 +1,20 @@
+{
+ "creation": "2026-01-01 00:00:00",
+ "css": ".print-format {\n font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;\n max-width: 800px;\n margin: 0 auto;\n padding: 40px;\n}\n.company-header {\n text-align: center;\n margin-bottom: 30px;\n}\n.company-header h1 {\n color: #1e293b;\n font-size: 28px;\n margin: 0;\n}\n.offer-title {\n text-align: center;\n font-size: 22px;\n color: #2563eb;\n margin: 20px 0;\n font-weight: 600;\n}\n.content {\n line-height: 1.8;\n color: #334155;\n}\n.details-table {\n width: 100%;\n margin: 20px 0;\n border-collapse: collapse;\n}\n.details-table td {\n padding: 10px;\n border-bottom: 1px solid #e2e8f0;\n}\n.details-table td:first-child {\n font-weight: 600;\n color: #475569;\n width: 40%;\n}\n.signature-section {\n margin-top: 50px;\n}\n.signature-line {\n border-top: 1px solid #cbd5e1;\n width: 250px;\n margin-top: 50px;\n padding-top: 8px;\n}\n.footer {\n margin-top: 40px;\n text-align: center;\n font-size: 12px;\n color: #94a3b8;\n border-top: 1px solid #e2e8f0;\n padding-top: 15px;\n}\n",
+ "custom_format": 1,
+ "default_print_language": "en",
+ "disabled": 0,
+ "doc_type": "Offer Management",
+ "docstatus": 0,
+ "doctype": "Print Format",
+ "font": "Default",
+ "format_data": "[]",
+ "html": "<div class='company-header'>\n <h1>{{ doc.company_name or \"Company Name\" }}</h1>\n</div>\n\n<div class='offer-title'>Offer of Employment</div>\n\n<div class='content'>\n <p><strong>Date:</strong> {{ frappe.utils.format_date(doc.offer_date) }}</p>\n <p><strong>Candidate:</strong> {{ doc.candidate_name }}</p>\n\n <p>Dear {{ doc.candidate_name }},</p>\n\n <p>We are pleased to offer you the position of <strong>{{ doc.job_title }}</strong> with our organization. We were impressed with your qualifications and believe you will be a valuable addition to our team.</p>\n\n <table class='details-table'>\n <tr><td>Position</td><td>{{ doc.job_title }}</td></tr>\n <tr><td>Base Salary</td><td>{{ frappe.utils.fmt_money(doc.base_salary) }}</td></tr>\n <tr><td>Variable Pay</td><td>{{ frappe.utils.fmt_money(doc.variable_pay) }}</td></tr>\n <tr><td>Total CTC</td><td><strong>{{ frappe.utils.fmt_money(doc.total_ctc) }}</strong></td></tr>\n <tr><td>Expected Joining Date</td><td>{{ frappe.utils.format_date(doc.expected_joining_date) }}</td></tr>\n <tr><td>Benefits</td><td>{{ doc.benefits or 'As per company policy' }}</td></tr>\n </table>\n\n <p>Please review the terms and conditions outlined in this offer. If you have any questions, please do not hesitate to reach out.</p>\n\n <p>To accept this offer, please sign and return this letter by <strong>{{ frappe.utils.format_date(doc.candidate_response_date) or 'N/A' }}</strong>.</p>\n\n <div class='signature-section'>\n <p>We look forward to welcoming you to our team!</p>\n <br><br>\n <p>Sincerely,</p>\n <div class='signature-line'>Authorized Signatory</div>\n </div>\n</div>\n\n<div class='footer'>\n <p>This is a computer-generated document. No signature is required.</p>\n <p>HR Master - Recruitment Management System</p>\n</div>",
+ "module": "HR Master",
+ "name": "Offer Letter",
+ "owner": "Administrator",
+ "print_format_builder": 0,
+ "print_format_type": "Jinja",
+ "raw_printing": 0,
+ "standard": "Yes"
+}

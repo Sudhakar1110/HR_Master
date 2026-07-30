@@ -1,0 +1,15 @@
+{
+ "content": "<h3>Welcome to {{ company_name }}, {{ candidate_name }}!</h3>\n<p>We are thrilled to welcome you to the team! This email contains important information to help you prepare for your first day.</p>\n<p><strong>Start Date:</strong> {{ joining_date }}</p>\n<p><strong>Position:</strong> {{ job_title }}</p>\n<br>\n<p><strong>Onboarding Checklist:</strong></p>\n<ul>\n<li>Complete your onboarding paperwork</li>\n<li>Review the employee handbook</li>\n<li>Set up your IT accounts</li>\n<li>Meet your team members</li>\n</ul>\n<p>Your point of contact for onboarding is <strong>{{ recruiter_name }}</strong>. Please reach out if you have any questions before your start date.</p>\n<br>\n<p>Welcome aboard! We're excited to have you as part of our team.</p>\n<br>\n<p>Best regards,<br><strong>{{ recruiter_name }}</strong><br>HR Department, {{ company_name }}</p>",
+ "context": "candidate_name, company_name, joining_date, job_title, recruiter_name",
+ "creation": "2026-01-01 00:00:00",
+ "docstatus": 0,
+ "doctype": "Email Template",
+ "enabled": 1,
+ "modified": "2026-01-01 00:00:00",
+ "module": "HR Master",
+ "name": "Onboarding Welcome",
+ "owner": "Administrator",
+ "response": "",
+ "subject": "Welcome to {{ company_name }}, {{ candidate_name }}!",
+ "use_html": 1
+}

@@ -1,0 +1,34 @@
+{
+ "attach_print": 0,
+ "channel": "System Notification",
+ "creation": "2026-01-01 00:00:00",
+ "date_changed": "offer_date",
+ "days_in_advance": 0,
+ "docstatus": 0,
+ "doctype": "Notification",
+ "document_type": "Offer Management",
+ "enabled": 1,
+ "event": "Submit",
+ "is_standard": 1,
+ "message": "<h3>Offer Generated</h3>\n<p>Dear {{ doc.owner }},</p>\n<p>An offer has been generated for candidate <strong>{{ doc.candidate_name }}</strong>.</p>\n<p><strong>Position:</strong> {{ doc.job_title }}</p>\n<p><strong>Total CTC:</strong> {{ doc.total_ctc }}</p>\n<p><strong>Status:</strong> {{ doc.status }}</p>\n<p><strong>Approval Status:</strong> {{ doc.approval_status }}</p>\n<br>\n<p>View Offer: <a href=\"/app/offer-management/{{ doc.name }}\">{{ doc.name }}</a></p>",
+ "method": "",
+ "modified": "2026-01-01 00:00:00",
+ "modified_by": "Administrator",
+ "module": "HR Master",
+ "name": "Offer Generated",
+ "name_field": "candidate_name",
+ "owner": "Administrator",
+ "recipients": [
+  {
+   "receiver_by_document_field": "owner"
+  },
+  {
+   "receiver_by_role": "HR Master Admin"
+  }
+ ],
+ "sender": "HR Master System",
+ "send_system_notification": 1,
+ "send_to_all_assignees": 0,
+ "subject": "Offer Generated: {{ doc.candidate_name }} - {{ doc.job_title }}",
+ "value_changed": ""
+}

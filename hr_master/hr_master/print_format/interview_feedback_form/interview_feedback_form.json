@@ -1,0 +1,20 @@
+{
+ "creation": "2026-01-01 00:00:00",
+ "css": ".print-format {\n font-family: 'Inter', sans-serif;\n}\nh2 {\n color: #1e293b;\n border-bottom: 2px solid #2563eb;\n padding-bottom: 8px;\n}\n.section {\n margin: 15px 0;\n padding: 15px;\n background: #f8fafc;\n border-radius: 8px;\n}\n.score-badge {\n display: inline-block;\n padding: 2px 10px;\n border-radius: 12px;\n font-weight: 600;\n font-size: 14px;\n}\n.score-high { background: #dcfce7; color: #166534; }\n.score-medium { background: #fef3c7; color: #92400e; }\n.score-low { background: #fce4ec; color: #c62828; }\n",
+ "custom_format": 1,
+ "default_print_language": "en",
+ "disabled": 0,
+ "doc_type": "Interview Feedback",
+ "docstatus": 0,
+ "doctype": "Print Format",
+ "font": "Default",
+ "format_data": "[]",
+ "html": "<h2>Interview Feedback Report</h2>\n\n<div class='section'>\n <table style='width:100%'>\n <tr><td><strong>Candidate:</strong> {{ doc.candidate_name }}</td>\n <td><strong>Interviewer:</strong> {{ doc.interviewer }}</td></tr>\n <tr><td><strong>Position:</strong> {{ doc.job_title }}</td>\n <td><strong>Round:</strong> {{ doc.interview_round }}</td></tr>\n <tr><td><strong>Date:</strong> {{ frappe.utils.format_datetime(doc.submitted_date) }}</td>\n <td><strong>Type:</strong> {{ doc.interview_type }}</td></tr>\n </table>\n</div>\n\n<div class='section'>\n <h3>Ratings</h3>\n <table style='width:100%'>\n <tr><td>Overall Rating</td><td>{{ doc.overall_rating or 'N/A' }}/5</td></tr>\n <tr><td>Technical Score</td><td>{{ doc.technical_score or 'N/A' }}/5</td></tr>\n <tr><td>Communication</td><td>{{ doc.communication_score or 'N/A' }}/5</td></tr>\n <tr><td>Cultural Fit</td><td>{{ doc.cultural_fit_score or 'N/A' }}/5</td></tr>\n <tr><td>Problem Solving</td><td>{{ doc.problem_solving_score or 'N/A' }}/5</td></tr>\n </table>\n</div>\n\n<div class='section'>\n <h3>Recommendation</h3>\n <p><strong>Recommendation:</strong> <span class='score-badge'>{{ doc.recommendation }}</span></p>\n <p><strong>Result:</strong> <span class='score-badge'>{{ doc.result }}</span></p>\n</div>\n\n<div class='section'>\n <h3>Detailed Feedback</h3>\n <p><strong>Strengths:</strong></p>\n <p>{{ doc.strengths or 'N/A' }}</p>\n <p><strong>Areas for Improvement:</strong></p>\n <p>{{ doc.weaknesses or 'N/A' }}</p>\n <p><strong>Next Steps:</strong></p>\n <p>{{ doc.next_steps or 'N/A' }}</p>\n</div>\n\n<p style='text-align:center; color:#94a3b8; font-size:12px; margin-top:30px;'>HR Master - Interview Feedback</p>",
+ "module": "HR Master",
+ "name": "Interview Feedback Form",
+ "owner": "Administrator",
+ "print_format_builder": 0,
+ "print_format_type": "Jinja",
+ "raw_printing": 0,
+ "standard": "Yes"
+}

@@ -1,0 +1,41 @@
+{
+ "attach_print": 0,
+ "channel": "Email",
+ "creation": "2026-01-01 00:00:00",
+ "date_changed": "",
+ "days_in_advance": 0,
+ "docstatus": 0,
+ "doctype": "Notification",
+ "document_type": "Candidate",
+ "enabled": 1,
+ "event": "Value Change",
+ "is_standard": 1,
+ "message": "<h3>Candidate Hired</h3>\n<p>Dear {{ doc.owner }},</p>\n<p><strong>{{ doc.candidate_name }}</strong> has been hired!</p>\n<p><strong>Email:</strong> {{ doc.email }}</p>\n<p><strong>Phone:</strong> {{ doc.phone }}</p>\n<p><strong>Current Title:</strong> {{ doc.current_title }}</p>\n<br>\n<p>The candidate has been moved to <strong>Selected</strong> status and the recruitment process is complete.</p>\n<p>View Candidate: <a href=\"/app/candidate/{{ doc.name }}\">{{ doc.candidate_name }}</a></p>",
+ "method": "",
+ "modified": "2026-01-01 00:00:00",
+ "modified_by": "Administrator",
+ "module": "HR Master",
+ "name": "Candidate Hired",
+ "name_field": "candidate_name",
+ "owner": "Administrator",
+ "recipients": [
+  {
+   "receiver_by_document_field": "owner"
+  },
+  {
+   "receiver_by_role": "HR Master Admin"
+  },
+  {
+   "receiver_by_role": "HR Master Recruiter"
+  },
+  {
+   "receiver_by_role": "HR Master Hiring Manager"
+  }
+ ],
+ "sender": "HR Master System",
+ "send_system_notification": 1,
+ "send_to_all_assignees": 0,
+ "subject": "Candidate Hired: {{ doc.candidate_name }}",
+ "value_changed": "status",
+ "condition": "doc.status == \"Selected\""
+}

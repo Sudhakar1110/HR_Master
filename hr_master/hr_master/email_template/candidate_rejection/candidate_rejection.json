@@ -1,0 +1,15 @@
+{
+ "content": "<h3>Application Update</h3>\n<p>Dear {{ candidate_name }},</p>\n<p>Thank you for your interest in the <strong>{{ job_title }}</strong> position at {{ company_name }} and for taking the time to interview with us.</p>\n<p>After careful consideration, we have decided to move forward with other candidates whose qualifications more closely match our current requirements.</p>\n<p>We sincerely appreciate your effort and wish you the very best in your job search and future endeavors.</p>\n<br>\n<p>Best regards,<br><strong>{{ recruiter_name }}</strong><br>HR Department, {{ company_name }}</p>",
+ "context": "candidate_name, job_title, company_name, recruiter_name",
+ "creation": "2026-01-01 00:00:00",
+ "docstatus": 0,
+ "doctype": "Email Template",
+ "enabled": 1,
+ "modified": "2026-01-01 00:00:00",
+ "module": "HR Master",
+ "name": "Candidate Rejection",
+ "owner": "Administrator",
+ "response": "",
+ "subject": "Update on your application for {{ job_title }} at {{ company_name }}",
+ "use_html": 1
+}
