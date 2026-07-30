@@ -2,8 +2,12 @@
 
 from __future__ import unicode_literals
 
+import os
+import json
+
 import frappe
 from frappe import _
+from frappe.modules.import_file import import_file_by_path
 
 
 def after_install():
@@ -11,11 +15,13 @@ def after_install():
     create_seed_data()
     create_default_workspace()
     set_default_config()
+    sync_all_resources()
 
 
 def after_migrate():
     """Run after database migration."""
     create_seed_data()
+    sync_all_resources()
 
 
 def create_seed_data():
@@ -180,6 +186,76 @@ def create_default_workspace():
         workspace.save(ignore_permissions=True)
 
     frappe.db.commit()
+
+
+def sync_all_resources():
+    """
+    Explicitly import all DocType, Report, Workspace, Number Card,
+    Notification, Print Format, and Workflow JSON files from disk.
+
+    This bypasses Frappe's auto-discovery mechanism which may fail
+    to find the JSON files due to path resolution issues.
+    """
+    # Get the module root directory (parent of setup/)
+    module_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+    resource_dirs = {
+        "doctype": "DocType",
+        "report": "Report",
+        "workspace": "Workspace",
+        "number_card": "Number Card",
+        "notification": "Notification",
+        "print_format": "Print Format",
+        "letter_head": "Letter Head",
+        "workflow": "Workflow",
+        "email_template": "Email Template",
+    }
+
+    for subdir, label in resource_dirs.items():
+        resource_path = os.path.join(module_root, subdir)
+        if not os.path.exists(resource_path):
+            continue
+
+        if subdir == "workspace":
+            # Workspaces are nested: workspace/{name}/{name}.json
+            for ws_dir in os.listdir(resource_path):
+                ws_path = os.path.join(resource_path, ws_dir)
+                if os.path.isdir(ws_path):
+                    for f in os.listdir(ws_path):
+                        if f.endswith(".json"):
+                            json_path = os.path.join(ws_path, f)
+                            _import_json(json_path, label)
+        else:
+            # Standard: subdir/{name}/{name}.json
+            for item_dir in os.listdir(resource_path):
+                item_path = os.path.join(resource_path, item_dir)
+                if os.path.isdir(item_path):
+                    json_file = f"{item_dir}.json"
+                    json_path = os.path.join(item_path, json_file)
+                    if os.path.exists(json_path):
+                        _import_json(json_path, label)
+
+
+def _import_json(json_path, label):
+    """Safely import a single JSON file as a Frappe document."""
+    try:
+        # Skip if the doctype already exists (avoid duplicates)
+        with open(json_path, "r") as f:
+            doc_data = json.load(f)
+
+        doctype_name = doc_data.get("doctype", "")
+        doc_name = doc_data.get("name", "")
+
+        if doctype_name and doc_name:
+            if frappe.db.exists(doctype_name, doc_name):
+                return  # Already exists, skip
+
+        import_file_by_path(json_path, force=True)
+        frappe.db.commit()
+    except Exception as e:
+        frappe.logger().debug(
+            f"HR Master: Skipped importing {json_path} - {str(e)}"
+        )
 
 
 def set_default_config():
