@@ -113,35 +113,6 @@ scheduled_tasks = {
     }
 }
 
-fixtures = [
-    {"dt": "Role", "filters": ["name", "in", [
-        "HR Master Admin",
-        "HR Master Recruiter",
-        "HR Master Hiring Manager",
-        "HR Master Viewer"
-    ]]},
-    {"dt": "Workflow", "filters": [["name", "=", "Candidate Evaluation"]]},
-    {"dt": "Notification", "filters": ["name", "in", [
-        "Candidate Shortlisted",
-        "Interview Scheduled",
-        "Resume Uploaded",
-        "Candidate Ranked",
-        "Interview Feedback Submitted",
-        "Offer Generated",
-        "Offer Accepted",
-        "Candidate Hired"
-    ]]},
-    {"dt": "Print Format", "filters": ["name", "in", [
-        "Interview Feedback Form",
-        "Candidate Profile",
-        "Offer Letter"
-    ]]},
-    {"dt": "Letter Head", "filters": ["name", "in", [
-        "Standard",
-        "Official"
-    ]]},
-]
-
 website_route_rules = [
     {"from_route": "/hr-master/candidates/<path:app>", "to_route": "candidate_portal"}
 ]
