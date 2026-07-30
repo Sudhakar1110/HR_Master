@@ -23,8 +23,8 @@ dependencies = [
 ]
 
 [tool.setuptools]
-package-dir = {"" = "."}
-packages = {find = {include = ["hr_master*"]}}
+package-dir = {"" = "hr_master"}
+packages = {find = {where = ["hr_master"], include = ["hr_master*"]}}
 
 [tool.setuptools.package-data]
 hr_master = [
