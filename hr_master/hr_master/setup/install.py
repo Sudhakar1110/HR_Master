@@ -13,7 +13,6 @@ from frappe.modules.import_file import import_file_by_path
 def after_install():
     """Run after app installation."""
     create_seed_data()
-    create_default_workspace()
     set_default_config()
     sync_all_resources()
 
@@ -174,20 +173,6 @@ def create_skills():
     frappe.db.commit()
 
 
-def create_default_workspace():
-    """Ensure default workspace is created."""
-    if not frappe.db.exists("Workspace", "HR Master"):
-        workspace = frappe.new_doc("Workspace")
-        workspace.label = "HR Master"
-        workspace.module = "HR Master"
-        workspace.icon = "hr"
-        workspace.indicator_color = "blue"
-        workspace.public = 1
-        workspace.save(ignore_permissions=True)
-
-    frappe.db.commit()
-
-
 def sync_all_resources():
     """
     Explicitly import all DocType, Report, Workspace, Number Card,
@@ -239,7 +224,6 @@ def sync_all_resources():
 def _import_json(json_path, label):
     """Safely import a single JSON file as a Frappe document."""
     try:
-        # Skip if the doctype already exists (avoid duplicates)
         with open(json_path, "r") as f:
             doc_data = json.load(f)
 
@@ -247,13 +231,15 @@ def _import_json(json_path, label):
         doc_name = doc_data.get("name", "")
 
         if doctype_name and doc_name:
-            if frappe.db.exists(doctype_name, doc_name):
-                return  # Already exists, skip
+            # For workspaces, always re-import (may have been created bare)
+            # For other doctypes, skip if already exists
+            if doctype_name != "Workspace" and frappe.db.exists(doctype_name, doc_name):
+                return
 
         import_file_by_path(json_path, force=True)
         frappe.db.commit()
     except Exception as e:
-        frappe.logger().debug(
+        frappe.logger().warning(
             f"HR Master: Skipped importing {json_path} - {str(e)}"
         )
 
