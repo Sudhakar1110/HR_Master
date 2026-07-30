@@ -1,0 +1,32 @@
+{
+ "attach_print": 0,
+ "channel": "System Notification",
+ "creation": "2026-01-01 00:00:00",
+ "date_changed": "evaluation_date",
+ "days_in_advance": 0,
+ "docstatus": 0,
+ "doctype": "Notification",
+ "document_type": "Candidate Ranking",
+ "enabled": 1,
+ "event": "Value Change",
+ "is_standard": 1,
+ "message": "<h3>Candidate Shortlisted</h3>\n<p>Dear {{ doc.owner }},</p>\n<p>Candidate <strong>{{ doc.candidate_name }}</strong> has been shortlisted for the position of <strong>{{ doc.job_title }}</strong>.</p>\n<p><strong>Match Score:</strong> {{ doc.total_match_score }}%</p>\n<p><strong>Recommendation:</strong> {{ doc.recommendation }}</p>\n<br>\n<p>Please proceed with the interview scheduling process.</p>\n<p>View Ranking: <a href=\"/app/candidate-ranking/{{ doc.name }}\">{{ doc.name }}</a></p>",
+ "method": "",
+ "modified": "2026-01-01 00:00:00",
+ "modified_by": "Administrator",
+ "module": "HR Master",
+ "name": "Candidate Shortlisted",
+ "name_field": "candidate_name",
+ "owner": "Administrator",
+ "recipients": [
+  {
+   "receiver_by_document_field": "owner"
+  }
+ ],
+ "sender": "HR Master System",
+ "send_system_notification": 1,
+ "send_to_all_assignees": 0,
+ "subject": "Candidate Shortlisted: {{ doc.candidate_name }} for {{ doc.job_title }}",
+ "value_changed": "status",
+ "condition": "doc.status == \"Shortlisted\""
+}

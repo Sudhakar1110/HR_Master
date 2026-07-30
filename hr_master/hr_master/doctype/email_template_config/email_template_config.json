@@ -1,0 +1,37 @@
+{
+ "actions": [],
+ "autoname": "field:template_name",
+ "creation": "2026-01-01 00:00:00",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": ["sb_details", "template_name", "template_type", "subject", "column_break_4", "is_active", "use_html", "sb_content", "message_html", "message_text", "sb_placeholders", "available_placeholders"],
+ "fields": [
+  {"fieldname":"sb_details","fieldtype":"Section Break","label":"Template Details"},
+  {"fieldname":"template_name","fieldtype":"Data","in_list_view":1,"label":"Template Name","reqd":1,"unique":1},
+  {"fieldname":"template_type","fieldtype":"Select","in_list_view":1,"label":"Template Type","options":"\nInterview Invitation\nOffer Letter\nRejection\nShortlist Notification\nWelcome Email\nFeedback Request\nCustom","reqd":1},
+  {"fieldname":"subject","fieldtype":"Data","label":"Email Subject","reqd":1},
+  {"fieldname":"column_break_4","fieldtype":"Column Break"},
+  {"default":"1","fieldname":"is_active","fieldtype":"Check","label":"Is Active"},
+  {"default":"1","fieldname":"use_html","fieldtype":"Check","label":"Use HTML"},
+  {"fieldname":"sb_content","fieldtype":"Section Break","label":"Email Content"},
+  {"fieldname":"message_html","fieldtype":"Text Editor","label":"HTML Message"},
+  {"fieldname":"message_text","fieldtype":"Long Text","label":"Plain Text Message"},
+  {"fieldname":"sb_placeholders","fieldtype":"Section Break","label":"Available Placeholders"},
+  {"fieldname":"available_placeholders","fieldtype":"Small Text","label":"Available Placeholders","read_only":1,"default":"{{ candidate_name }}, {{ job_title }}, {{ company_name }}, {{ interviewer_name }}, {{ scheduled_date }}, {{ scheduled_time }}, {{ interview_link }}, {{ recruiter_name }}, {{ offer_link }}"}
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-01-01 00:00:00",
+ "modified_by": "Administrator",
+ "module": "HR Master",
+ "name": "Email Template Config",
+ "owner": "Administrator",
+ "permissions": [
+  {"create":1,"delete":1,"email":1,"export":1,"print":1,"read":1,"report":1,"role":"HR Master Admin","share":1,"write":1},
+  {"create":1,"delete":0,"email":1,"export":1,"print":1,"read":1,"report":1,"role":"HR Master Recruiter","share":1,"write":1},
+  {"create":0,"delete":0,"email":1,"export":0,"print":1,"read":1,"report":1,"role":"HR Master Viewer","share":0,"write":0}
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

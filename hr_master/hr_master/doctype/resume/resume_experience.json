@@ -1,0 +1,27 @@
+{
+ "actions": [],
+ "creation": "2026-01-01 00:00:00",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": ["company", "title", "from_date", "to_date", "is_current", "description", "location"],
+ "fields": [
+  {"fieldname":"company","fieldtype":"Data","in_list_view":1,"label":"Company","reqd":1},
+  {"fieldname":"title","fieldtype":"Data","in_list_view":1,"label":"Title","reqd":1},
+  {"fieldname":"from_date","fieldtype":"Date","in_list_view":1,"label":"From Date"},
+  {"fieldname":"to_date","fieldtype":"Date","in_list_view":1,"label":"To Date"},
+  {"default":"0","fieldname":"is_current","fieldtype":"Check","in_list_view":1,"label":"Current"},
+  {"fieldname":"description","fieldtype":"Small Text","label":"Description"},
+  {"fieldname":"location","fieldtype":"Data","label":"Location"}
+ ],
+ "istable": 1,
+ "links": [],
+ "modified": "2026-01-01 00:00:00",
+ "modified_by": "Administrator",
+ "module": "HR Master",
+ "name": "Resume Experience",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}

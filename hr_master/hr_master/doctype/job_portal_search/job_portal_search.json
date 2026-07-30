@@ -1,0 +1,244 @@
+{
+ "actions": [],
+ "autoname": "format:JPS-{YYYY}-{#####}",
+ "creation": "2026-01-01 00:00:00",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "sb_details",
+  "job_description",
+  "job_title",
+  "search_keywords",
+  "column_break_4",
+  "status",
+  "search_date",
+  "total_candidates_found",
+  "sb_portals",
+  "search_linkedin",
+  "search_naukri",
+  "search_indeed",
+  "search_monster",
+  "column_break_9",
+  "linkedin_results",
+  "naukri_results",
+  "indeed_results",
+  "monster_results",
+  "sb_results",
+  "search_results",
+  "sb_errors",
+  "error_log"
+ ],
+ "fields": [
+  {
+   "fieldname": "sb_details",
+   "fieldtype": "Section Break",
+   "label": "Search Details"
+  },
+  {
+   "fieldname": "job_description",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Job Description",
+   "options": "Job Description",
+   "reqd": 1
+  },
+  {
+   "fetch_from": "job_description.job_title",
+   "fieldname": "job_title",
+   "fieldtype": "Data",
+   "label": "Job Title",
+   "read_only": 1
+  },
+  {
+   "fieldname": "search_keywords",
+   "fieldtype": "Small Text",
+   "label": "Search Keywords"
+  },
+  {
+   "fieldname": "column_break_4",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "Queued",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Status",
+   "options": "Queued\nIn Progress\nCompleted\nPartial\nFailed"
+  },
+  {
+   "default": "Today",
+   "fieldname": "search_date",
+   "fieldtype": "Datetime",
+   "label": "Search Date"
+  },
+  {
+   "fieldname": "total_candidates_found",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Total Candidates Found",
+   "read_only": 1
+  },
+  {
+   "fieldname": "sb_portals",
+   "fieldtype": "Section Break",
+   "label": "Portal Selection"
+  },
+  {
+   "default": "1",
+   "fieldname": "search_linkedin",
+   "fieldtype": "Check",
+   "label": "Search LinkedIn"
+  },
+  {
+   "default": "1",
+   "fieldname": "search_naukri",
+   "fieldtype": "Check",
+   "label": "Search Naukri"
+  },
+  {
+   "default": "0",
+   "fieldname": "search_indeed",
+   "fieldtype": "Check",
+   "label": "Search Indeed"
+  },
+  {
+   "default": "0",
+   "fieldname": "search_monster",
+   "fieldtype": "Check",
+   "label": "Search Monster"
+  },
+  {
+   "fieldname": "column_break_9",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "linkedin_results",
+   "fieldtype": "Int",
+   "label": "LinkedIn Results",
+   "read_only": 1
+  },
+  {
+   "fieldname": "naukri_results",
+   "fieldtype": "Int",
+   "label": "Naukri Results",
+   "read_only": 1
+  },
+  {
+   "fieldname": "indeed_results",
+   "fieldtype": "Int",
+   "label": "Indeed Results",
+   "read_only": 1
+  },
+  {
+   "fieldname": "monster_results",
+   "fieldtype": "Int",
+   "label": "Monster Results",
+   "read_only": 1
+  },
+  {
+   "fieldname": "sb_results",
+   "fieldtype": "Section Break",
+   "label": "Search Results"
+  },
+  {
+   "fieldname": "search_results",
+   "fieldtype": "Table",
+   "label": "Search Results",
+   "options": "Portal Search Result"
+  },
+  {
+   "fieldname": "sb_errors",
+   "fieldtype": "Section Break",
+   "label": "Errors"
+  },
+  {
+   "fieldname": "error_log",
+   "fieldtype": "Small Text",
+   "label": "Error Log",
+   "read_only": 1
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-01-01 00:00:00",
+ "modified_by": "Administrator",
+ "module": "HR Master",
+ "name": "Job Portal Search",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "HR Master Admin",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 0,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "HR Master Recruiter",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 0,
+   "delete": 0,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "HR Master Hiring Manager",
+   "share": 0,
+   "write": 0
+  },
+  {
+   "create": 0,
+   "delete": 0,
+   "email": 1,
+   "export": 0,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "HR Master Viewer",
+   "share": 0,
+   "write": 0
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [
+  {
+   "color": "Gray",
+   "title": "Queued"
+  },
+  {
+   "color": "Blue",
+   "title": "In Progress"
+  },
+  {
+   "color": "Green",
+   "title": "Completed"
+  },
+  {
+   "color": "Orange",
+   "title": "Partial"
+  },
+  {
+   "color": "Red",
+   "title": "Failed"
+  }
+ ],
+ "track_changes": 1
+}

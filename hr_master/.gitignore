@@ -1,0 +1,36 @@
+# Python
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+__pycache__/
+*.egg
+
+# Environment
+.env
+.venv
+venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Frappe
+sites/
+node_modules/
+*.less.css
+*.css.map
+
+# Misc
+*.log
+*.bak
+.git~

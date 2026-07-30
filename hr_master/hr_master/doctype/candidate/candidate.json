@@ -1,0 +1,331 @@
+{
+ "actions": [],
+ "autoname": "format:CAN-{YYYY}-{#####}",
+ "creation": "2026-01-01 00:00:00",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "sb_personal",
+  "candidate_name",
+  "email",
+  "phone",
+  "column_break_4",
+  "current_company",
+  "current_title",
+  "total_experience_years",
+  "sb_skills",
+  "skills_section",
+  "candidate_skills",
+  "column_break_9",
+  "languages",
+  "certifications",
+  "sb_education",
+  "highest_education",
+  "field_of_study",
+  "column_break_13",
+  "college",
+  "graduation_year",
+  "sb_source",
+  "source",
+  "source_url",
+  "column_break_17",
+  "linkedin_url",
+  "naukri_url",
+  "other_portal_url",
+  "sb_resume",
+  "resume_attachment",
+  "resume_text",
+  "column_break_22",
+  "parsed_skills_from_resume",
+  "sb_status",
+  "status",
+  "column_break_25",
+  "blacklisted",
+  "notes",
+  "sb_section_break_28",
+  "total_match_score",
+  "last_ranked_date"
+ ],
+ "fields": [
+  {
+   "fieldname": "sb_personal",
+   "fieldtype": "Section Break",
+   "label": "Personal Information"
+  },
+  {
+   "fieldname": "candidate_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Candidate Name",
+   "reqd": 1
+  },
+  {
+   "fieldname": "email",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Email",
+   "options": "Email"
+  },
+  {
+   "fieldname": "phone",
+   "fieldtype": "Data",
+   "label": "Phone"
+  },
+  {
+   "fieldname": "column_break_4",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "current_company",
+   "fieldtype": "Data",
+   "label": "Current Company"
+  },
+  {
+   "fieldname": "current_title",
+   "fieldtype": "Data",
+   "label": "Current Title"
+  },
+  {
+   "fieldname": "total_experience_years",
+   "fieldtype": "Float",
+   "label": "Total Experience (Years)"
+  },
+  {
+   "fieldname": "sb_skills",
+   "fieldtype": "Section Break",
+   "label": "Skills & Competencies"
+  },
+  {
+   "fieldname": "skills_section",
+   "fieldtype": "Heading",
+   "label": "Skills"
+  },
+  {
+   "fieldname": "candidate_skills",
+   "fieldtype": "Table MultiSelect",
+   "label": "Candidate Skills",
+   "options": "Candidate Skill Detail"
+  },
+  {
+   "fieldname": "column_break_9",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "languages",
+   "fieldtype": "Small Text",
+   "label": "Languages"
+  },
+  {
+   "fieldname": "certifications",
+   "fieldtype": "Small Text",
+   "label": "Certifications"
+  },
+  {
+   "fieldname": "sb_education",
+   "fieldtype": "Section Break",
+   "label": "Education"
+  },
+  {
+   "fieldname": "highest_education",
+   "fieldtype": "Select",
+   "label": "Highest Education",
+   "options": "\nHigh School\nDiploma\nBachelor's\nMaster's\nPhD\nMBA\nOther"
+  },
+  {
+   "fieldname": "field_of_study",
+   "fieldtype": "Data",
+   "label": "Field of Study"
+  },
+  {
+   "fieldname": "column_break_13",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "college",
+   "fieldtype": "Data",
+   "label": "College/University"
+  },
+  {
+   "fieldname": "graduation_year",
+   "fieldtype": "Int",
+   "label": "Graduation Year"
+  },
+  {
+   "fieldname": "sb_source",
+   "fieldtype": "Section Break",
+   "label": "Source"
+  },
+  {
+   "fieldname": "source",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Source",
+   "options": "\nLinkedIn\nNaukri\nIndeed\nMonster\nInternal Referral\nDirect Apply\nOther"
+  },
+  {
+   "fieldname": "source_url",
+   "fieldtype": "Small Text",
+   "label": "Source URL"
+  },
+  {
+   "fieldname": "column_break_17",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "linkedin_url",
+   "fieldtype": "Data",
+   "label": "LinkedIn URL"
+  },
+  {
+   "fieldname": "naukri_url",
+   "fieldtype": "Data",
+   "label": "Naukri URL"
+  },
+  {
+   "fieldname": "other_portal_url",
+   "fieldtype": "Data",
+   "label": "Other Portal URL"
+  },
+  {
+   "fieldname": "sb_resume",
+   "fieldtype": "Section Break",
+   "label": "Resume"
+  },
+  {
+   "fieldname": "resume_attachment",
+   "fieldtype": "Attach",
+   "label": "Resume Attachment"
+  },
+  {
+   "fieldname": "resume_text",
+   "fieldtype": "Text",
+   "label": "Resume Text",
+   "description": "Parsed text from resume for analysis"
+  },
+  {
+   "fieldname": "column_break_22",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "parsed_skills_from_resume",
+   "fieldtype": "Small Text",
+   "label": "Parsed Skills from Resume",
+   "read_only": 1
+  },
+  {
+   "fieldname": "sb_status",
+   "fieldtype": "Section Break",
+   "label": "Status"
+  },
+  {
+   "default": "New",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Status",
+   "options": "New\nContacted\nScreened\nShortlisted\nInterview Scheduled\nInterviewed\nSelected\nRejected\nOn Hold\nBlacklisted"
+  },
+  {
+   "fieldname": "column_break_25",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "blacklisted",
+   "fieldtype": "Check",
+   "label": "Blacklisted"
+  },
+  {
+   "fieldname": "notes",
+   "fieldtype": "Small Text",
+   "label": "Notes"
+  },
+  {
+   "fieldname": "sb_section_break_28",
+   "fieldtype": "Section Break",
+   "label": "Ranking"
+  },
+  {
+   "fieldname": "total_match_score",
+   "fieldtype": "Percent",
+   "label": "Total Match Score",
+   "read_only": 1
+  },
+  {
+   "fieldname": "last_ranked_date",
+   "fieldtype": "Datetime",
+   "label": "Last Ranked Date",
+   "read_only": 1
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [
+  {
+   "link_doctype": "Candidate Ranking",
+   "link_fieldname": "candidate"
+  },
+  {
+   "link_doctype": "Interview Schedule",
+   "link_fieldname": "candidate"
+  }
+ ],
+ "modified": "2026-01-01 00:00:00",
+ "modified_by": "Administrator",
+ "module": "HR Master",
+ "name": "Candidate",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "HR Master Admin",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "HR Master Recruiter",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 0,
+   "delete": 0,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "HR Master Hiring Manager",
+   "share": 0,
+   "write": 0
+  },
+  {
+   "create": 0,
+   "delete": 0,
+   "email": 1,
+   "export": 0,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "HR Master Viewer",
+   "share": 0,
+   "write": 0
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

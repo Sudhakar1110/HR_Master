@@ -1,0 +1,311 @@
+{
+ "actions": [],
+ "creation": "2026-01-01 00:00:00",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "sb_general",
+  "auto_search_enabled",
+  "auto_shortlist_threshold",
+  "max_candidates_per_search",
+  "column_break_4",
+  "default_country",
+  "search_delay_seconds",
+  "sb_linkedin",
+  "linkedin_enabled",
+  "linkedin_api_key",
+  "linkedin_api_secret",
+  "linkedin_access_token",
+  "column_break_9",
+  "linkedin_search_limit",
+  "linkedin_company_ids",
+  "sb_naukri",
+  "naukri_enabled",
+  "naukri_api_key",
+  "naukri_api_secret",
+  "column_break_15",
+  "naukri_search_limit",
+  "naukri_company_ids",
+  "sb_indeed",
+  "indeed_enabled",
+  "indeed_publisher_id",
+  "indeed_api_key",
+  "column_break_21",
+  "indeed_search_limit",
+  "sb_monster",
+  "monster_enabled",
+  "monster_api_key",
+  "column_break_26",
+  "monster_search_limit",
+  "sb_notifications",
+  "notify_on_high_match",
+  "notify_on_search_complete",
+  "notification_recipients",
+  "column_break_31",
+  "email_notifications",
+  "desktop_notifications"
+ ],
+ "fields": [
+  {
+   "fieldname": "sb_general",
+   "fieldtype": "Section Break",
+   "label": "General Settings"
+  },
+  {
+   "default": "0",
+   "fieldname": "auto_search_enabled",
+   "fieldtype": "Check",
+   "label": "Enable Auto Search on JD Submission"
+  },
+  {
+   "default": "80",
+   "fieldname": "auto_shortlist_threshold",
+   "fieldtype": "Percent",
+   "label": "Auto Shortlist Threshold (%)"
+  },
+  {
+   "default": "50",
+   "fieldname": "max_candidates_per_search",
+   "fieldtype": "Int",
+   "label": "Max Candidates Per Search"
+  },
+  {
+   "fieldname": "column_break_4",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "default_country",
+   "fieldtype": "Data",
+   "label": "Default Country"
+  },
+  {
+   "default": "2",
+   "fieldname": "search_delay_seconds",
+   "fieldtype": "Int",
+   "label": "Search Delay (Seconds)"
+  },
+  {
+   "fieldname": "sb_linkedin",
+   "fieldtype": "Section Break",
+   "label": "LinkedIn Configuration"
+  },
+  {
+   "default": "0",
+   "fieldname": "linkedin_enabled",
+   "fieldtype": "Check",
+   "label": "Enable LinkedIn Search"
+  },
+  {
+   "fieldname": "linkedin_api_key",
+   "fieldtype": "Data",
+   "label": "LinkedIn API Key"
+  },
+  {
+   "fieldname": "linkedin_api_secret",
+   "fieldtype": "Password",
+   "label": "LinkedIn API Secret"
+  },
+  {
+   "fieldname": "linkedin_access_token",
+   "fieldtype": "Password",
+   "label": "LinkedIn Access Token"
+  },
+  {
+   "fieldname": "column_break_9",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "25",
+   "fieldname": "linkedin_search_limit",
+   "fieldtype": "Int",
+   "label": "LinkedIn Search Limit"
+  },
+  {
+   "fieldname": "linkedin_company_ids",
+   "fieldtype": "Small Text",
+   "label": "LinkedIn Company IDs (comma-separated)"
+  },
+  {
+   "fieldname": "sb_naukri",
+   "fieldtype": "Section Break",
+   "label": "Naukri Configuration"
+  },
+  {
+   "default": "0",
+   "fieldname": "naukri_enabled",
+   "fieldtype": "Check",
+   "label": "Enable Naukri Search"
+  },
+  {
+   "fieldname": "naukri_api_key",
+   "fieldtype": "Password",
+   "label": "Naukri API Key"
+  },
+  {
+   "fieldname": "naukri_api_secret",
+   "fieldtype": "Password",
+   "label": "Naukri API Secret"
+  },
+  {
+   "fieldname": "column_break_15",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "25",
+   "fieldname": "naukri_search_limit",
+   "fieldtype": "Int",
+   "label": "Naukri Search Limit"
+  },
+  {
+   "fieldname": "naukri_company_ids",
+   "fieldtype": "Small Text",
+   "label": "Naukri Company IDs"
+  },
+  {
+   "fieldname": "sb_indeed",
+   "fieldtype": "Section Break",
+   "label": "Indeed Configuration"
+  },
+  {
+   "default": "0",
+   "fieldname": "indeed_enabled",
+   "fieldtype": "Check",
+   "label": "Enable Indeed Search"
+  },
+  {
+   "fieldname": "indeed_publisher_id",
+   "fieldtype": "Data",
+   "label": "Indeed Publisher ID"
+  },
+  {
+   "fieldname": "indeed_api_key",
+   "fieldtype": "Password",
+   "label": "Indeed API Key"
+  },
+  {
+   "fieldname": "column_break_21",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "25",
+   "fieldname": "indeed_search_limit",
+   "fieldtype": "Int",
+   "label": "Indeed Search Limit"
+  },
+  {
+   "fieldname": "sb_monster",
+   "fieldtype": "Section Break",
+   "label": "Monster Configuration"
+  },
+  {
+   "default": "0",
+   "fieldname": "monster_enabled",
+   "fieldtype": "Check",
+   "label": "Enable Monster Search"
+  },
+  {
+   "fieldname": "monster_api_key",
+   "fieldtype": "Password",
+   "label": "Monster API Key"
+  },
+  {
+   "fieldname": "column_break_26",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "25",
+   "fieldname": "monster_search_limit",
+   "fieldtype": "Int",
+   "label": "Monster Search Limit"
+  },
+  {
+   "fieldname": "sb_notifications",
+   "fieldtype": "Section Break",
+   "label": "Notification Settings"
+  },
+  {
+   "default": "1",
+   "fieldname": "notify_on_high_match",
+   "fieldtype": "Check",
+   "label": "Notify on High Match Candidates"
+  },
+  {
+   "default": "0",
+   "fieldname": "notify_on_search_complete",
+   "fieldtype": "Check",
+   "label": "Notify on Search Complete"
+  },
+  {
+   "fieldname": "notification_recipients",
+   "fieldtype": "Table MultiSelect",
+   "label": "Notification Recipients",
+   "options": "Portal Notification Recipient"
+  },
+  {
+   "fieldname": "column_break_31",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "1",
+   "fieldname": "email_notifications",
+   "fieldtype": "Check",
+   "label": "Enable Email Notifications"
+  },
+  {
+   "default": "1",
+   "fieldname": "desktop_notifications",
+   "fieldtype": "Check",
+   "label": "Enable Desktop Notifications"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "issingle": 1,
+ "links": [],
+ "modified": "2026-01-01 00:00:00",
+ "modified_by": "Administrator",
+ "module": "HR Master",
+ "name": "Job Portal Config",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "HR Master Admin",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 0,
+   "delete": 0,
+   "email": 1,
+   "export": 0,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "HR Master Recruiter",
+   "share": 0,
+   "write": 0
+  },
+  {
+   "create": 0,
+   "delete": 0,
+   "email": 1,
+   "export": 0,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "HR Master Viewer",
+   "share": 0,
+   "write": 0
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

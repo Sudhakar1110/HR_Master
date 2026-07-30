@@ -1,0 +1,41 @@
+{
+ "actions": [],
+ "autoname": "format:CAL-{YYYY}{MM}{DD}-{#####}",
+ "creation": "2026-01-01 00:00:00",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": ["sb_details", "candidate", "candidate_name", "activity_type", "column_break_4", "activity_date", "activity_time", "user", "sb_description", "description", "column_break_8", "reference_doctype", "reference_name", "notes"],
+ "fields": [
+  {"fieldname":"sb_details","fieldtype":"Section Break","label":"Activity Details"},
+  {"fieldname":"candidate","fieldtype":"Link","in_list_view":1,"label":"Candidate","options":"Candidate","reqd":1},
+  {"fetch_from":"candidate.candidate_name","fieldname":"candidate_name","fieldtype":"Data","label":"Candidate Name","read_only":1},
+  {"fieldname":"activity_type","fieldtype":"Select","in_list_view":1,"label":"Activity Type","options":"\nCreated\nContacted\nScreened\nShortlisted\nInterview Scheduled\nInterview Completed\nFeedback Submitted\nOffer Made\nOffer Accepted\nOffer Rejected\nHired\nRejected\nRank Updated\nResume Uploaded\nStatus Changed\nNote Added\nEmail Sent\nOther","reqd":1},
+  {"fieldname":"column_break_4","fieldtype":"Column Break"},
+  {"fieldname":"activity_date","fieldtype":"Date","in_list_view":1,"label":"Activity Date","reqd":1},
+  {"fieldname":"activity_time","fieldtype":"Time","label":"Activity Time"},
+  {"fieldname":"user","fieldtype":"Link","label":"User","options":"User"},
+  {"fieldname":"sb_description","fieldtype":"Section Break","label":"Description"},
+  {"fieldname":"description","fieldtype":"Small Text","label":"Description","reqd":1},
+  {"fieldname":"column_break_8","fieldtype":"Column Break"},
+  {"fieldname":"reference_doctype","fieldtype":"Link","label":"Reference DocType","options":"DocType"},
+  {"fieldname":"reference_name","fieldtype":"Dynamic Link","label":"Reference Name","options":"reference_doctype"},
+  {"fieldname":"notes","fieldtype":"Small Text","label":"Notes"}
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-01-01 00:00:00",
+ "modified_by": "Administrator",
+ "module": "HR Master",
+ "name": "Candidate Activity Log",
+ "owner": "Administrator",
+ "permissions": [
+  {"create":1,"delete":1,"email":1,"export":1,"print":1,"read":1,"report":1,"role":"HR Master Admin","share":1,"write":1},
+  {"create":1,"delete":0,"email":1,"export":1,"print":1,"read":1,"report":1,"role":"HR Master Recruiter","share":1,"write":1},
+  {"create":0,"delete":0,"email":1,"export":1,"print":1,"read":1,"report":1,"role":"HR Master Hiring Manager","share":0,"write":0},
+  {"create":0,"delete":0,"email":1,"export":0,"print":1,"read":1,"report":1,"role":"HR Master Viewer","share":0,"write":0}
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1,
+ "track_views": 1
+}

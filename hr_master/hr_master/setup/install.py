@@ -1,0 +1,241 @@
+"""Installation setup for HR Master - creates seed data and initial configuration"""
+
+from __future__ import unicode_literals
+
+import frappe
+from frappe import _
+
+
+def after_install():
+    """Run after app installation."""
+    create_seed_data()
+    create_default_workspace()
+    set_default_config()
+
+
+def after_migrate():
+    """Run after database migration."""
+    create_seed_data()
+
+
+def create_seed_data():
+    """Create initial seed data for the app."""
+    create_roles()
+    create_departments()
+    create_skills()
+
+
+def create_roles():
+    """Create HR Master roles if they don't exist."""
+    roles = [
+        {
+            "role_name": "HR Master Admin",
+            "desk_access": 1,
+            "role_type": "System",
+        },
+        {
+            "role_name": "HR Master Recruiter",
+            "desk_access": 1,
+            "role_type": "System",
+        },
+        {
+            "role_name": "HR Master Hiring Manager",
+            "desk_access": 1,
+            "role_type": "System",
+        },
+        {
+            "role_name": "HR Master Viewer",
+            "desk_access": 1,
+            "role_type": "System",
+        },
+    ]
+
+    for role_data in roles:
+        if not frappe.db.exists("Role", role_data["role_name"]):
+            role = frappe.new_doc("Role")
+            role.update(role_data)
+            role.save(ignore_permissions=True)
+
+    frappe.db.commit()
+
+
+def create_departments():
+    """Create common departments if they don't exist."""
+    departments = [
+        "Engineering",
+        "Product",
+        "Design",
+        "Marketing",
+        "Sales",
+        "Human Resources",
+        "Finance",
+        "Operations",
+        "Legal",
+        "Customer Support",
+    ]
+
+    for dept_name in departments:
+        if not frappe.db.exists("Department", dept_name):
+            dept = frappe.new_doc("Department")
+            dept.department_name = dept_name
+            dept.is_active = 1
+            dept.save(ignore_permissions=True)
+
+    frappe.db.commit()
+
+
+def create_skills():
+    """Create common skills if they don't exist."""
+    skills = [
+        # Programming Languages
+        ("Python", "Programming Language"),
+        ("JavaScript", "Programming Language"),
+        ("TypeScript", "Programming Language"),
+        ("Java", "Programming Language"),
+        ("C++", "Programming Language"),
+        ("Go", "Programming Language"),
+        ("Rust", "Programming Language"),
+        ("Ruby", "Programming Language"),
+        ("PHP", "Programming Language"),
+        ("SQL", "Programming Language"),
+        # Frameworks
+        ("React", "Framework"),
+        ("Angular", "Framework"),
+        ("Vue.js", "Framework"),
+        ("Django", "Framework"),
+        ("Flask", "Framework"),
+        ("Node.js", "Framework"),
+        ("Express.js", "Framework"),
+        ("Spring Boot", "Framework"),
+        (".NET", "Framework"),
+        ("Frappe Framework", "Framework"),
+        # Databases
+        ("PostgreSQL", "Database"),
+        ("MySQL", "Database"),
+        ("MongoDB", "Database"),
+        ("Redis", "Database"),
+        ("Elasticsearch", "Database"),
+        # Cloud & DevOps
+        ("AWS", "Cloud"),
+        ("Azure", "Cloud"),
+        ("GCP", "Cloud"),
+        ("Docker", "DevOps"),
+        ("Kubernetes", "DevOps"),
+        ("CI/CD", "DevOps"),
+        ("Terraform", "DevOps"),
+        # Soft Skills
+        ("Leadership", "Soft Skill"),
+        ("Communication", "Soft Skill"),
+        ("Project Management", "Soft Skill"),
+        ("Team Management", "Soft Skill"),
+        # Tools
+        ("Git", "Tool"),
+        ("Jira", "Tool"),
+        ("Confluence", "Tool"),
+        ("Figma", "Tool"),
+        # Domain Knowledge
+        ("Machine Learning", "Domain Knowledge"),
+        ("Data Science", "Domain Knowledge"),
+        ("Cybersecurity", "Domain Knowledge"),
+        ("Blockchain", "Domain Knowledge"),
+    ]
+
+    for skill_name, category in skills:
+        if not frappe.db.exists("Skill", skill_name):
+            skill = frappe.new_doc("Skill")
+            skill.skill_name = skill_name
+            skill.category = category
+            skill.is_active = 1
+            skill.save(ignore_permissions=True)
+
+    frappe.db.commit()
+
+
+def create_default_workspace():
+    """Ensure default workspace is created."""
+    if not frappe.db.exists("Workspace", "HR Master"):
+        workspace = frappe.new_doc("Workspace")
+        workspace.label = "HR Master"
+        workspace.module = "HR Master"
+        workspace.icon = "hr"
+        workspace.indicator_color = "blue"
+        workspace.public = 1
+        workspace.save(ignore_permissions=True)
+
+    frappe.db.commit()
+
+
+def set_default_config():
+    """Set default configuration values."""
+    config = frappe.get_single("Job Portal Config")
+    if not config.get("__onload"):
+        config.auto_search_enabled = 0
+        config.auto_shortlist_threshold = 80
+        config.max_candidates_per_search = 50
+        config.search_delay_seconds = 2
+        config.default_country = "India"
+        config.notify_on_high_match = 1
+        config.notify_on_search_complete = 0
+        config.email_notifications = 1
+        config.desktop_notifications = 1
+        config.save(ignore_permissions=True)
+
+    frappe.db.commit()
+
+    # Set default Recruitment Settings
+    rs = frappe.get_single("Recruitment Settings")
+    if not rs.get("__onload"):
+        rs.auto_parse_resumes = 1
+        rs.max_resume_size_kb = 10240
+        rs.allowed_file_types = "pdf,docx,txt"
+        rs.enable_duplicate_detection = 1
+        rs.duplicate_threshold = 85
+        rs.notify_on_new_candidate = 1
+        rs.notify_on_offer_acceptance = 1
+        rs.daily_digest_enabled = 1
+        rs.weekly_report_enabled = 1
+        rs.enable_audit_logging = 1
+        rs.enable_rate_limiting = 0
+        rs.max_api_requests_per_minute = 60
+        rs.session_timeout_minutes = 60
+        rs.require_approval_for_offers = 1
+        rs.save(ignore_permissions=True)
+
+    frappe.db.commit()
+
+    # Create default Email Templates
+    create_default_email_templates()
+
+
+def create_default_email_templates():
+    """Create default email templates if they don't exist."""
+    templates = [
+        {
+            "template_name": "Interview Invitation",
+            "template_type": "Interview Invitation",
+            "subject": "Interview Invitation - {{ job_title }} at {{ company_name }}",
+            "message_html": "<h3>Dear {{ candidate_name }},</h3><p>We are pleased to invite you for an interview for the position of <strong>{{ job_title }}</strong>.</p><p><strong>Date:</strong> {{ scheduled_date }}<br><strong>Time:</strong> {{ scheduled_time }}<br><strong>Mode:</strong> {{ interview_link }}</p><p>Best regards,<br>{{ recruiter_name }}</p>",
+        },
+        {
+            "template_name": "Offer Letter",
+            "template_type": "Offer Letter",
+            "subject": "Offer of Employment - {{ job_title }} at {{ company_name }}",
+            "message_html": "<h3>Dear {{ candidate_name }},</h3><p>Congratulations! We are pleased to offer you the position of <strong>{{ job_title }}</strong>.</p><p>Please find the offer letter attached. Kindly review and respond at your earliest convenience.</p><p>Best regards,<br>{{ recruiter_name }}</p>",
+        },
+        {
+            "template_name": "Candidate Rejection",
+            "template_type": "Custom",
+            "subject": "Update on your application for {{ job_title }}",
+            "message_html": "<h3>Dear {{ candidate_name }},</h3><p>Thank you for your interest in the <strong>{{ job_title }}</strong> position.</p><p>After careful consideration, we have decided to move forward with other candidates. We wish you the best in your job search.</p><p>Best regards,<br>{{ recruiter_name }}</p>",
+        },
+    ]
+
+    for tpl in templates:
+        if not frappe.db.exists("Email Template Config", tpl["template_name"]):
+            doc = frappe.new_doc("Email Template Config")
+            doc.update(tpl)
+            doc.is_active = 1
+            doc.use_html = 1
+            doc.save(ignore_permissions=True)
+
+    frappe.db.commit()

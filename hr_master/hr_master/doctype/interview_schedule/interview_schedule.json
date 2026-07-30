@@ -1,0 +1,292 @@
+{
+ "actions": [],
+ "autoname": "format:INT-{YYYY}-{#####}",
+ "creation": "2026-01-01 00:00:00",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "sb_details",
+  "candidate",
+  "candidate_name",
+  "job_description",
+  "job_title",
+  "column_break_5",
+  "status",
+  "scheduled_date",
+  "scheduled_time",
+  "duration_minutes",
+  "sb_interviewers",
+  "interviewers",
+  "column_break_10",
+  "interview_round",
+  "interview_type",
+  "sb_details_section",
+  "mode_of_interview",
+  "location_or_link",
+  "column_break_15",
+  "feedback_required",
+  "send_calendar_invite",
+  "sb_feedback",
+  "feedback",
+  "rating",
+  "column_break_19",
+  "result",
+  "remarks",
+  "sb_notes",
+  "notes"
+ ],
+ "fields": [
+  {
+   "fieldname": "sb_details",
+   "fieldtype": "Section Break",
+   "label": "Interview Details"
+  },
+  {
+   "fieldname": "candidate",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Candidate",
+   "options": "Candidate",
+   "reqd": 1
+  },
+  {
+   "fetch_from": "candidate.candidate_name",
+   "fieldname": "candidate_name",
+   "fieldtype": "Data",
+   "label": "Candidate Name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "job_description",
+   "fieldtype": "Link",
+   "label": "Job Description",
+   "options": "Job Description"
+  },
+  {
+   "fetch_from": "job_description.job_title",
+   "fieldname": "job_title",
+   "fieldtype": "Data",
+   "label": "Job Title",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_5",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "Scheduled",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Status",
+   "options": "Scheduled\nRescheduled\nIn Progress\nCompleted\nCancelled\nNo Show"
+  },
+  {
+   "fieldname": "scheduled_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Scheduled Date",
+   "reqd": 1
+  },
+  {
+   "fieldname": "scheduled_time",
+   "fieldtype": "Time",
+   "label": "Scheduled Time",
+   "reqd": 1
+  },
+  {
+   "default": "60",
+   "fieldname": "duration_minutes",
+   "fieldtype": "Int",
+   "label": "Duration (Minutes)"
+  },
+  {
+   "fieldname": "sb_interviewers",
+   "fieldtype": "Section Break",
+   "label": "Interviewers"
+  },
+  {
+   "fieldname": "interviewers",
+   "fieldtype": "Table MultiSelect",
+   "label": "Interviewers",
+   "options": "Interviewer Detail"
+  },
+  {
+   "fieldname": "column_break_10",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "Round 1",
+   "fieldname": "interview_round",
+   "fieldtype": "Select",
+   "label": "Interview Round",
+   "options": "Round 1\nRound 2\nRound 3\nHR Round\nTechnical Round\nManagerial Round\nFinal Round"
+  },
+  {
+   "default": "Technical",
+   "fieldname": "interview_type",
+   "fieldtype": "Select",
+   "label": "Interview Type",
+   "options": "Technical\nHR\nManagerial\nCultural\nCase Study\nPresentation"
+  },
+  {
+   "fieldname": "sb_details_section",
+   "fieldtype": "Section Break",
+   "label": "Logistics"
+  },
+  {
+   "default": "Video Call",
+   "fieldname": "mode_of_interview",
+   "fieldtype": "Select",
+   "label": "Mode of Interview",
+   "options": "In-Person\nVideo Call\nPhone Call"
+  },
+  {
+   "fieldname": "location_or_link",
+   "fieldtype": "Small Text",
+   "label": "Location / Video Link"
+  },
+  {
+   "fieldname": "column_break_15",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "1",
+   "fieldname": "feedback_required",
+   "fieldtype": "Check",
+   "label": "Feedback Required"
+  },
+  {
+   "default": "1",
+   "fieldname": "send_calendar_invite",
+   "fieldtype": "Check",
+   "label": "Send Calendar Invite"
+  },
+  {
+   "fieldname": "sb_feedback",
+   "fieldtype": "Section Break",
+   "label": "Feedback"
+  },
+  {
+   "fieldname": "feedback",
+   "fieldtype": "Text Editor",
+   "label": "Feedback"
+  },
+  {
+   "fieldname": "rating",
+   "fieldtype": "Rating",
+   "label": "Rating"
+  },
+  {
+   "fieldname": "column_break_19",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "result",
+   "fieldtype": "Select",
+   "label": "Result",
+   "options": "\nSelected\nRejected\nOn Hold\nAdvanced to Next Round"
+  },
+  {
+   "fieldname": "remarks",
+   "fieldtype": "Small Text",
+   "label": "Remarks"
+  },
+  {
+   "fieldname": "sb_notes",
+   "fieldtype": "Section Break",
+   "label": "Notes"
+  },
+  {
+   "fieldname": "notes",
+   "fieldtype": "Text",
+   "label": "Notes"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-01-01 00:00:00",
+ "modified_by": "Administrator",
+ "module": "HR Master",
+ "name": "Interview Schedule",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "HR Master Admin",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 0,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "HR Master Recruiter",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 0,
+   "delete": 0,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "HR Master Hiring Manager",
+   "share": 0,
+   "write": 0
+  },
+  {
+   "create": 0,
+   "delete": 0,
+   "email": 1,
+   "export": 0,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "HR Master Viewer",
+   "share": 0,
+   "write": 0
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [
+  {
+   "color": "Blue",
+   "title": "Scheduled"
+  },
+  {
+   "color": "Orange",
+   "title": "Rescheduled"
+  },
+  {
+   "color": "Purple",
+   "title": "In Progress"
+  },
+  {
+   "color": "Green",
+   "title": "Completed"
+  },
+  {
+   "color": "Red",
+   "title": "Cancelled"
+  },
+  {
+   "color": "Gray",
+   "title": "No Show"
+  }
+ ],
+ "track_changes": 1
+}

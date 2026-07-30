@@ -1,0 +1,2 @@
+[pre_model_sync]
+hr_master.hr_master.patches.v15_0.create_initial_custom_fields

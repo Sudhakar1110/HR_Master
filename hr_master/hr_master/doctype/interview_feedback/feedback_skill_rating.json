@@ -1,0 +1,23 @@
+{
+ "actions": [],
+ "creation": "2026-01-01 00:00:00",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": ["skill", "rating", "comments"],
+ "fields": [
+  {"fieldname":"skill","fieldtype":"Link","in_list_view":1,"label":"Skill","options":"Skill","reqd":1},
+  {"fieldname":"rating","fieldtype":"Rating","in_list_view":1,"label":"Rating"},
+  {"fieldname":"comments","fieldtype":"Small Text","label":"Comments"}
+ ],
+ "istable": 1,
+ "links": [],
+ "modified": "2026-01-01 00:00:00",
+ "modified_by": "Administrator",
+ "module": "HR Master",
+ "name": "Feedback Skill Rating",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}

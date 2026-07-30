@@ -1,0 +1,32 @@
+[
+ {
+  "doctype": "Custom Field",
+  "dt": "User",
+  "fieldname": "hr_master_section",
+  "label": "HR Master Settings",
+  "fieldtype": "Section Break",
+  "insert_after": "bio",
+  "collapsible": 1,
+  "module": "HR Master"
+ },
+ {
+  "doctype": "Custom Field",
+  "dt": "User",
+  "fieldname": "hr_master_role",
+  "label": "HR Master Role",
+  "fieldtype": "Select",
+  "options": "\nHR Master Admin\nHR Master Recruiter\nHR Master Hiring Manager\nHR Master Viewer",
+  "insert_after": "hr_master_section",
+  "in_standard_filter": 1,
+  "module": "HR Master"
+ },
+ {
+  "doctype": "Custom Field",
+  "dt": "User",
+  "fieldname": "linkedin_profile_url",
+  "label": "LinkedIn Profile URL",
+  "fieldtype": "Data",
+  "insert_after": "hr_master_role",
+  "module": "HR Master"
+ }
+]

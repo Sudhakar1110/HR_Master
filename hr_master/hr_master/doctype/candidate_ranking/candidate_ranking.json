@@ -1,0 +1,258 @@
+{
+ "actions": [],
+ "autoname": "format:CR-{YYYY}-{#####}",
+ "creation": "2026-01-01 00:00:00",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "sb_details",
+  "job_description",
+  "job_title",
+  "candidate",
+  "candidate_name",
+  "column_break_5",
+  "total_match_score",
+  "ranking_order",
+  "status",
+  "evaluation_date",
+  "sb_skill_match",
+  "skills_match_details",
+  "column_break_10",
+  "skill_match_summary",
+  "sb_experience",
+  "experience_match_score",
+  "experience_analysis",
+  "column_break_14",
+  "education_match_score",
+  "education_analysis",
+  "sb_notes",
+  "notes",
+  "recommendation"
+ ],
+ "fields": [
+  {
+   "fieldname": "sb_details",
+   "fieldtype": "Section Break",
+   "label": "Evaluation Details"
+  },
+  {
+   "fieldname": "job_description",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Job Description",
+   "options": "Job Description",
+   "reqd": 1
+  },
+  {
+   "fieldname": "job_title",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Job Title",
+   "read_only": 1
+  },
+  {
+   "fieldname": "candidate",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Candidate",
+   "options": "Candidate",
+   "reqd": 1
+  },
+  {
+   "fetch_from": "candidate.candidate_name",
+   "fieldname": "candidate_name",
+   "fieldtype": "Data",
+   "label": "Candidate Name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_5",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "total_match_score",
+   "fieldtype": "Percent",
+   "in_list_view": 1,
+   "label": "Total Match Score",
+   "read_only": 1
+  },
+  {
+   "fieldname": "ranking_order",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Ranking Order",
+   "read_only": 1
+  },
+  {
+   "default": "Pending",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Status",
+   "options": "Pending\nEvaluated\nShortlisted\nInterview Scheduled\nRejected\nOn Hold"
+  },
+  {
+   "fieldname": "evaluation_date",
+   "fieldtype": "Datetime",
+   "label": "Evaluation Date",
+   "read_only": 1
+  },
+  {
+   "fieldname": "sb_skill_match",
+   "fieldtype": "Section Break",
+   "label": "Skill Match Analysis"
+  },
+  {
+   "fieldname": "skills_match_details",
+   "fieldtype": "Table",
+   "label": "Skills Match Details",
+   "options": "Skill Match Detail",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_10",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "skill_match_summary",
+   "fieldtype": "Small Text",
+   "label": "Skill Match Summary",
+   "read_only": 1
+  },
+  {
+   "fieldname": "sb_experience",
+   "fieldtype": "Section Break",
+   "label": "Experience & Education Match"
+  },
+  {
+   "fieldname": "experience_match_score",
+   "fieldtype": "Percent",
+   "label": "Experience Match Score",
+   "read_only": 1
+  },
+  {
+   "fieldname": "experience_analysis",
+   "fieldtype": "Small Text",
+   "label": "Experience Analysis",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_14",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "education_match_score",
+   "fieldtype": "Percent",
+   "label": "Education Match Score",
+   "read_only": 1
+  },
+  {
+   "fieldname": "education_analysis",
+   "fieldtype": "Small Text",
+   "label": "Education Analysis",
+   "read_only": 1
+  },
+  {
+   "fieldname": "sb_notes",
+   "fieldtype": "Section Break",
+   "label": "Notes & Recommendations"
+  },
+  {
+   "fieldname": "notes",
+   "fieldtype": "Small Text",
+   "label": "Notes"
+  },
+  {
+   "fieldname": "recommendation",
+   "fieldtype": "Select",
+   "label": "Recommendation",
+   "options": "\nStrong Yes\nYes\nMaybe\nNo\nStrong No"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-01-01 00:00:00",
+ "modified_by": "Administrator",
+ "module": "HR Master",
+ "name": "Candidate Ranking",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "HR Master Admin",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 0,
+   "delete": 0,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "HR Master Recruiter",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 0,
+   "delete": 0,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "HR Master Hiring Manager",
+   "share": 0,
+   "write": 0
+  },
+  {
+   "create": 0,
+   "delete": 0,
+   "email": 1,
+   "export": 0,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "HR Master Viewer",
+   "share": 0,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [
+  {
+   "color": "Gray",
+   "title": "Pending"
+  },
+  {
+   "color": "Blue",
+   "title": "Evaluated"
+  },
+  {
+   "color": "Green",
+   "title": "Shortlisted"
+  },
+  {
+   "color": "Purple",
+   "title": "Interview Scheduled"
+  },
+  {
+   "color": "Red",
+   "title": "Rejected"
+  },
+  {
+   "color": "Orange",
+   "title": "On Hold"
+  }
+ ],
+ "track_changes": 1
+}

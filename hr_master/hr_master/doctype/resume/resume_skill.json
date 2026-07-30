@@ -1,0 +1,24 @@
+{
+ "actions": [],
+ "creation": "2026-01-01 00:00:00",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": ["skill", "proficiency", "years_of_experience", "extracted_from"],
+ "fields": [
+  {"fieldname":"skill","fieldtype":"Link","in_list_view":1,"label":"Skill","options":"Skill","reqd":1},
+  {"fieldname":"proficiency","fieldtype":"Select","in_list_view":1,"label":"Proficiency","options":"Beginner\nIntermediate\nAdvanced\nExpert"},
+  {"fieldname":"years_of_experience","fieldtype":"Float","in_list_view":1,"label":"Years of Experience"},
+  {"fieldname":"extracted_from","fieldtype":"Select","in_list_view":1,"label":"Extracted From","options":"\nResume Parsing\nManual Entry\nAPI Import"}
+ ],
+ "istable": 1,
+ "links": [],
+ "modified": "2026-01-01 00:00:00",
+ "modified_by": "Administrator",
+ "module": "HR Master",
+ "name": "Resume Skill",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}

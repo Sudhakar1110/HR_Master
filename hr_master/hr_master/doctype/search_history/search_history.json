@@ -1,0 +1,37 @@
+{
+ "actions": [],
+ "autoname": "format:SH-{YYYY}{MM}{DD}-{#####}",
+ "creation": "2026-01-01 00:00:00",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": ["sb_details", "search_query", "search_type", "filters_used", "column_break_4", "user", "search_date", "result_count", "sb_results", "search_results_preview", "ref_doctype", "ref_name"],
+ "fields": [
+  {"fieldname":"sb_details","fieldtype":"Section Break","label":"Search Details"},
+  {"fieldname":"search_query","fieldtype":"Small Text","label":"Search Query","reqd":1},
+  {"fieldname":"search_type","fieldtype":"Select","in_list_view":1,"label":"Search Type","options":"\nCandidate\nJob Description\nSkill\nPortal\nAdvanced","reqd":1},
+  {"fieldname":"filters_used","fieldtype":"Long Text","label":"Filters Used (JSON)"},
+  {"fieldname":"column_break_4","fieldtype":"Column Break"},
+  {"fieldname":"user","fieldtype":"Link","label":"User","options":"User","read_only":1},
+  {"fieldname":"search_date","fieldtype":"Datetime","label":"Search Date","read_only":1},
+  {"fieldname":"result_count","fieldtype":"Int","label":"Result Count","read_only":1},
+  {"fieldname":"sb_results","fieldtype":"Section Break","label":"Results"},
+  {"fieldname":"search_results_preview","fieldtype":"Long Text","label":"Results Preview","read_only":1},
+  {"fieldname":"ref_doctype","fieldtype":"Link","label":"Reference Doctype","options":"DocType"},
+  {"fieldname":"ref_name","fieldtype":"Dynamic Link","label":"Reference Name","options":"ref_doctype"}
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-01-01 00:00:00",
+ "modified_by": "Administrator",
+ "module": "HR Master",
+ "name": "Search History",
+ "owner": "Administrator",
+ "permissions": [
+  {"create":1,"delete":1,"email":1,"export":1,"print":1,"read":1,"report":1,"role":"HR Master Admin","share":1,"write":1},
+  {"create":1,"delete":0,"email":1,"export":1,"print":1,"read":1,"report":1,"role":"HR Master Recruiter","share":1,"write":1},
+  {"create":0,"delete":0,"email":1,"export":0,"print":1,"read":1,"report":1,"role":"HR Master Viewer","share":0,"write":0}
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

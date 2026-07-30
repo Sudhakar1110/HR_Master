@@ -1,0 +1,97 @@
+{
+ "actions": [],
+ "creation": "2026-01-01 00:00:00",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "candidate_name",
+  "source",
+  "profile_url",
+  "current_title",
+  "current_company",
+  "location",
+  "skills_summary",
+  "experience_years",
+  "is_imported",
+  "import_status"
+ ],
+ "fields": [
+  {
+   "fieldname": "candidate_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Candidate Name",
+   "reqd": 1
+  },
+  {
+   "fieldname": "source",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Source",
+   "options": "LinkedIn\nNaukri\nIndeed\nMonster\nOther"
+  },
+  {
+   "fieldname": "profile_url",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Profile URL"
+  },
+  {
+   "fieldname": "current_title",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Current Title"
+  },
+  {
+   "fieldname": "current_company",
+   "fieldtype": "Data",
+   "label": "Current Company"
+  },
+  {
+   "fieldname": "location",
+   "fieldtype": "Data",
+   "label": "Location"
+  },
+  {
+   "fieldname": "skills_summary",
+   "fieldtype": "Small Text",
+   "label": "Skills Summary"
+  },
+  {
+   "fieldname": "experience_years",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Experience (Years)"
+  },
+  {
+   "default": "0",
+   "fieldname": "is_imported",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "label": "Imported",
+   "read_only": 1
+  },
+  {
+   "default": "Pending",
+   "fieldname": "import_status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Import Status",
+   "options": "Pending\nImported\nFailed"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2026-01-01 00:00:00",
+ "modified_by": "Administrator",
+ "module": "HR Master",
+ "name": "Portal Search Result",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

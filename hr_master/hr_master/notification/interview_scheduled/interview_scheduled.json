@@ -1,0 +1,35 @@
+{
+ "attach_print": 0,
+ "channel": "System Notification",
+ "creation": "2026-01-01 00:00:00",
+ "date_changed": "scheduled_date",
+ "days_in_advance": 1,
+ "docstatus": 0,
+ "doctype": "Notification",
+ "document_type": "Interview Schedule",
+ "enabled": 1,
+ "event": "New",
+ "is_standard": 1,
+ "message": "<h3>Interview Scheduled</h3>\n<p>Dear {{ doc.owner }},</p>\n<p>An interview has been scheduled for candidate <strong>{{ doc.candidate_name }}</strong>.</p>\n<p><strong>Job:</strong> {{ doc.job_title }}</p>\n<p><strong>Date:</strong> {{ doc.scheduled_date }}</p>\n<p><strong>Time:</strong> {{ doc.scheduled_time }}</p>\n<p><strong>Mode:</strong> {{ doc.mode_of_interview }}</p>\n<p><strong>Round:</strong> {{ doc.interview_round }}</p>\n<br>\n<p>View Schedule: <a href=\"/app/interview-schedule/{{ doc.name }}\">{{ doc.name }}</a></p>",
+ "method": "",
+ "modified": "2026-01-01 00:00:00",
+ "modified_by": "Administrator",
+ "module": "HR Master",
+ "name": "Interview Scheduled",
+ "name_field": "candidate_name",
+ "owner": "Administrator",
+ "recipients": [
+  {
+   "receiver_by_document_field": "owner"
+  },
+  {
+   "receiver_by_document_field": "",
+   "receiver_by_role": "HR Master Admin"
+  }
+ ],
+ "sender": "HR Master System",
+ "send_system_notification": 1,
+ "send_to_all_assignees": 0,
+ "subject": "Interview Scheduled: {{ doc.candidate_name }} - {{ doc.interview_type }}",
+ "value_changed": ""
+}

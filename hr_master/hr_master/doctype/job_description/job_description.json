@@ -1,0 +1,306 @@
+{
+ "actions": [],
+ "autoname": "format:JD-{YYYY}-{#####}",
+ "creation": "2026-01-01 00:00:00",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "sb_title",
+  "job_title",
+  "department",
+  "employment_type",
+  "experience_required",
+  "column_break_5",
+  "status",
+  "posting_date",
+  "target_close_date",
+  "vacancies",
+  "sb_description",
+  "job_description_raw",
+  "column_break_10",
+  "parsed_skills",
+  "sb_requirements",
+  "required_skills",
+  "preferred_skills",
+  "qualifications",
+  "column_break_16",
+  "min_experience_years",
+  "max_experience_years",
+  "salary_range_min",
+  "salary_range_max",
+  "sb_locations",
+  "location",
+  "remote_option",
+  "column_break_21",
+  "portal_search_status",
+  "amended_from"
+ ],
+ "fields": [
+  {
+   "fieldname": "sb_title",
+   "fieldtype": "Section Break",
+   "label": "Job Details"
+  },
+  {
+   "fieldname": "job_title",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Job Title",
+   "reqd": 1
+  },
+  {
+   "fieldname": "department",
+   "fieldtype": "Link",
+   "label": "Department",
+   "options": "Department"
+  },
+  {
+   "fieldname": "employment_type",
+   "fieldtype": "Select",
+   "label": "Employment Type",
+   "options": "\nFull-Time\nPart-Time\nContract\nInternship\nFreelance"
+  },
+  {
+   "fieldname": "experience_required",
+   "fieldtype": "Small Text",
+   "label": "Experience Required"
+  },
+  {
+   "fieldname": "column_break_5",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "Draft",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Status",
+   "options": "Draft\nOpen\nIn Progress\nFilled\nClosed\nCancelled"
+  },
+  {
+   "default": "Today",
+   "fieldname": "posting_date",
+   "fieldtype": "Date",
+   "label": "Posting Date"
+  },
+  {
+   "fieldname": "target_close_date",
+   "fieldtype": "Date",
+   "label": "Target Close Date"
+  },
+  {
+   "fieldname": "vacancies",
+   "fieldtype": "Int",
+   "label": "Number of Vacancies"
+  },
+  {
+   "fieldname": "sb_description",
+   "fieldtype": "Section Break",
+   "label": "Job Description"
+  },
+  {
+   "fieldname": "job_description_raw",
+   "fieldtype": "Text Editor",
+   "label": "Job Description (Raw)",
+   "description": "Paste the full job description here"
+  },
+  {
+   "fieldname": "column_break_10",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "parsed_skills",
+   "fieldtype": "Small Text",
+   "label": "Parsed Skills",
+   "read_only": 1,
+   "description": "Auto-parsed skills from the JD"
+  },
+  {
+   "fieldname": "sb_requirements",
+   "fieldtype": "Section Break",
+   "label": "Requirements"
+  },
+  {
+   "fieldname": "required_skills",
+   "fieldtype": "Table MultiSelect",
+   "label": "Required Skills",
+   "options": "JD Skill Detail",
+   "reqd": 1
+  },
+  {
+   "fieldname": "preferred_skills",
+   "fieldtype": "Table MultiSelect",
+   "label": "Preferred Skills",
+   "options": "JD Skill Detail"
+  },
+  {
+   "fieldname": "qualifications",
+   "fieldtype": "Small Text",
+   "label": "Qualifications"
+  },
+  {
+   "fieldname": "column_break_16",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "min_experience_years",
+   "fieldtype": "Int",
+   "label": "Min Experience (Years)"
+  },
+  {
+   "fieldname": "max_experience_years",
+   "fieldtype": "Int",
+   "label": "Max Experience (Years)"
+  },
+  {
+   "fieldname": "salary_range_min",
+   "fieldtype": "Currency",
+   "label": "Salary Range Min"
+  },
+  {
+   "fieldname": "salary_range_max",
+   "fieldtype": "Currency",
+   "label": "Salary Range Max"
+  },
+  {
+   "fieldname": "sb_locations",
+   "fieldtype": "Section Break",
+   "label": "Location"
+  },
+  {
+   "fieldname": "location",
+   "fieldtype": "Data",
+   "label": "Location"
+  },
+  {
+   "fieldname": "remote_option",
+   "fieldtype": "Select",
+   "label": "Remote Option",
+   "options": "\nOn-site\nHybrid\nRemote"
+  },
+  {
+   "fieldname": "column_break_21",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "portal_search_status",
+   "fieldtype": "Select",
+   "label": "Portal Search Status",
+   "options": "Not Searched\nSearching\nSearched\nError",
+   "read_only": 1
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Job Description",
+   "print_hide": 1,
+   "read_only": 1
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [
+  {
+   "link_doctype": "Candidate Ranking",
+   "link_fieldname": "job_description"
+  },
+  {
+   "link_doctype": "Job Portal Search",
+   "link_fieldname": "job_description"
+  }
+ ],
+ "modified": "2026-01-01 00:00:00",
+ "modified_by": "Administrator",
+ "module": "HR Master",
+ "name": "Job Description",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "amend": 1,
+   "cancel": 1,
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "HR Master Admin",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "amend": 0,
+   "cancel": 1,
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "HR Master Recruiter",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "amend": 0,
+   "cancel": 0,
+   "create": 0,
+   "delete": 0,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "HR Master Hiring Manager",
+   "share": 0,
+   "submit": 0,
+   "write": 0
+  },
+  {
+   "amend": 0,
+   "cancel": 0,
+   "create": 0,
+   "delete": 0,
+   "email": 1,
+   "export": 0,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "HR Master Viewer",
+   "share": 0,
+   "submit": 0,
+   "write": 0
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [
+  {
+   "color": "Gray",
+   "title": "Draft"
+  },
+  {
+   "color": "Blue",
+   "title": "Open"
+  },
+  {
+   "color": "Orange",
+   "title": "In Progress"
+  },
+  {
+   "color": "Green",
+   "title": "Filled"
+  },
+  {
+   "color": "Red",
+   "title": "Closed"
+  }
+ ],
+ "track_changes": 1
+}
