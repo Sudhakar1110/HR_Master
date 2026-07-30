@@ -211,14 +211,14 @@ def sync_all_resources():
                             json_path = os.path.join(ws_path, f)
                             _import_json(json_path, label)
         else:
-            # Standard: subdir/{name}/{name}.json
+            # Standard: subdir/{name}/*.json (import ALL json files including child tables)
             for item_dir in os.listdir(resource_path):
                 item_path = os.path.join(resource_path, item_dir)
                 if os.path.isdir(item_path):
-                    json_file = f"{item_dir}.json"
-                    json_path = os.path.join(item_path, json_file)
-                    if os.path.exists(json_path):
-                        _import_json(json_path, label)
+                    for f in os.listdir(item_path):
+                        if f.endswith(".json"):
+                            json_path = os.path.join(item_path, f)
+                            _import_json(json_path, label)
 
 
 def _import_json(json_path, label):
