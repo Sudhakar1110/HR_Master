@@ -62,9 +62,18 @@ def create_roles():
 def create_departments():
     """Create common departments if they don't exist."""
     # Get default company from ERPNext
-    default_company = frappe.defaults.get_user_default("Company") or \
-        frappe.db.get_single_value("Global Defaults", "default_company") or \
-        frappe.db.get_value("Company", {}, "name")
+    # During after_migrate, there's no user session, so check all sources
+    default_company = (
+        frappe.defaults.get_user_default("Company")
+        or frappe.db.get_single_value("Global Defaults", "default_company")
+        or frappe.db.get_value("Company", {}, "name")
+    )
+
+    if not default_company:
+        frappe.logger().info(
+            "HR Master: No company found. Skipping department creation."
+        )
+        return
 
     departments = [
         "Engineering",
