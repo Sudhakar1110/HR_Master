@@ -114,18 +114,14 @@ scheduled_tasks = {
 }
 
 fixtures = [
-    {"dt": "Role", "filters": ["name", "in", [
+    {"dt": "Role", "filters": [["name", "in", [
         "HR Master Admin",
         "HR Master Recruiter",
         "HR Master Hiring Manager",
         "HR Master Viewer"
     ]]},
     {"dt": "Workflow", "filters": [["name", "=", "Candidate Evaluation"]]},
-    {"dt": "Workflow State"},
-    {"dt": "Workflow Action"},
-    {"dt": "Email Template Config"},
-    {"dt": "Recruitment Settings"},
-    {"dt": "Notification", "filters": ["name", "in", [
+    {"dt": "Notification", "filters": [["name", "in", [
         "Candidate Shortlisted",
         "Interview Scheduled",
         "Resume Uploaded",
@@ -135,12 +131,12 @@ fixtures = [
         "Offer Accepted",
         "Candidate Hired"
     ]]},
-    {"dt": "Print Format", "filters": ["name", "in", [
+    {"dt": "Print Format", "filters": [["name", "in", [
         "Interview Feedback Form",
         "Candidate Profile",
         "Offer Letter"
     ]]},
-    {"dt": "Letter Head", "filters": ["name", "in", [
+    {"dt": "Letter Head", "filters": [["name", "in", [
         "Standard",
         "Official"
     ]]},
@@ -164,4 +160,3 @@ jinja = {
 }
 
 translations = "hr_master/hr_master/translations"
-custom_fields_path = "hr_master/fixtures/custom_fields.json"
