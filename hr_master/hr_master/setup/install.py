@@ -89,7 +89,9 @@ def create_departments():
     ]
 
     for dept_name in departments:
-        if not frappe.db.exists("Department", dept_name):
+        # Check by department_name field — ERPNext uses autonaming (e.g. "Marketing - HM")
+        # so the document name won't match the plain department_name
+        if not frappe.db.get_value("Department", {"department_name": dept_name}, "name"):
             dept = frappe.new_doc("Department")
             dept.department_name = dept_name
             dept.company = default_company
