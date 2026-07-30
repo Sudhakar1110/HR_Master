@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 
 import frappe
 from frappe import _
+from hr_master.security.rate_limiter import rate_limit_decorator
 
 # ------------------------------------------
 # Search Endpoints
@@ -11,6 +12,7 @@ from frappe import _
 
 
 @frappe.whitelist()
+@rate_limit_decorator
 def search_candidates_for_jd(job_description_name):
     """Trigger candidate search across enabled job portals for a JD."""
     try:
@@ -63,6 +65,7 @@ def search_candidates_for_jd(job_description_name):
 
 
 @frappe.whitelist()
+@rate_limit_decorator
 def import_search_results(search_name):
     """Import search results as Candidate documents."""
     try:
@@ -87,6 +90,7 @@ def import_search_results(search_name):
 
 
 @frappe.whitelist()
+@rate_limit_decorator
 def get_search_status(search_name):
     """Get the status of a portal search."""
     try:

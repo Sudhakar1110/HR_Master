@@ -5,9 +5,11 @@ from __future__ import unicode_literals
 import frappe
 from frappe import _
 from frappe.utils import now_datetime
+from hr_master.security.rate_limiter import rate_limit_decorator
 
 
 @frappe.whitelist()
+@rate_limit_decorator
 def rank_all_candidates_for_jd(job_description_name):
     """Rank all candidates associated with a JD."""
     try:
@@ -31,6 +33,7 @@ def rank_all_candidates_for_jd(job_description_name):
 
 
 @frappe.whitelist()
+@rate_limit_decorator
 def rank_candidates_from_search(search_name):
     """Rank candidates from a portal search against the JD."""
     try:
@@ -54,6 +57,7 @@ def rank_candidates_from_search(search_name):
 
 
 @frappe.whitelist()
+@rate_limit_decorator
 def get_candidate_ranking_summary(jd_name):
     """Get a summary of candidate rankings for a JD."""
     rankings = frappe.get_all(
