@@ -61,6 +61,11 @@ def create_roles():
 
 def create_departments():
     """Create common departments if they don't exist."""
+    # Get default company from ERPNext
+    default_company = frappe.defaults.get_user_default("Company") or \
+        frappe.db.get_single_value("Global Defaults", "default_company") or \
+        frappe.db.get_value("Company", {}, "name")
+
     departments = [
         "Engineering",
         "Product",
@@ -78,6 +83,7 @@ def create_departments():
         if not frappe.db.exists("Department", dept_name):
             dept = frappe.new_doc("Department")
             dept.department_name = dept_name
+            dept.company = default_company
             dept.is_active = 1
             dept.save(ignore_permissions=True)
 
