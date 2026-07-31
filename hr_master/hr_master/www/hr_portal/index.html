@@ -10,15 +10,23 @@
     {% include "templates/includes/hr_portal_header.html" %}
 
     <main class="hrp-container">
-        <div class="hrp-page-head">
-            <div>
-                <h1 class="hrp-page-title">HR Dashboard</h1>
-                <p class="hrp-page-sub">Live recruitment overview · everything here reflects in the Desk instantly</p>
+        <section class="hrp-hero">
+            <div class="hrp-hero-glow hrp-hero-glow-1"></div>
+            <div class="hrp-hero-glow hrp-hero-glow-2"></div>
+            <div class="hrp-hero-content">
+                <span class="hrp-hero-eyebrow">✦ Recruitment Command Center</span>
+                <h1 class="hrp-hero-title">HR Dashboard</h1>
+                <p class="hrp-hero-sub">Live recruitment overview — everything you do here reflects in the Desk instantly.</p>
+                <div class="hrp-hero-actions">
+                    <a class="hrp-btn hrp-btn-primary hrp-btn-lg" href="/hr_portal/jds">+ New Job Description</a>
+                    <a class="hrp-btn hrp-btn-glass hrp-btn-lg" href="/hr_portal/jds">View All JDs</a>
+                </div>
             </div>
-            <div class="hrp-actions">
-                <a class="hrp-btn hrp-btn-primary" href="/hr_portal/jds">+ New Job Description</a>
+            <div class="hrp-hero-metric">
+                <span class="hrp-hero-metric-value" data-count="{{ kpis.get('total_candidates', 0) }}">{{ kpis.get('total_candidates', 0) }}</span>
+                <span class="hrp-hero-metric-label">Candidates in pipeline</span>
             </div>
-        </div>
+        </section>
 
         {% set kpi_cards = [
             {"key": "total_candidates", "label": "Total Candidates", "icon": "👥"},
@@ -32,11 +40,11 @@
         <div class="hrp-grid hrp-grid-4 hrp-mb">
             {% for card in kpi_cards %}
             <div class="hrp-card hrp-kpi hrp-card-hover">
-                <div class="hrp-flex hrp-between">
+                <div class="hrp-kpi-top">
                     <span class="hrp-kpi-icon">{{ card.icon }}</span>
                     <span class="hrp-kpi-label">{{ card.label }}</span>
                 </div>
-                <div class="hrp-kpi-value">{{ kpis.get(card.key, 0) }}</div>
+                <div class="hrp-kpi-value" data-count="{{ kpis.get(card.key, 0) }}">{{ kpis.get(card.key, 0) }}</div>
             </div>
             {% endfor %}
         </div>

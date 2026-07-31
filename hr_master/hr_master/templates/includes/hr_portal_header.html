@@ -1,18 +1,22 @@
-<nav class="hrp-nav">
+<nav class="hrp-nav" id="hrpNav">
   <div class="hrp-nav-inner">
     <a class="hrp-brand" href="/hr_portal">
       <span class="hrp-logo">H</span>
-      <span>HR Master</span>
+      <span class="hrp-brand-text">
+        <strong>HR Master</strong>
+        <em>Recruiting Suite</em>
+      </span>
     </a>
-    <div class="hrp-nav-links">
+    <button class="hrp-nav-toggle" type="button" aria-label="Toggle navigation" onclick="var l=document.getElementById('hrpNavLinks');if(l){l.classList.toggle('hrp-open');}">☰</button>
+    <div class="hrp-nav-links" id="hrpNavLinks">
       <a href="/hr_portal" class="{{ 'hrp-active' if active == 'dashboard' else '' }}">Dashboard</a>
       <a href="/hr_portal/jds" class="{{ 'hrp-active' if active == 'jds' else '' }}">Job Descriptions</a>
-      <a href="/app/hr-master" target="_blank">Open Desk ↗</a>
+      <a href="/app/hr-master" target="_blank" class="hrp-desk-link">Open Desk <span aria-hidden="true">↗</span></a>
     </div>
     {% if frappe.session.user != "Guest" %}
     <div class="hrp-nav-user">
       <span class="hrp-avatar">{{ (frappe.session.user or 'U')[0]|upper }}</span>
-      <span>{{ frappe.session.user }}</span>
+      <span class="hrp-username">{{ frappe.session.user }}</span>
       <a class="hrp-btn-logout" href="/api/method/logout">Logout</a>
     </div>
     {% endif %}

@@ -2,17 +2,67 @@
 (function () {
 	"use strict";
 
-	document.addEventListener("DOMContentLoaded", function () {
-		// Auto-dismiss flash alerts after 5 seconds
-		document.querySelectorAll(".hrp-alert[data-dismiss]").forEach(function (el) {
-			setTimeout(function () {
-				el.style.transition = "opacity 0.4s ease";
-				el.style.opacity = "0";
-				setTimeout(function () { el.remove(); }, 400);
-			}, 5000);
+	function onReady(fn) {
+		if (document.readyState !== "loading") { fn(); }
+		else { document.addEventListener("DOMContentLoaded", fn); }
+	}
+
+	onReady(function () {
+		var nav = document.getElementById("hrpNav");
+
+		/* Scroll shadow on the dark nav */
+		function onScroll() {
+			if (nav) {
+				nav.classList.toggle("hrp-scrolled", window.scrollY > 8);
+			}
+		}
+		window.addEventListener("scroll", onScroll, { passive: true });
+		onScroll();
+
+		/* Close the mobile nav when a link inside it is clicked */
+		document.querySelectorAll("#hrpNavLinks a").forEach(function (link) {
+			link.addEventListener("click", function () {
+				var links = document.getElementById("hrpNavLinks");
+				if (links) { links.classList.remove("hrp-open"); }
+			});
 		});
 
-		// Confirm dialog for destructive / state-changing actions
+		/* Auto-dismiss flash alerts after 5 seconds (or on click) */
+		document.querySelectorAll(".hrp-alert[data-dismiss]").forEach(function (el) {
+			el.style.cursor = "pointer";
+			el.title = "Click to dismiss";
+			var dismiss = function () {
+				el.style.transition = "opacity 0.4s ease, transform 0.4s ease";
+				el.style.opacity = "0";
+				el.style.transform = "translateY(-6px)";
+				setTimeout(function () { el.remove(); }, 400);
+			};
+			el.addEventListener("click", dismiss);
+			setTimeout(dismiss, 5000);
+		});
+
+		/* Count-up animation for KPI values */
+		document.querySelectorAll(".hrp-kpi-value[data-count]").forEach(function (el) {
+			var target = parseFloat(el.getAttribute("data-count") || "0");
+			var decimals = (target % 1 !== 0) ? 1 : 0;
+			var duration = 900;
+			var start = null;
+
+			function frame(ts) {
+				if (!start) { start = ts; }
+				var progress = Math.min((ts - start) / duration, 1);
+				/* ease-out cubic */
+				var eased = 1 - Math.pow(1 - progress, 3);
+				var current = target * eased;
+				el.textContent = decimals
+					? current.toFixed(decimals)
+					: Math.round(current).toString();
+				if (progress < 1) { requestAnimationFrame(frame); }
+			}
+			requestAnimationFrame(frame);
+		});
+
+		/* Confirm dialog for destructive / state-changing actions */
 		document.querySelectorAll("form[data-confirm]").forEach(function (form) {
 			form.addEventListener("submit", function (e) {
 				var message = form.getAttribute("data-confirm") || "Are you sure?";
@@ -22,7 +72,7 @@
 			});
 		});
 
-		// Loading state on submit buttons
+		/* Loading state on submit buttons */
 		document.querySelectorAll("form").forEach(function (form) {
 			form.addEventListener("submit", function () {
 				var btn = form.querySelector('button[type="submit"]');

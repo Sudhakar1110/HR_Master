@@ -1,11 +1,18 @@
 <footer class="hrp-footer">
   <div class="hrp-footer-inner">
-    <span>© {{ frappe.utils.now_datetime().year }} HR Master · All rights reserved</span>
+    <div class="hrp-footer-brand">
+      <span class="hrp-logo">H</span>
+      <div>
+        <strong>HR Master</strong>
+        <span>Recruiting Suite · Powered by Frappe</span>
+      </div>
+    </div>
     <div class="hrp-footer-links">
       <a href="/hr_portal/privacy">Privacy Policy</a>
       <a href="/hr_portal/terms">Terms of Use</a>
       <a href="/hr_portal/cookies">Cookie Policy</a>
       <a href="/hr_portal/data">Data Protection</a>
     </div>
+    <span class="hrp-footer-copy">© {{ frappe.utils.now_datetime().year }} HR Master · All rights reserved</span>
   </div>
 </footer>
