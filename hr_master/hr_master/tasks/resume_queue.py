@@ -24,7 +24,7 @@ def process_resume_parsing(resume_name):
             resume.db_set("parsed_on", now_datetime())
 
             # Extract skills from parsed text
-            from hr_master.doctype.skill.skill import extract_skills_from_text
+            from hr_master.hr_master.doctype.skill.skill import extract_skills_from_text
             skills = extract_skills_from_text(text)
             resume = frappe.get_doc("Resume", resume_name)
             for skill_name in skills:

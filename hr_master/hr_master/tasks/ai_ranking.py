@@ -109,7 +109,7 @@ def ai_rank_single_candidate(jd_name, candidate_name):
         ranking.save(ignore_permissions=True)
 
         # Log activity
-        from hr_master.doctype.candidate_activity_log.candidate_activity_log import log_activity
+        from hr_master.hr_master.doctype.candidate_activity_log.candidate_activity_log import log_activity
         log_activity(
             candidate=candidate_name,
             activity_type="Rank Updated",

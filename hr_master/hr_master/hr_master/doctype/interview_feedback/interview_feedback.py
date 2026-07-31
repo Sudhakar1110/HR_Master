@@ -35,7 +35,7 @@ class InterviewFeedback(Document):
             schedule.save(ignore_permissions=True)
 
     def log_activity(self):
-        from hr_master.doctype.candidate_activity_log.candidate_activity_log import log_activity
+        from hr_master.hr_master.doctype.candidate_activity_log.candidate_activity_log import log_activity
         log_activity(
             candidate=self.candidate,
             activity_type="Feedback Submitted",

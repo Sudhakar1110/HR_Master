@@ -107,7 +107,7 @@ def link_candidate_to_jd(jd_name, candidate_name):
 
 def log_import_activity(results):
     """Log import activity."""
-    from hr_master.doctype.candidate_activity_log.candidate_activity_log import log_activity
+    from hr_master.hr_master.doctype.candidate_activity_log.candidate_activity_log import log_activity
     for c_name in results.get("candidates", []):
         log_activity(
             candidate=c_name,

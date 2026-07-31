@@ -23,7 +23,7 @@ def parse_resume(candidate_name, file_url):
         # Extract skills from resume text
         skills = []
         if resume_text:
-            from hr_master.doctype.skill.skill import extract_skills_from_text
+            from hr_master.hr_master.doctype.skill.skill import extract_skills_from_text
 
             skills = extract_skills_from_text(resume_text)
 

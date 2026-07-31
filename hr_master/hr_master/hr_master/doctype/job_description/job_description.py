@@ -44,7 +44,7 @@ class JobDescription(Document):
             return
 
         raw_text = frappe.utils.strip_html_tags(self.job_description_raw)
-        from hr_master.doctype.skill.skill import extract_skills_from_text
+        from hr_master.hr_master.doctype.skill.skill import extract_skills_from_text
 
         found_skills = extract_skills_from_text(raw_text)
         if found_skills:

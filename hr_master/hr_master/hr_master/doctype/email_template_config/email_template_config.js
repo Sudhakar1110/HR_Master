@@ -34,7 +34,7 @@ frappe.ui.form.on("Email Template Config", {
                     primary_action_label: __("Preview"),
                     primary_action: function (vals) {
                         frappe.call({
-                            method: "hr_master.doctype.email_template_config.email_template_config.render_template",
+                            method: "hr_master.hr_master.doctype.email_template_config.email_template_config.render_template",
                             args: {
                                 template_name: frm.doc.name,
                                 context: vals

@@ -165,7 +165,7 @@ def merge_duplicates(primary_candidate, duplicate_candidate, merge_activities=Tr
                             f"Merged into {primary_candidate} on {frappe.utils.now_datetime()}")
 
         # Log activity
-        from hr_master.doctype.candidate_activity_log.candidate_activity_log import log_activity
+        from hr_master.hr_master.doctype.candidate_activity_log.candidate_activity_log import log_activity
         log_activity(
             candidate=primary_candidate,
             activity_type="Status Changed",

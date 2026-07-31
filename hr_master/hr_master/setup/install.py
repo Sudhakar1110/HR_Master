@@ -262,8 +262,12 @@ def sync_all_resources():
     letter heads are only ever imported here. Running all of them keeps
     every standard record in sync with this repository.
     """
-    # Get the module root directory (parent of setup/)
-    module_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    # Module content lives in the 'hr_master' module folder inside the
+    # app package root (parent of setup/).
+    module_root = os.path.join(
+        os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+        "hr_master",
+    )
 
     resource_dirs = [
         "doctype",

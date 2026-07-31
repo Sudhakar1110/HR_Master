@@ -19,23 +19,23 @@ override_doctype_class = {}
 
 doc_events = {
     "Job Description": {
-        "on_update": "hr_master.doctype.job_description.job_description.on_update"
+        "on_update": "hr_master.hr_master.doctype.job_description.job_description.on_update"
     },
     "Candidate Ranking": {
-        "after_insert": "hr_master.doctype.candidate_ranking.candidate_ranking.after_insert"
+        "after_insert": "hr_master.hr_master.doctype.candidate_ranking.candidate_ranking.after_insert"
     },
     "Resume": {
-        "on_submit": "hr_master.doctype.resume.resume.on_submit",
-        "validate": "hr_master.doctype.resume.resume.validate"
+        "on_submit": "hr_master.hr_master.doctype.resume.resume.on_submit",
+        "validate": "hr_master.hr_master.doctype.resume.resume.validate"
     },
     "Offer Management": {
-        "on_update_after_submit": "hr_master.doctype.offer_management.offer_management.on_update_after_submit"
+        "on_update_after_submit": "hr_master.hr_master.doctype.offer_management.offer_management.on_update_after_submit"
     },
     "Interview Feedback": {
-        "after_insert": "hr_master.doctype.interview_feedback.interview_feedback.after_insert"
+        "after_insert": "hr_master.hr_master.doctype.interview_feedback.interview_feedback.after_insert"
     },
     "Candidate": {
-        "after_insert": "hr_master.doctype.candidate.candidate.after_insert"
+        "after_insert": "hr_master.hr_master.doctype.candidate.candidate.after_insert"
     }
 }
 
@@ -120,7 +120,7 @@ website_route_rules = [
 boot_session = "hr_master.boot.set_boot_config"
 
 permission_query_conditions = {
-    "Candidate": "hr_master.doctype.candidate.candidate.get_permission_query_conditions"
+    "Candidate": "hr_master.hr_master.doctype.candidate.candidate.get_permission_query_conditions"
 }
 
 jinja = {

@@ -26,7 +26,7 @@ frappe.ui.form.on("Resume", {
                     },
                     callback: function () {
                         frappe.call({
-                            method: "hr_master.doctype.resume.resume.create_resume_from_attachment",
+                            method: "hr_master.hr_master.doctype.resume.resume.create_resume_from_attachment",
                             args: {
                                 candidate_name: frm.doc.candidate,
                                 file_url: frm.doc.resume_file

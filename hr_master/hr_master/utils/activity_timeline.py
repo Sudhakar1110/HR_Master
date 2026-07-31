@@ -153,7 +153,7 @@ def get_activity_color(activity_type):
 def add_timeline_note(candidate_name, note):
     """Add a manual note to candidate timeline."""
     try:
-        from hr_master.doctype.candidate_activity_log.candidate_activity_log import log_activity
+        from hr_master.hr_master.doctype.candidate_activity_log.candidate_activity_log import log_activity
         log_name = log_activity(
             candidate=candidate_name,
             activity_type="Note Added",

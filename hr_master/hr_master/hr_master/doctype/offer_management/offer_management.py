@@ -40,7 +40,7 @@ class OfferManagement(Document):
             self.log_activity("Offer Declined")
 
     def log_activity(self, activity_type):
-        from hr_master.doctype.candidate_activity_log.candidate_activity_log import log_activity
+        from hr_master.hr_master.doctype.candidate_activity_log.candidate_activity_log import log_activity
         log_activity(
             candidate=self.candidate,
             activity_type=activity_type,

@@ -44,7 +44,7 @@ def rebuild_search_index():
         )
 
         # Log audit entry
-        from hr_master.doctype.candidate_activity_log.candidate_activity_log import log_activity
+        from hr_master.hr_master.doctype.candidate_activity_log.candidate_activity_log import log_activity
         log_activity(
             candidate="",
             activity_type="System Action",

@@ -30,7 +30,7 @@ class Candidate(Document):
             return
 
         if self.resume_text and not self.parsed_skills_from_resume:
-            from hr_master.doctype.skill.skill import extract_skills_from_text
+            from hr_master.hr_master.doctype.skill.skill import extract_skills_from_text
 
             found_skills = extract_skills_from_text(self.resume_text)
             if found_skills:
@@ -57,7 +57,7 @@ class Candidate(Document):
 
 def after_insert(doc, method):
     """Log activity when a new candidate is created."""
-    from hr_master.doctype.candidate_activity_log.candidate_activity_log import log_activity
+    from hr_master.hr_master.doctype.candidate_activity_log.candidate_activity_log import log_activity
     log_activity(
         candidate=doc.name,
         activity_type="Created",

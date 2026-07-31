@@ -12,7 +12,7 @@ def parse_skills_from_jd(jd_text):
     if not jd_text:
         return []
 
-    from hr_master.doctype.skill.skill import extract_skills_from_text
+    from hr_master.hr_master.doctype.skill.skill import extract_skills_from_text
 
     # Strip HTML tags
     raw_text = frappe.utils.strip_html_tags(jd_text)
