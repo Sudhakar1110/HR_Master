@@ -15,6 +15,7 @@ def get_context(context):
     context.no_cache = 1
     context.active = "jds"
     context.page_title = "Job Descriptions"
+    context.page_description = "Create and manage job descriptions, then search candidate portals and rank applicants by match percentage."
     context.can_write = can_write()
 
     # Handle POST (create JD)

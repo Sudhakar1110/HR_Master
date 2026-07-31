@@ -13,6 +13,7 @@ def get_context(context):
     context.no_cache = 1
     context.active = "dashboard"
     context.page_title = "HR Dashboard"
+    context.page_description = "Live recruitment overview — track candidates, job descriptions, shortlists, interviews, offers and average match scores at a glance."
 
     context.kpis = {
         "total_candidates": frappe.db.count("Candidate"),

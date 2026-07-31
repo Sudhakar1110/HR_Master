@@ -65,6 +65,7 @@ def get_context(context):
     jd = frappe.get_doc("Job Description", jd_name)
     context.jd = jd
     context.page_title = jd.job_title
+    context.page_description = "{0} — search candidate portals, import results and rank applicants by match percentage.".format(jd.job_title)
 
     context.searches = frappe.get_all(
         "Job Portal Search",

@@ -83,6 +83,7 @@ def get_context(context):
     candidate = frappe.get_doc("Candidate", candidate_name)
     context.candidate = candidate
     context.page_title = candidate.candidate_name
+    context.page_description = "Candidate profile — skills, rankings, interviews, offers and feedback for {0}.".format(candidate.candidate_name)
 
     context.rankings = frappe.get_all(
         "Candidate Ranking",

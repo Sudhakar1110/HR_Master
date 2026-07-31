@@ -10,6 +10,7 @@ def get_context(context):
     context.no_cache = 1
     context.active = "legal"
     context.page_title = "Privacy Policy"
+    context.page_description = "How HR Master collects, uses and protects candidate and user data."
 
     context.company_name = (
         frappe.db.get_single_value("Global Defaults", "default_company")
