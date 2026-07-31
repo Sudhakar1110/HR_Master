@@ -19,6 +19,7 @@
   "search_indeed",
   "search_monster",
   "search_serpapi",
+  "search_adzuna",
   "search_demo",
   "column_break_9",
   "linkedin_results",
@@ -26,6 +27,7 @@
   "indeed_results",
   "monster_results",
   "serpapi_results",
+  "adzuna_results",
   "demo_results",
   "sb_results",
   "search_results",
@@ -120,6 +122,12 @@
   },
   {
    "default": "0",
+   "fieldname": "search_adzuna",
+   "fieldtype": "Check",
+   "label": "Search Adzuna (free live data)"
+  },
+  {
+   "default": "0",
    "fieldname": "search_demo",
    "fieldtype": "Check",
    "label": "Search Demo Data (no key)"
@@ -156,6 +164,12 @@
    "fieldname": "serpapi_results",
    "fieldtype": "Int",
    "label": "SerpAPI Results",
+   "read_only": 1
+  },
+  {
+   "fieldname": "adzuna_results",
+   "fieldtype": "Int",
+   "label": "Adzuna Results",
    "read_only": 1
   },
   {

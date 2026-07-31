@@ -29,7 +29,7 @@
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Source",
-   "options": "LinkedIn\nNaukri\nIndeed\nMonster\nSerpAPI\nDemo\nOther"
+   "options": "LinkedIn\nNaukri\nIndeed\nMonster\nSerpAPI\nAdzuna\nDemo\nOther"
   },
   {
    "fieldname": "profile_url",

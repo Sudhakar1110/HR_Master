@@ -43,6 +43,13 @@
   "column_break_27",
   "serpapi_search_limit",
   "serpapi_country",
+  "sb_adzuna",
+  "adzuna_enabled",
+  "adzuna_app_id",
+  "adzuna_api_key",
+  "column_break_28",
+  "adzuna_country",
+  "adzuna_search_limit",
   "sb_demo",
   "demo_enabled",
   "demo_search_limit",
@@ -259,6 +266,45 @@
    "fieldtype": "Data",
    "label": "SerpAPI Country Code (gl)",
    "description": "Two-letter country code, e.g. us, uk, in"
+  },
+  {
+   "fieldname": "sb_adzuna",
+   "fieldtype": "Section Break",
+   "label": "Adzuna Configuration (free live data)"
+  },
+  {
+   "default": "0",
+   "fieldname": "adzuna_enabled",
+   "fieldtype": "Check",
+   "label": "Enable Adzuna Search",
+   "description": "Free job-listings API — register a free app_id + api_key at developer.adzuna.com (500 requests/day, non-commercial)"
+  },
+  {
+   "fieldname": "adzuna_app_id",
+   "fieldtype": "Data",
+   "label": "Adzuna App ID"
+  },
+  {
+   "fieldname": "adzuna_api_key",
+   "fieldtype": "Password",
+   "label": "Adzuna API Key"
+  },
+  {
+   "fieldname": "column_break_28",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "in",
+   "fieldname": "adzuna_country",
+   "fieldtype": "Data",
+   "label": "Adzuna Country Code",
+   "description": "Two-letter country code, e.g. gb, us, in, au"
+  },
+  {
+   "default": "25",
+   "fieldname": "adzuna_search_limit",
+   "fieldtype": "Int",
+   "label": "Adzuna Search Limit"
   },
   {
    "fieldname": "sb_demo",

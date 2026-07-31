@@ -36,6 +36,7 @@ def search_candidates_for_jd(job_description_name):
         search.search_indeed = 1 if "Indeed" in portals else 0
         search.search_monster = 1 if "Monster" in portals else 0
         search.search_serpapi = 1 if "SerpAPI" in portals else 0
+        search.search_adzuna = 1 if "Adzuna" in portals else 0
         search.search_demo = 1 if "Demo" in portals else 0
 
         search.save(ignore_permissions=True)
@@ -144,6 +145,7 @@ def get_search_status(search_name):
             "indeed": search.indeed_results,
             "monster": search.monster_results,
             "serpapi": search.serpapi_results,
+            "adzuna": search.adzuna_results,
         }
     except Exception as e:
         return {"status": "error", "message": str(e)}
@@ -175,6 +177,7 @@ def get_jd_search_status(job_description_name):
                 "indeed_results",
                 "monster_results",
                 "serpapi_results",
+                "adzuna_results",
             ],
             filters={"job_description": job_description_name},
             order_by="search_date desc",
@@ -404,6 +407,79 @@ def search_serpapi(search_name, jd_name, keywords):
         frappe.log_error(
             message=f"SerpAPI search error: {str(e)}",
             title="SerpAPI Search Error",
+        )
+        return []
+
+
+def search_adzuna(search_name, jd_name, keywords):
+    """Search Adzuna for matching job postings (free live data source).
+
+    Adzuna offers a free REST API (register at developer.adzuna.com for an
+    app_id + app_key; ~500 requests/day, non-commercial). It returns job
+    postings rather than candidate profiles, so each posting is mapped into a
+    candidate-like search result exactly like the SerpAPI/Google Jobs connector.
+    """
+    config = frappe.get_single("Job Portal Config")
+    if not getattr(config, "adzuna_enabled", 0):
+        return []
+
+    app_id = getattr(config, "adzuna_app_id", None)
+    api_key = getattr(config, "adzuna_api_key", None)
+    if not app_id or not api_key:
+        return []
+
+    try:
+        import requests
+
+        # Adzuna caps results_per_page at 50 — clamp so large limits don't error out
+        limit = min(getattr(config, "adzuna_search_limit", 0) or 25, 50)
+        country = (
+            getattr(config, "adzuna_country", None)
+            or config.default_country
+            or "in"
+        )
+
+        params = {
+            "app_id": app_id,
+            "app_key": api_key,
+            "what": keywords,
+            "results_per_page": str(limit),
+            "content-type": "application/json",
+            "max_days_old": "30",
+        }
+
+        response = requests.get(
+            "https://api.adzuna.com/v1/api/jobs/{0}/search/1".format(country),
+            params=params,
+            headers={"Accept": "application/json"},
+            timeout=30,
+        )
+        response.raise_for_status()
+        data = response.json()
+
+        results = []
+        for job in (data.get("results") or [])[:limit]:
+            company = (job.get("company") or {}).get("display_name") or ""
+            location = (job.get("location") or {}).get("display_name") or ""
+            description = job.get("description") or ""
+
+            results.append({
+                "name": company or job.get("title") or "Unknown",
+                "url": job.get("redirect_url") or "",
+                "title": job.get("title") or "",
+                "company": company,
+                "location": location,
+                "skills": _extract_skills_from_description(description),
+                "experience": _extract_experience_years(description),
+                "source_url": job.get("redirect_url") or "",
+            })
+
+        return results
+
+    except Exception as e:
+        frappe.log_error(
+            message=f"Adzuna search error: {str(e)}",
+            title="Adzuna Search Error",
         )
         return []
 
