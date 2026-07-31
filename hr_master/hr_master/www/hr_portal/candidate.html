@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ page_title }} · HR Master</title>
+    <link rel="stylesheet" href="/assets/hr_master/css/hr_portal.css">
+</head>
+<body class="hrp-body">
+    {% include "templates/includes/hr_portal_header.html" %}
+
+    <main class="hrp-container">
+        {% if flash %}
+        <div class="hrp-alert {{ 'hrp-alert-success' if flash.type == 'success' else 'hrp-alert-error' }}" data-dismiss>
+            {{ flash.message }}
+        </div>
+        {% endif %}
+
+        <div class="hrp-page-head">
+            <div>
+                <h1 class="hrp-page-title">{{ candidate.candidate_name }}</h1>
+                <p class="hrp-page-sub">
+                    {% if candidate.current_title %}{{ candidate.current_title }}{% endif %}
+                    {% if candidate.current_company %} · {{ candidate.current_company }}{% endif %}
+                    {% if candidate.source %} · Source: {{ candidate.source }}{% endif %}
+                </p>
+            </div>
+            <div class="hrp-actions">
+                <a class="hrp-btn hrp-btn-secondary" href="javascript:history.back()">← Back</a>
+                {% if candidate.source_url %}
+                <a class="hrp-btn hrp-btn-secondary" href="{{ candidate.source_url }}" target="_blank">Profile ↗</a>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="hrp-grid hrp-grid-3">
+            <!-- Candidate profile -->
+            <div class="hrp-card">
+                <h2 class="hrp-card-title">Profile</h2>
+                <dl class="hrp-detail-list">
+                    <div class="hrp-detail"><dt>Email</dt><dd>{{ candidate.email or '—' }}</dd></div>
+                    <div class="hrp-detail"><dt>Phone</dt><dd>{{ candidate.phone or '—' }}</dd></div>
+                    <div class="hrp-detail"><dt>Experience</dt><dd>{{ candidate.total_experience_years or 0 }} yrs</dd></div>
+                    <div class="hrp-detail"><dt>Education</dt><dd>{{ candidate.highest_education or '—' }}</dd></div>
+                    <div class="hrp-detail"><dt>Overall Match</dt><dd><span class="hrp-score">{{ candidate.total_match_score|int if candidate.total_match_score else 0 }}%</span></dd></div>
+                    <div class="hrp-detail"><dt>Status</dt><dd><span class="hrp-badge hrp-badge-blue">{{ candidate.status }}</span></dd></div>
+                </dl>
+
+                {% if candidate.candidate_skills %}
+                <h3 class="hrp-card-title" style="margin-top:16px">Skills</h3>
+                <div class="hrp-chips">
+                    {% for s in candidate.candidate_skills %}
+                    <span class="hrp-chip">{{ s.skill }}{% if s.years_of_experience %} ({{ s.years_of_experience }}y){% endif %}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                {% if candidate.resume_text %}
+                <h3 class="hrp-card-title" style="margin-top:16px">Resume</h3>
+                <p style="white-space:pre-wrap;font-size:13px;color:#334155;max-height:200px;overflow:auto">{{ candidate.resume_text }}</p>
+                {% endif %}
+            </div>
+
+            <!-- Rankings + workflow -->
+            <div class="hrp-card">
+                <h2 class="hrp-card-title">Rankings &amp; Workflow</h2>
+                {% if rankings %}
+                <div class="hrp-table-wrap">
+                    <table class="hrp-table">
+                        <thead>
+                            <tr><th>Job</th><th>Match</th><th>Status</th><th></th></tr>
+                        </thead>
+                        <tbody>
+                            {% for r in rankings %}
+                            <tr>
+                                <td>{{ r.job_title }}</td>
+                                <td><span class="hrp-score">{{ r.total_match_score|int if r.total_match_score else 0 }}%</span></td>
+                                <td>
+                                    {% set st = r.status|lower %}
+                                    <span class="hrp-badge {{ 'hrp-badge-green' if st in ('shortlisted', 'interview scheduled') else ('hrp-badge-orange' if st in ('pending', 'evaluated', 'on hold') else 'hrp-badge-red') }}">{{ r.status }}</span>
+                                </td>
+                                <td>
+                                    {% if can_write %}
+                                    <details>
+                                        <summary class="hrp-link" style="cursor:pointer">Actions ▾</summary>
+                                        <div class="hrp-actions hrp-mt">
+                                            {% for act, label in [("Evaluate", "Evaluate"), ("Shortlist", "Shortlist"), ("Reject", "Reject"), ("Put on Hold", "Hold")] %}
+                                            <form method="post" style="display:inline">
+                                                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                                                <input type="hidden" name="action" value="{{ act }}">
+                                                <input type="hidden" name="ranking" value="{{ r.name }}">
+                                                <button class="hrp-btn hrp-btn-sm {{ 'hrp-btn-success' if act == 'Shortlist' else ('hrp-btn-danger' if act == 'Reject' else 'hrp-btn-secondary') }}" type="submit">{{ label }}</button>
+                                            </form>
+                                            {% endfor %}
+                                        </div>
+                                    </details>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="hrp-empty">
+                    <p>No rankings yet for this candidate.</p>
+                </div>
+                {% endif %}
+
+                {% if can_write %}
+                <h3 class="hrp-card-title" style="margin-top:20px">Schedule Interview</h3>
+                <form class="hrp-form" method="post">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                    <input type="hidden" name="action" value="schedule_interview">
+                    <input type="hidden" name="candidate" value="{{ candidate.name }}">
+                    <div class="hrp-form-grid">
+                        <div class="hrp-form-row">
+                            <label class="hrp-label">Date *</label>
+                            <input class="hrp-input" type="date" name="scheduled_date" required>
+                        </div>
+                        <div class="hrp-form-row">
+                            <label class="hrp-label">Time *</label>
+                            <input class="hrp-input" type="time" name="scheduled_time" required>
+                        </div>
+                    </div>
+                    <div class="hrp-form-grid">
+                        <div class="hrp-form-row">
+                            <label class="hrp-label">Round</label>
+                            <select class="hrp-select" name="interview_round">
+                                <option>Round 1</option><option>Round 2</option><option>Round 3</option>
+                                <option>HR Round</option><option>Technical Round</option><option>Managerial Round</option><option>Final Round</option>
+                            </select>
+                        </div>
+                        <div class="hrp-form-row">
+                            <label class="hrp-label">Type</label>
+                            <select class="hrp-select" name="interview_type">
+                                <option>Technical</option><option>HR</option><option>Managerial</option>
+                                <option>Cultural</option><option>Case Study</option><option>Presentation</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="hrp-form-grid">
+                        <div class="hrp-form-row">
+                            <label class="hrp-label">Mode</label>
+                            <select class="hrp-select" name="mode_of_interview">
+                                <option>Video Call</option><option>In-Person</option><option>Phone Call</option>
+                            </select>
+                        </div>
+                        <div class="hrp-form-row">
+                            <label class="hrp-label">Link / Location</label>
+                            <input class="hrp-input" type="text" name="location_or_link" placeholder="https://meet… or office">
+                        </div>
+                    </div>
+                    {% if rankings %}
+                    <input type="hidden" name="ranking" value="{{ rankings[0].name }}">
+                    {% endif %}
+                    <button class="hrp-btn hrp-btn-primary" type="submit">📅 Schedule Interview</button>
+                </form>
+                {% endif %}
+            </div>
+
+            <!-- Offers + feedback -->
+            <div>
+                <div class="hrp-card">
+                    <h2 class="hrp-card-title">Offers</h2>
+                    {% if offers %}
+                    <div class="hrp-table-wrap">
+                        <table class="hrp-table">
+                            <thead><tr><th>Job</th><th>Status</th><th>CTC</th></tr></thead>
+                            <tbody>
+                                {% for o in offers %}
+                                <tr>
+                                    <td>{{ o.job_title }}</td>
+                                    <td><span class="hrp-badge {{ 'hrp-badge-green' if o.status == 'Accepted' else ('hrp-badge-blue' if o.status in ('Approved', 'Offer Sent') else 'hrp-badge-gray') }}">{{ o.status }}</span></td>
+                                    <td>{{ o.total_ctc or '—' }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="hrp-empty"><p>No offers yet.</p></div>
+                    {% endif %}
+
+                    {% if can_write %}
+                    <h3 class="hrp-card-title" style="margin-top:20px">Create Offer</h3>
+                    <form class="hrp-form" method="post">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                        <input type="hidden" name="action" value="create_offer">
+                        <input type="hidden" name="candidate" value="{{ candidate.name }}">
+                        <div class="hrp-form-grid">
+                            <div class="hrp-form-row">
+                                <label class="hrp-label">Base Salary</label>
+                                <input class="hrp-input" type="number" name="base_salary" min="0" placeholder="LPA / currency">
+                            </div>
+                            <div class="hrp-form-row">
+                                <label class="hrp-label">Variable Pay</label>
+                                <input class="hrp-input" type="number" name="variable_pay" min="0">
+                            </div>
+                        </div>
+                        <div class="hrp-form-grid">
+                            <div class="hrp-form-row">
+                                <label class="hrp-label">Offer Date</label>
+                                <input class="hrp-input" type="date" name="offer_date">
+                            </div>
+                            <div class="hrp-form-row">
+                                <label class="hrp-label">Expected Joining</label>
+                                <input class="hrp-input" type="date" name="expected_joining_date">
+                            </div>
+                        </div>
+                        <div class="hrp-form-row">
+                            <label class="hrp-label">Benefits</label>
+                            <textarea class="hrp-textarea" name="benefits" style="min-height:60px" placeholder="Health insurance, ESOPs, etc."></textarea>
+                        </div>
+                        <button class="hrp-btn hrp-btn-success" type="submit">💌 Create Offer</button>
+                    </form>
+                    {% endif %}
+                </div>
+
+                <div class="hrp-card hrp-mt">
+                    <h2 class="hrp-card-title">Interview Feedback</h2>
+                    {% if feedback_list %}
+                    <div class="hrp-table-wrap">
+                        <table class="hrp-table">
+                            <thead><tr><th>Interviewer</th><th>Recommendation</th><th>Result</th></tr></thead>
+                            <tbody>
+                                {% for f in feedback_list %}
+                                <tr>
+                                    <td>{{ f.interviewer }}</td>
+                                    <td>{{ f.recommendation or '—' }}</td>
+                                    <td>{{ f.result or '—' }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="hrp-empty"><p>No feedback yet.</p></div>
+                    {% endif %}
+
+                    {% if can_write and interviews %}
+                    <h3 class="hrp-card-title" style="margin-top:20px">Submit Feedback</h3>
+                    <form class="hrp-form" method="post">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                        <input type="hidden" name="action" value="submit_feedback">
+                        <input type="hidden" name="candidate" value="{{ candidate.name }}">
+                        <div class="hrp-form-row">
+                            <label class="hrp-label">Interview *</label>
+                            <select class="hrp-select" name="interview_schedule" required>
+                                {% for i in interviews %}
+                                <option value="{{ i.name }}">{{ i.job_title }} · {{ i.scheduled_date }} ({{ i.status }})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="hrp-form-row">
+                            <label class="hrp-label">Interviewer *</label>
+                            <select class="hrp-select" name="interviewer" required>
+                                {% for u in users %}
+                                <option value="{{ u }}" {{ 'selected' if u == frappe.session.user else '' }}>{{ u }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="hrp-form-grid">
+                            <div class="hrp-form-row">
+                                <label class="hrp-label">Recommendation</label>
+                                <select class="hrp-select" name="recommendation">
+                                    <option>Hire</option><option>Strong Hire</option><option>Lean Hire</option>
+                                    <option>No Decision</option><option>Lean No</option><option>No</option><option>Strong No</option>
+                                </select>
+                            </div>
+                            <div class="hrp-form-row">
+                                <label class="hrp-label">Result</label>
+                                <select class="hrp-select" name="result">
+                                    <option>Advanced to Next Round</option><option>Selected</option>
+                                    <option>On Hold</option><option>Rejected</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="hrp-form-row">
+                            <label class="hrp-label">Strengths</label>
+                            <textarea class="hrp-textarea" name="strengths" style="min-height:60px"></textarea>
+                        </div>
+                        <div class="hrp-form-row">
+                            <label class="hrp-label">Areas for Improvement</label>
+                            <textarea class="hrp-textarea" name="weaknesses" style="min-height:60px"></textarea>
+                        </div>
+                        <button class="hrp-btn hrp-btn-primary" type="submit">✓ Submit Feedback</button>
+                    </form>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </main>
+
+    {% include "templates/includes/hr_portal_footer.html" %}
+    <script src="/assets/hr_master/js/hr_portal.js"></script>
+</body>
+</html>

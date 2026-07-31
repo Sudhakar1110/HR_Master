@@ -1,0 +1,20 @@
+<nav class="hrp-nav">
+  <div class="hrp-nav-inner">
+    <a class="hrp-brand" href="/hr_portal">
+      <span class="hrp-logo">H</span>
+      <span>HR Master</span>
+    </a>
+    <div class="hrp-nav-links">
+      <a href="/hr_portal" class="{{ 'hrp-active' if active == 'dashboard' else '' }}">Dashboard</a>
+      <a href="/hr_portal/jds" class="{{ 'hrp-active' if active == 'jds' else '' }}">Job Descriptions</a>
+      <a href="/app/hr-master" target="_blank">Open Desk ↗</a>
+    </div>
+    {% if frappe.session.user != "Guest" %}
+    <div class="hrp-nav-user">
+      <span class="hrp-avatar">{{ (frappe.session.user or 'U')[0]|upper }}</span>
+      <span>{{ frappe.session.user }}</span>
+      <a class="hrp-btn-logout" href="/api/method/logout">Logout</a>
+    </div>
+    {% endif %}
+  </div>
+</nav>

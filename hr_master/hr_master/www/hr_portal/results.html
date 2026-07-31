@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ page_title }} · HR Master</title>
+    <link rel="stylesheet" href="/assets/hr_master/css/hr_portal.css">
+</head>
+<body class="hrp-body">
+    {% include "templates/includes/hr_portal_header.html" %}
+
+    <main class="hrp-container">
+        {% if flash %}
+        <div class="hrp-alert {{ 'hrp-alert-success' if flash.type == 'success' else 'hrp-alert-error' }}" data-dismiss>
+            {{ flash.message }}
+        </div>
+        {% endif %}
+
+        <div class="hrp-page-head">
+            <div>
+                <h1 class="hrp-page-title">Ranked Candidates</h1>
+                <p class="hrp-page-sub">{{ jd.job_title }} · {{ jd.name }} · sorted by match %</p>
+            </div>
+            <div class="hrp-actions">
+                <a class="hrp-btn hrp-btn-secondary" href="/hr_portal/jd?name={{ jd.name }}">← Back to JD</a>
+                {% if can_write %}
+                <form method="post" style="display:inline">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                    <input type="hidden" name="action" value="rank_all">
+                    <button class="hrp-btn hrp-btn-primary" type="submit">📊 Re-rank All</button>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+
+        {% if rankings %}
+        <div class="hrp-card">
+            <div class="hrp-table-wrap">
+                <table class="hrp-table">
+                    <thead>
+                        <tr>
+                            <th>#</th><th>Candidate</th><th>Match %</th><th>Recommendation</th>
+                            <th>Status</th><th>Exp / Edu</th><th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for r in rankings %}
+                        <tr>
+                            <td><strong>{{ loop.index }}</strong></td>
+                            <td>
+                                <a class="hrp-link" href="/hr_portal/candidate?name={{ r.candidate }}">{{ r.candidate_name }}</a>
+                            </td>
+                            <td>
+                                {% set score = r.total_match_score or 0 %}
+                                <div class="hrp-flex">
+                                    <span class="hrp-score">{{ score|int }}%</span>
+                                    <div class="hrp-progress" style="flex:1;min-width:80px">
+                                        <div class="hrp-progress-fill {{ 'hrp-badge-green' if score >= 80 else ('hrp-badge-orange' if score >= 50 else 'hrp-badge-red') }}"
+                                             style="width: {{ score|int }}%;background: currentColor"></div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                {% set rec = (r.recommendation or '')|lower %}
+                                <span class="hrp-badge {{ 'hrp-badge-green' if 'yes' in rec else ('hrp-badge-orange' if rec == 'maybe' else 'hrp-badge-gray') }}">{{ r.recommendation or '—' }}</span>
+                            </td>
+                            <td>
+                                {% set st = r.status|lower %}
+                                <span class="hrp-badge {{ 'hrp-badge-green' if st in ('shortlisted', 'interview scheduled') else ('hrp-badge-orange' if st in ('pending', 'on hold', 'evaluated') else 'hrp-badge-red') }}">{{ r.status }}</span>
+                            </td>
+                            <td>
+                                <span class="hrp-hint">{{ r.experience_match_score or 0 }}% exp</span> ·
+                                <span class="hrp-hint">{{ r.education_match_score or 0 }}% edu</span>
+                            </td>
+                            <td>
+                                {% if can_write %}
+                                <div class="hrp-actions">
+                                    <form method="post" style="display:inline">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                                        <input type="hidden" name="action" value="Shortlist">
+                                        <input type="hidden" name="ranking" value="{{ r.name }}">
+                                        <button class="hrp-btn hrp-btn-success hrp-btn-sm" type="submit" data-confirm="Shortlist {{ r.candidate_name }}?">Shortlist</button>
+                                    </form>
+                                    <form method="post" style="display:inline">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                                        <input type="hidden" name="action" value="Reject">
+                                        <input type="hidden" name="ranking" value="{{ r.name }}">
+                                        <button class="hrp-btn hrp-btn-danger hrp-btn-sm" type="submit" data-confirm="Reject {{ r.candidate_name }}?">Reject</button>
+                                    </form>
+                                    <form method="post" style="display:inline">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                                        <input type="hidden" name="action" value="Put on Hold">
+                                        <input type="hidden" name="ranking" value="{{ r.name }}">
+                                        <button class="hrp-btn hrp-btn-warning hrp-btn-sm" type="submit">Hold</button>
+                                    </form>
+                                </div>
+                                {% else %}
+                                <span class="hrp-hint">View only</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% else %}
+        <div class="hrp-card">
+            <div class="hrp-empty">
+                <div class="hrp-empty-icon">📊</div>
+                <p>No rankings yet for this JD.</p>
+                <p class="hrp-hint">Import candidates from a portal search, then click <strong>Rank Candidates</strong> on the JD page to score them.</p>
+                <a class="hrp-btn hrp-btn-primary hrp-btn-sm" href="/hr_portal/jd?name={{ jd.name }}">Go to JD →</a>
+            </div>
+        </div>
+        {% endif %}
+    </main>
+
+    {% include "templates/includes/hr_portal_footer.html" %}
+    <script src="/assets/hr_master/js/hr_portal.js"></script>
+</body>
+</html>

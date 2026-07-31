@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ page_title }} · HR Master</title>
+    <link rel="stylesheet" href="/assets/hr_master/css/hr_portal.css">
+</head>
+<body class="hrp-body">
+    {% include "templates/includes/hr_portal_header.html" %}
+
+    <main class="hrp-container hrp-legal">
+        <div class="hrp-page-head">
+            <div>
+                <h1 class="hrp-page-title">Privacy Policy</h1>
+                <p class="hrp-page-sub">Last updated: {{ frappe.utils.today() }}</p>
+            </div>
+        </div>
+
+        <div class="hrp-card">
+            <h2>1. Who we are</h2>
+            <p>This Recruitment Portal is operated by <strong>{{ company_name }}</strong> (referred to as "we", "our" or "us") and is used exclusively by our authorised Human Resources team for talent acquisition purposes.</p>
+
+            <h2>2. Information we collect</h2>
+            <p>We collect and process the following categories of personal data about candidates and users of this portal:</p>
+            <ul>
+                <li><strong>Candidate data:</strong> name, contact details, employment history, education, skills, resumes, and any information voluntarily shared through job applications or public professional profiles (e.g. LinkedIn, Naukri, Indeed, Monster).</li>
+                <li><strong>User data:</strong> names, work email addresses and role permissions of HR staff authorised to use this portal.</li>
+                <li><strong>Usage data:</strong> records of searches, rankings, shortlisting, interview scheduling and feedback activities performed on the portal.</li>
+            </ul>
+
+            <h2>3. Legal bases for processing</h2>
+            <p>We process personal data on the following lawful bases: (a) legitimate interest in recruiting and evaluating candidates for employment, (b) performance of pre-contractual steps at the request of the data subject, and (c) compliance with legal obligations.</p>
+
+            <h2>4. How we use the information</h2>
+            <ul>
+                <li>To evaluate candidate suitability against job descriptions (skill, experience and education matching).</li>
+                <li>To schedule interviews, collect feedback and manage offers.</li>
+                <li>To maintain an internal audit trail of recruitment activities.</li>
+                <li>To comply with applicable employment and data protection laws.</li>
+            </ul>
+
+            <h2>5. Who we share it with</h2>
+            <p>Candidate information is accessible only to authorised HR staff with HR Master roles. We do not sell personal data. Data may be shared with third-party service providers (e.g. job portal APIs, email or hosting providers) solely to operate the recruitment process, under appropriate contractual safeguards.</p>
+
+            <h2>6. Data retention</h2>
+            <p>We retain candidate data only for as long as needed for the recruitment process and any legal retention obligations. Unsuccessful candidate records are retained for a limited period and deleted thereafter, unless a separate legal basis applies.</p>
+
+            <h2>7. Your rights</h2>
+            <p>Where applicable law provides, data subjects have rights to access, rectify, erase, restrict or object to processing, and to data portability. Requests should be directed to our HR or Data Protection team.</p>
+
+            <h2>8. Security</h2>
+            <p>Access to this portal is restricted by role-based permissions. All access is authenticated and activity is logged. We implement appropriate technical and organisational measures to protect personal data.</p>
+
+            <h2>9. Contact</h2>
+            <p>For privacy questions or to exercise your rights, please contact our HR department.</p>
+
+            <p class="hrp-hint" style="margin-top:24px">This policy is a template for internal use and should be reviewed by your legal counsel before publication.</p>
+        </div>
+    </main>
+
+    {% include "templates/includes/hr_portal_footer.html" %}
+    <script src="/assets/hr_master/js/hr_portal.js"></script>
+</body>
+</html>

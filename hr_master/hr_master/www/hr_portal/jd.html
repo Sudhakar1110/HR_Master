@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ page_title }} · HR Master</title>
+    <link rel="stylesheet" href="/assets/hr_master/css/hr_portal.css">
+</head>
+<body class="hrp-body">
+    {% include "templates/includes/hr_portal_header.html" %}
+
+    <main class="hrp-container">
+        {% if flash %}
+        <div class="hrp-alert {{ 'hrp-alert-success' if flash.type == 'success' else 'hrp-alert-error' }}" data-dismiss>
+            {{ flash.message }}
+        </div>
+        {% endif %}
+
+        <div class="hrp-page-head">
+            <div>
+                <h1 class="hrp-page-title">{{ jd.job_title }}</h1>
+                <p class="hrp-page-sub">{{ jd.name }} · {{ jd.location or 'Anywhere' }} · {{ jd.employment_type or 'Full-Time' }}</p>
+            </div>
+            <div class="hrp-actions">
+                <a class="hrp-btn hrp-btn-secondary" href="/hr_portal/results?jd={{ jd.name }}">
+                    View Ranked Candidates ({{ ranking_count }}) →
+                </a>
+            </div>
+        </div>
+
+        <div class="hrp-grid hrp-grid-2 hrp-mb">
+            <!-- JD details -->
+            <div class="hrp-card">
+                <h2 class="hrp-card-title">Job Details</h2>
+                <dl class="hrp-detail-list">
+                    <div class="hrp-detail"><dt>Status</dt><dd><span class="hrp-badge {{ 'hrp-badge-green' if jd.status in ('Open', 'In Progress') else 'hrp-badge-gray' }}">{{ jd.status }}</span></dd></div>
+                    <div class="hrp-detail"><dt>Portal Search</dt><dd>
+                        {% set ps = jd.portal_search_status|lower %}
+                        <span class="hrp-badge {{ 'hrp-badge-blue' if ps == 'searched' else ('hrp-badge-orange' if ps == 'searching' else 'hrp-badge-gray') }}">{{ jd.portal_search_status }}</span>
+                    </dd></div>
+                    <div class="hrp-detail"><dt>Experience</dt><dd>{{ jd.min_experience_years or 0 }} – {{ jd.max_experience_years or 'Any' }} yrs</dd></div>
+                    <div class="hrp-detail"><dt>Salary Range</dt><dd>{% if jd.salary_range_min %}{{ jd.salary_range_min|int }} – {{ jd.salary_range_max|int or '—' }}{% else %}—{% endif %}</dd></div>
+                    <div class="hrp-detail"><dt>Vacancies</dt><dd>{{ jd.vacancies or 1 }}</dd></div>
+                    <div class="hrp-detail"><dt>Posting Date</dt><dd>{{ jd.posting_date }}</dd></div>
+                    <div class="hrp-detail"><dt>Target Close</dt><dd>{{ jd.target_close_date or '—' }}</dd></div>
+                </dl>
+
+                {% if jd.required_skills %}
+                <h3 class="hrp-card-title" style="margin-top:16px">Required Skills</h3>
+                <div class="hrp-chips">
+                    {% for s in jd.required_skills %}
+                    <span class="hrp-chip hrp-chip-required">{{ s.skill }}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                {% if jd.preferred_skills %}
+                <h3 class="hrp-card-title" style="margin-top:16px">Preferred Skills</h3>
+                <div class="hrp-chips">
+                    {% for s in jd.preferred_skills %}
+                    <span class="hrp-chip hrp-chip-preferred">{{ s.skill }}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                {% if jd.job_description_raw %}
+                <h3 class="hrp-card-title" style="margin-top:16px">Description</h3>
+                <p style="white-space:pre-wrap;font-size:14px;color:#334155">{{ jd.job_description_raw }}</p>
+                {% endif %}
+            </div>
+
+            <!-- Portal search panel -->
+            <div>
+                <div class="hrp-card">
+                    <h2 class="hrp-card-title">Portal Search</h2>
+                    <div class="hrp-actions hrp-mb">
+                        <form method="post" style="display:inline">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                            <input type="hidden" name="action" value="search">
+                            <button class="hrp-btn hrp-btn-primary" type="submit" {{ 'disabled' if not can_write else '' }}>🔎 Search Portals</button>
+                        </form>
+                        <form method="post" style="display:inline">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                            <input type="hidden" name="action" value="rank">
+                            <button class="hrp-btn hrp-btn-secondary" type="submit" {{ 'disabled' if not can_write else '' }}>📊 Rank Candidates</button>
+                        </form>
+                    </div>
+                    <p class="hrp-hint">Search queues a background job across enabled portals (LinkedIn, Naukri, Indeed, Monster). Import converts results into Candidate records; Rank scores them against this JD.</p>
+                </div>
+
+                <div class="hrp-card hrp-mt">
+                    <h2 class="hrp-card-title">Search History</h2>
+                    {% if searches %}
+                    <div class="hrp-table-wrap">
+                        <table class="hrp-table">
+                            <thead>
+                                <tr><th>Status</th><th>Found</th><th>Date</th><th></th></tr>
+                            </thead>
+                            <tbody>
+                                {% for s in searches %}
+                                <tr>
+                                    <td>
+                                        {% set st = s.status|lower %}
+                                        <span class="hrp-badge {{ 'hrp-badge-green' if st in ('completed', 'partial') else ('hrp-badge-orange' if st in ('queued', 'in progress') else 'hrp-badge-red') }}">{{ s.status }}</span>
+                                    </td>
+                                    <td>{{ s.total_candidates_found or 0 }}
+                                        <span class="hrp-hint">(LI {{ s.linkedin_results or 0 }} · NK {{ s.naukri_results or 0 }} · IN {{ s.indeed_results or 0 }} · MN {{ s.monster_results or 0 }})</span>
+                                    </td>
+                                    <td>{{ s.search_date }}</td>
+                                    <td class="hrp-right">
+                                        {% if can_write %}
+                                        <form method="post" style="display:inline" data-confirm="Import all results of this search as candidates?">
+                                            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                                            <input type="hidden" name="action" value="import">
+                                            <input type="hidden" name="search_name" value="{{ s.name }}">
+                                            <button class="hrp-btn hrp-btn-success hrp-btn-sm" type="submit">Import</button>
+                                        </form>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="hrp-empty">
+                        <div class="hrp-empty-icon">🔎</div>
+                        <p>No portal searches yet. Click <strong>Search Portals</strong> to start.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </main>
+
+    {% include "templates/includes/hr_portal_footer.html" %}
+    <script src="/assets/hr_master/js/hr_portal.js"></script>
+</body>
+</html>

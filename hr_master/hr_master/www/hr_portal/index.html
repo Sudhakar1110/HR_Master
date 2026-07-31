@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ page_title }} · HR Master</title>
+    <link rel="stylesheet" href="/assets/hr_master/css/hr_portal.css">
+</head>
+<body class="hrp-body">
+    {% include "templates/includes/hr_portal_header.html" %}
+
+    <main class="hrp-container">
+        <div class="hrp-page-head">
+            <div>
+                <h1 class="hrp-page-title">HR Dashboard</h1>
+                <p class="hrp-page-sub">Live recruitment overview · everything here reflects in the Desk instantly</p>
+            </div>
+            <div class="hrp-actions">
+                <a class="hrp-btn hrp-btn-primary" href="/hr_portal/jds">+ New Job Description</a>
+            </div>
+        </div>
+
+        {% set kpi_cards = [
+            {"key": "total_candidates", "label": "Total Candidates", "icon": "👥"},
+            {"key": "active_jds", "label": "Active JDs", "icon": "📋"},
+            {"key": "shortlisted", "label": "Shortlisted", "icon": "⭐"},
+            {"key": "interviews", "label": "Interviews", "icon": "📅"},
+            {"key": "offers_released", "label": "Offers Released", "icon": "💌"},
+            {"key": "hired", "label": "Hired", "icon": "🎉"},
+            {"key": "avg_match", "label": "Avg Match %", "icon": "🎯"},
+        ] %}
+        <div class="hrp-grid hrp-grid-4 hrp-mb">
+            {% for card in kpi_cards %}
+            <div class="hrp-card hrp-kpi hrp-card-hover">
+                <div class="hrp-flex hrp-between">
+                    <span class="hrp-kpi-icon">{{ card.icon }}</span>
+                    <span class="hrp-kpi-label">{{ card.label }}</span>
+                </div>
+                <div class="hrp-kpi-value">{{ kpis.get(card.key, 0) }}</div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="hrp-grid hrp-grid-2">
+            <div class="hrp-card">
+                <h2 class="hrp-card-title">Recent Job Descriptions</h2>
+                {% if recent_jds %}
+                <div class="hrp-table-wrap">
+                    <table class="hrp-table">
+                        <thead>
+                            <tr><th>Job Title</th><th>Status</th><th>Search</th><th></th></tr>
+                        </thead>
+                        <tbody>
+                            {% for jd in recent_jds %}
+                            <tr>
+                                <td><strong>{{ jd.job_title }}</strong></td>
+                                <td>
+                                    {% set st = jd.status|lower %}
+                                    <span class="hrp-badge {{ 'hrp-badge-green' if st in ('open', 'in progress') else 'hrp-badge-gray' }}">{{ jd.status }}</span>
+                                </td>
+                                <td>
+                                    {% set ps = jd.portal_search_status|lower %}
+                                    <span class="hrp-badge {{ 'hrp-badge-blue' if ps == 'searched' else ('hrp-badge-orange' if ps == 'searching' else 'hrp-badge-gray') }}">{{ jd.portal_search_status }}</span>
+                                </td>
+                                <td class="hrp-right"><a class="hrp-link" href="/hr_portal/jd?name={{ jd.name }}">Open →</a></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="hrp-empty">
+                    <div class="hrp-empty-icon">📋</div>
+                    <p>No job descriptions yet.</p>
+                    <a class="hrp-btn hrp-btn-primary hrp-btn-sm" href="/hr_portal/jds">Create your first JD</a>
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="hrp-card">
+                <h2 class="hrp-card-title">Top Matches</h2>
+                {% if top_rankings %}
+                <div class="hrp-table-wrap">
+                    <table class="hrp-table">
+                        <thead>
+                            <tr><th>Candidate</th><th>Job</th><th>Match</th><th></th></tr>
+                        </thead>
+                        <tbody>
+                            {% for r in top_rankings %}
+                            <tr>
+                                <td><strong>{{ r.candidate_name }}</strong></td>
+                                <td>{{ r.job_title }}</td>
+                                <td>
+                                    <div class="hrp-flex">
+                                        <span class="hrp-score">{{ r.total_match_score|int }}%</span>
+                                        <div class="hrp-progress" style="flex:1;min-width:60px">
+                                            <div class="hrp-progress-fill {{ 'hrp-badge-green' if (r.total_match_score or 0) >= 80 else ('hrp-badge-orange' if (r.total_match_score or 0) >= 50 else 'hrp-badge-red') }}"
+                                                 style="width: {{ r.total_match_score|int }}%;background: currentColor"></div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="hrp-right"><a class="hrp-link" href="/hr_portal/candidate?name={{ r.candidate }}">View →</a></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="hrp-empty">
+                    <div class="hrp-empty-icon">🎯</div>
+                    <p>No ranked candidates yet. Create a JD and rank candidates to see matches here.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </main>
+
+    {% include "templates/includes/hr_portal_footer.html" %}
+    <script src="/assets/hr_master/js/hr_portal.js"></script>
+</body>
+</html>

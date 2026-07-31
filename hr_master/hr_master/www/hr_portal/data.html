@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ page_title }} · HR Master</title>
+    <link rel="stylesheet" href="/assets/hr_master/css/hr_portal.css">
+</head>
+<body class="hrp-body">
+    {% include "templates/includes/hr_portal_header.html" %}
+
+    <main class="hrp-container hrp-legal">
+        <div class="hrp-page-head">
+            <div>
+                <h1 class="hrp-page-title">Data Protection Policy</h1>
+                <p class="hrp-page-sub">Last updated: {{ frappe.utils.today() }}</p>
+            </div>
+        </div>
+
+        <div class="hrp-card">
+            <h2>1. Purpose</h2>
+            <p>This policy describes how <strong>{{ company_name }}</strong> protects the personal data of job applicants and candidates processed through this Recruitment Portal.</p>
+
+            <h2>2. Scope</h2>
+            <p>This policy applies to all personal data of candidates and users collected, stored or processed through the portal, including resumes, contact details, employment history, skills and assessment results.</p>
+
+            <h2>3. Data protection principles</h2>
+            <ul>
+                <li><strong>Lawfulness &amp; fairness:</strong> data is processed only for legitimate recruitment purposes.</li>
+                <li><strong>Purpose limitation:</strong> data is used only for the stated recruitment purposes.</li>
+                <li><strong>Data minimisation:</strong> only data necessary for evaluation is collected.</li>
+                <li><strong>Accuracy:</strong> reasonable steps are taken to keep data accurate and up to date.</li>
+                <li><strong>Storage limitation:</strong> data is retained no longer than necessary.</li>
+                <li><strong>Integrity &amp; confidentiality:</strong> data is protected with appropriate technical and organisational measures.</li>
+            </ul>
+
+            <h2>4. Access control</h2>
+            <p>Access to candidate data is granted only to authorised HR staff based on role. All access is authenticated, and significant actions are recorded in an audit log.</p>
+
+            <h2>5. Consent &amp; transparency</h2>
+            <p>Where required by law, candidates are informed about how their data is used and may be asked for consent. Automated evaluation (match scoring) assists, but does not replace, human decision-making.</p>
+
+            <h2>6. Data subject rights</h2>
+            <p>Candidates may request access, rectification, erasure, restriction, objection or portability of their data. Requests are handled by the HR department within applicable time limits.</p>
+
+            <h2>7. Breach handling</h2>
+            <p>Suspected data breaches are reported immediately to the designated data protection contact and handled in line with applicable law, including notification obligations.</p>
+
+            <h2>8. Training &amp; accountability</h2>
+            <p>HR staff using this portal receive appropriate guidance on data protection. The organisation maintains records of processing activities and reviews this policy periodically.</p>
+
+            <h2>9. Contact</h2>
+            <p>For data protection enquiries, contact our HR department.</p>
+
+            <p class="hrp-hint" style="margin-top:24px">This document is a template for internal use and should be reviewed by your legal counsel before publication.</p>
+        </div>
+    </main>
+
+    {% include "templates/includes/hr_portal_footer.html" %}
+    <script src="/assets/hr_master/js/hr_portal.js"></script>
+</body>
+</html>

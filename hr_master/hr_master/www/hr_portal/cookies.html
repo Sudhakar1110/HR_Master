@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ page_title }} · HR Master</title>
+    <link rel="stylesheet" href="/assets/hr_master/css/hr_portal.css">
+</head>
+<body class="hrp-body">
+    {% include "templates/includes/hr_portal_header.html" %}
+
+    <main class="hrp-container hrp-legal">
+        <div class="hrp-page-head">
+            <div>
+                <h1 class="hrp-page-title">Cookie Policy</h1>
+                <p class="hrp-page-sub">Last updated: {{ frappe.utils.today() }}</p>
+            </div>
+        </div>
+
+        <div class="hrp-card">
+            <h2>1. What are cookies?</h2>
+            <p>Cookies are small text files stored on your device when you visit a website. This portal is built on the Frappe/ERPNext platform, which uses cookies for essential functions.</p>
+
+            <h2>2. Cookies we use</h2>
+            <ul>
+                <li><strong>Essential/session cookies:</strong> required to keep you logged in and maintain a secure session (e.g. <span class="hrp-mono">sid</span>). These cannot be disabled.</li>
+                <li><strong>Security cookies:</strong> used to prevent cross-site request forgery (CSRF) attacks (e.g. <span class="hrp-mono">csrf_token</span>).</li>
+                <li><strong>Preferences:</strong> the platform may store user interface preferences locally.</li>
+            </ul>
+
+            <h2>3. Managing cookies</h2>
+            <p>Essential cookies are necessary for the portal to function. You can clear cookies through your browser settings at any time, but doing so may log you out or affect functionality.</p>
+
+            <h2>4. Third-party cookies</h2>
+            <p>When portal features integrate with third-party services (e.g. job portal APIs), those services may set their own cookies or tokens in accordance with their own policies.</p>
+
+            <h2>5. Contact</h2>
+            <p>Questions about this Cookie Policy should be directed to our HR department.</p>
+
+            <p class="hrp-hint" style="margin-top:24px">This document is a template for internal use and should be reviewed by your legal counsel before publication.</p>
+        </div>
+    </main>
+
+    {% include "templates/includes/hr_portal_footer.html" %}
+    <script src="/assets/hr_master/js/hr_portal.js"></script>
+</body>
+</html>

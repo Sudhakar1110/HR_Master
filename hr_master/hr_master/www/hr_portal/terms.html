@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ page_title }} · HR Master</title>
+    <link rel="stylesheet" href="/assets/hr_master/css/hr_portal.css">
+</head>
+<body class="hrp-body">
+    {% include "templates/includes/hr_portal_header.html" %}
+
+    <main class="hrp-container hrp-legal">
+        <div class="hrp-page-head">
+            <div>
+                <h1 class="hrp-page-title">Terms of Use</h1>
+                <p class="hrp-page-sub">Last updated: {{ frappe.utils.today() }}</p>
+            </div>
+        </div>
+
+        <div class="hrp-card">
+            <h2>1. Acceptance of terms</h2>
+            <p>By accessing this Recruitment Portal operated by <strong>{{ company_name }}</strong>, you agree to these Terms of Use. If you do not agree, do not use the portal.</p>
+
+            <h2>2. Authorised access</h2>
+            <p>This portal is for internal use by authorised HR personnel only. Access is granted through role-based permissions (HR Master Admin, Recruiter, Hiring Manager, Viewer) and may be revoked at any time.</p>
+
+            <h2>3. Acceptable use</h2>
+            <ul>
+                <li>Use candidate data only for legitimate recruitment purposes.</li>
+                <li>Do not share login credentials or allow unauthorised access.</li>
+                <li>Do not use the portal for any unlawful, discriminatory or harassing activity.</li>
+                <li>Do not attempt to access data or systems beyond your authorisation.</li>
+                <li>Comply with all applicable data protection and employment laws.</li>
+            </ul>
+
+            <h2>4. Data responsibility</h2>
+            <p>Users are responsible for the accuracy of data they enter and for handling candidate personal data in line with the Privacy Policy and Data Protection Policy.</p>
+
+            <h2>5. Intellectual property</h2>
+            <p>All software, design, content and documentation of this portal are the property of {{ company_name }} or its licensors. No licence is granted except the limited right to use the portal for recruitment purposes.</p>
+
+            <h2>6. No guarantee of accuracy</h2>
+            <p>Match scores, rankings and search results are automated outputs provided to assist decision-making. Final hiring decisions remain the responsibility of qualified HR staff.</p>
+
+            <h2>7. Limitation of liability</h2>
+            <p>To the maximum extent permitted by law, {{ company_name }} is not liable for indirect or consequential losses arising from use of this portal.</p>
+
+            <h2>8. Changes to terms</h2>
+            <p>We may update these terms from time to time. Continued use of the portal after changes constitutes acceptance of the revised terms.</p>
+
+            <p class="hrp-hint" style="margin-top:24px">This document is a template for internal use and should be reviewed by your legal counsel before publication.</p>
+        </div>
+    </main>
+
+    {% include "templates/includes/hr_portal_footer.html" %}
+    <script src="/assets/hr_master/js/hr_portal.js"></script>
+</body>
+</html>

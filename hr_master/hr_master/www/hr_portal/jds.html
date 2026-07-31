@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ page_title }} · HR Master</title>
+    <link rel="stylesheet" href="/assets/hr_master/css/hr_portal.css">
+</head>
+<body class="hrp-body">
+    {% include "templates/includes/hr_portal_header.html" %}
+
+    <main class="hrp-container">
+        <div class="hrp-page-head">
+            <div>
+                <h1 class="hrp-page-title">Job Descriptions</h1>
+                <p class="hrp-page-sub">Create a JD, search portals, import &amp; rank candidates</p>
+            </div>
+        </div>
+
+        {% if form_error %}
+        <div class="hrp-alert hrp-alert-error">{{ form_error }}</div>
+        {% endif %}
+
+        <div class="hrp-grid hrp-grid-2">
+            <!-- New JD form -->
+            <div class="hrp-card">
+                <h2 class="hrp-card-title">New Job Description</h2>
+                {% if can_write %}
+                <form class="hrp-form" method="post">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                    <div class="hrp-form-row">
+                        <label class="hrp-label" for="job_title">Job Title *</label>
+                        <input class="hrp-input" type="text" id="job_title" name="job_title" required
+                               value="{{ (form_values or {}).get('job_title', '') }}" placeholder="e.g. Senior Python Developer">
+                    </div>
+
+                    <div class="hrp-form-grid">
+                        <div class="hrp-form-row">
+                            <label class="hrp-label" for="department">Department</label>
+                            <select class="hrp-select" id="department" name="department">
+                                <option value="">— Select —</option>
+                                {% for d in departments %}
+                                <option value="{{ d }}" {{ 'selected' if (form_values or {}).get('department') == d else '' }}>{{ d }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="hrp-form-row">
+                            <label class="hrp-label" for="employment_type">Employment Type</label>
+                            <select class="hrp-select" id="employment_type" name="employment_type">
+                                <option value="Full-Time" {{ 'selected' if (form_values or {}).get('employment_type') == 'Full-Time' else '' }}>Full-Time</option>
+                                <option value="Part-Time">Part-Time</option>
+                                <option value="Contract">Contract</option>
+                                <option value="Internship">Internship</option>
+                                <option value="Freelance">Freelance</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="hrp-form-grid">
+                        <div class="hrp-form-row">
+                            <label class="hrp-label" for="location">Location</label>
+                            <input class="hrp-input" type="text" id="location" name="location"
+                                   value="{{ (form_values or {}).get('location', '') }}" placeholder="City / Remote">
+                        </div>
+                        <div class="hrp-form-row">
+                            <label class="hrp-label" for="remote_option">Remote Option</label>
+                            <select class="hrp-select" id="remote_option" name="remote_option">
+                                <option value="On-site">On-site</option>
+                                <option value="Hybrid">Hybrid</option>
+                                <option value="Remote">Remote</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="hrp-form-grid">
+                        <div class="hrp-form-row">
+                            <label class="hrp-label" for="min_experience_years">Min Experience (yrs)</label>
+                            <input class="hrp-input" type="number" id="min_experience_years" name="min_experience_years" min="0"
+                                   value="{{ (form_values or {}).get('min_experience_years', 0) }}">
+                        </div>
+                        <div class="hrp-form-row">
+                            <label class="hrp-label" for="max_experience_years">Max Experience (yrs)</label>
+                            <input class="hrp-input" type="number" id="max_experience_years" name="max_experience_years" min="0"
+                                   value="{{ (form_values or {}).get('max_experience_years', 0) }}">
+                        </div>
+                    </div>
+
+                    <div class="hrp-form-grid">
+                        <div class="hrp-form-row">
+                            <label class="hrp-label" for="salary_range_min">Salary Min</label>
+                            <input class="hrp-input" type="number" id="salary_range_min" name="salary_range_min" min="0"
+                                   value="{{ (form_values or {}).get('salary_range_min', '') }}">
+                        </div>
+                        <div class="hrp-form-row">
+                            <label class="hrp-label" for="salary_range_max">Salary Max</label>
+                            <input class="hrp-input" type="number" id="salary_range_max" name="salary_range_max" min="0"
+                                   value="{{ (form_values or {}).get('salary_range_max', '') }}">
+                        </div>
+                    </div>
+
+                    <div class="hrp-form-row">
+                        <label class="hrp-label" for="required_skills">Required Skills * (comma separated)</label>
+                        <input class="hrp-input" type="text" id="required_skills" name="required_skills" required
+                               value="{{ (form_values or {}).get('required_skills', '') }}" placeholder="Python, Django, SQL">
+                        <span class="hrp-hint">Unknown skills are auto-created in the Skill master.</span>
+                    </div>
+
+                    <div class="hrp-form-row">
+                        <label class="hrp-label" for="preferred_skills">Preferred Skills (comma separated)</label>
+                        <input class="hrp-input" type="text" id="preferred_skills" name="preferred_skills"
+                               value="{{ (form_values or {}).get('preferred_skills', '') }}">
+                    </div>
+
+                    <div class="hrp-form-row">
+                        <label class="hrp-label" for="job_description_raw">Full Job Description</label>
+                        <textarea class="hrp-textarea" id="job_description_raw" name="job_description_raw"
+                                  placeholder="Paste the full job description here…">{{ (form_values or {}).get('job_description_raw', '') }}</textarea>
+                    </div>
+
+                    <button class="hrp-btn hrp-btn-primary" type="submit">Create JD &amp; Open</button>
+                </form>
+                {% else %}
+                <div class="hrp-empty">
+                    <p>You have read-only access. Ask an HR Master Admin or Recruiter to create JDs.</p>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- JD list -->
+            <div class="hrp-card">
+                <h2 class="hrp-card-title">All Job Descriptions</h2>
+                {% if jds %}
+                <div class="hrp-table-wrap">
+                    <table class="hrp-table">
+                        <thead>
+                            <tr><th>Job Title</th><th>Status</th><th>Search</th><th>Location</th><th>Vac.</th><th></th></tr>
+                        </thead>
+                        <tbody>
+                            {% for jd in jds %}
+                            <tr>
+                                <td><strong>{{ jd.job_title }}</strong></td>
+                                <td>
+                                    {% set st = jd.status|lower %}
+                                    <span class="hrp-badge {{ 'hrp-badge-green' if st in ('open', 'in progress') else ('hrp-badge-orange' if st == 'draft' else 'hrp-badge-gray') }}">{{ jd.status }}</span>
+                                </td>
+                                <td>
+                                    {% set ps = jd.portal_search_status|lower %}
+                                    <span class="hrp-badge {{ 'hrp-badge-blue' if ps == 'searched' else ('hrp-badge-orange' if ps == 'searching' else 'hrp-badge-gray') }}">{{ jd.portal_search_status }}</span>
+                                </td>
+                                <td>{{ jd.location or '—' }}</td>
+                                <td>{{ jd.vacancies or 1 }}</td>
+                                <td class="hrp-right"><a class="hrp-link" href="/hr_portal/jd?name={{ jd.name }}">Open →</a></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="hrp-empty">
+                    <div class="hrp-empty-icon">📋</div>
+                    <p>No job descriptions yet. Create one using the form.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </main>
+
+    {% include "templates/includes/hr_portal_footer.html" %}
+    <script src="/assets/hr_master/js/hr_portal.js"></script>
+</body>
+</html>
