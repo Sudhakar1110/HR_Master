@@ -33,6 +33,7 @@ class JobPortalSearch(Document):
             self.indeed_results = len([r for r in self.search_results if r.source == "Indeed"])
             self.monster_results = len([r for r in self.search_results if r.source == "Monster"])
             self.serpapi_results = len([r for r in self.search_results if r.source == "SerpAPI"])
+            self.demo_results = len([r for r in self.search_results if r.source == "Demo"])
 
     def import_result_to_candidate(self, result):
         """Import a single search result row as a Candidate document.
@@ -53,6 +54,10 @@ class JobPortalSearch(Document):
             candidate.total_experience_years = result.experience_years or 0
             candidate.parsed_skills_from_resume = result.skills_summary
             candidate.status = "New"
+
+            # Structure the skills so the ranking engine can score them
+            self._populate_candidate_skills(candidate, result.skills_summary)
+
             candidate.save(ignore_permissions=True)
 
             result.is_imported = 1
@@ -65,6 +70,42 @@ class JobPortalSearch(Document):
                 title="Candidate Import Error",
             )
             return False
+
+    def _populate_candidate_skills(self, candidate, skills_summary):
+        """Parse a skills summary into structured Candidate Skill Detail rows.
+
+        This is what lets the ranking engine score imported candidates properly
+        (the match % is built from candidate_skills, not free text).
+        """
+        if not skills_summary:
+            return
+
+        from hr_master.hr_master.doctype.skill.skill import extract_skills_from_text
+
+        found = extract_skills_from_text(skills_summary)
+        if not found:
+            # Fallback: split on commas / semicolons
+            found = [
+                s.strip()
+                for s in skills_summary.replace(";", ",").split(",")
+                if s.strip() and len(s.strip()) > 1
+            ]
+
+        # candidate_skills.skill is a required Link to the Skill doctype, so each
+        # skill must exist as a Skill record or save() fails link validation.
+        from hr_master.api.portal_actions import ensure_skill
+
+        for skill_name in found[:20]:
+            ensure_skill(skill_name)
+            candidate.append(
+                "candidate_skills",
+                {
+                    "skill": skill_name,
+                    "years_of_experience": candidate.total_experience_years or 0,
+                    "proficiency": "Intermediate",
+                    "is_primary": 0,
+                },
+            )
 
     def import_results_to_candidates(self):
         """Import unimported search results as Candidate documents."""

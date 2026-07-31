@@ -49,6 +49,8 @@ class JobPortalConfig(Document):
             portals.append("Monster")
         if getattr(self, "serpapi_enabled", 0):
             portals.append("SerpAPI")
+        if getattr(self, "demo_enabled", 0):
+            portals.append("Demo")
         return portals
 
     def get_search_limit(self, portal):
@@ -59,6 +61,7 @@ class JobPortalConfig(Document):
             "Indeed": self.indeed_search_limit or 25,
             "Monster": self.monster_search_limit or 25,
             "SerpAPI": self.serpapi_search_limit or 10,
+            "Demo": getattr(self, "demo_search_limit", 0) or 15,
         }
         return limits.get(portal, 10)
 

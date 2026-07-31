@@ -36,6 +36,7 @@ def search_candidates_for_jd(job_description_name):
         search.search_indeed = 1 if "Indeed" in portals else 0
         search.search_monster = 1 if "Monster" in portals else 0
         search.search_serpapi = 1 if "SerpAPI" in portals else 0
+        search.search_demo = 1 if "Demo" in portals else 0
 
         search.save(ignore_permissions=True)
 
@@ -464,3 +465,150 @@ def search_monster(search_name, jd_name, keywords):
             title="Monster Search Error",
         )
         return []
+
+
+# ------------------------------------------
+# Demo Data Mode (zero-key sample candidates)
+# ------------------------------------------
+
+DEMO_CANDIDATES = [
+    {"name": "Aarav Sharma", "title": "Senior Full Stack Developer", "company": "TechNova Solutions", "location": "Bengaluru", "skills": ["Python", "React", "Node.js", "SQL", "Docker", "AWS"], "experience": 7},
+    {"name": "Priya Patel", "title": "Backend Developer", "company": "CloudPeak Systems", "location": "Pune", "skills": ["Python", "Django", "PostgreSQL", "AWS", "REST API"], "experience": 5},
+    {"name": "Rohan Mehta", "title": "Frontend Developer", "company": "PixelWorks", "location": "Mumbai", "skills": ["React", "TypeScript", "JavaScript", "Next.js", "Tailwind CSS"], "experience": 4},
+    {"name": "Sneha Reddy", "title": "Data Scientist", "company": "InsightLabs", "location": "Hyderabad", "skills": ["Python", "SQL", "TensorFlow", "Pandas", "Machine Learning", "Statistics"], "experience": 6},
+    {"name": "Vikram Singh", "title": "DevOps Engineer", "company": "InfraCore", "location": "Gurugram", "skills": ["Docker", "Kubernetes", "AWS", "CI/CD", "Terraform", "Linux"], "experience": 8},
+    {"name": "Ananya Iyer", "title": "Data Analyst", "company": "MarketPulse Analytics", "location": "Chennai", "skills": ["SQL", "Excel", "Tableau", "Power BI", "Python"], "experience": 3},
+    {"name": "Karthik Nair", "title": "Mobile App Developer", "company": "AppFleet", "location": "Kochi", "skills": ["Flutter", "Dart", "React Native", "Firebase", "Kotlin"], "experience": 5},
+    {"name": "Divya Krishnan", "title": "Machine Learning Engineer", "company": "NeuralEdge AI", "location": "Bengaluru", "skills": ["Python", "PyTorch", "Scikit-learn", "NLP", "AWS"], "experience": 4},
+    {"name": "Rahul Verma", "title": "Java Developer", "company": "BankSys Technologies", "location": "Noida", "skills": ["Java", "Spring Boot", "Hibernate", "Microservices", "MySQL"], "experience": 9},
+    {"name": "Neha Gupta", "title": "QA Engineer", "company": "QualityFirst", "location": "Delhi", "skills": ["Selenium", "JIRA", "Python", "Postman", "Test Automation"], "experience": 4},
+    {"name": "Arjun Menon", "title": "Product Manager", "company": "ProductHub", "location": "Bengaluru", "skills": ["JIRA", "Agile", "SQL", "Analytics", "Roadmapping"], "experience": 6},
+    {"name": "Ishita Bose", "title": "UX Designer", "company": "DesignCraft", "location": "Kolkata", "skills": ["Figma", "Sketch", "User Research", "Prototyping", "Design Systems"], "experience": 4},
+    {"name": "Manish Kumar", "title": "Cloud Engineer", "company": "CloudBridge", "location": "Pune", "skills": ["AWS", "Azure", "Kubernetes", "Docker", "Networking"], "experience": 7},
+    {"name": "Pooja Shah", "title": "HR Manager", "company": "PeopleFirst HR", "location": "Ahmedabad", "skills": ["Recruitment", "HRMS", "Payroll", "Employee Relations", "Talent Acquisition"], "experience": 8},
+    {"name": "Suresh Pillai", "title": "Sales Manager", "company": "GrowthWorks", "location": "Mumbai", "skills": ["CRM", "Salesforce", "Negotiation", "Account Management", "B2B Sales"], "experience": 6},
+    {"name": "Kavita Joshi", "title": "Digital Marketing Specialist", "company": "MediaNest", "location": "Jaipur", "skills": ["SEO", "Google Ads", "Content Marketing", "Analytics", "Social Media"], "experience": 5},
+    {"name": "Amit Desai", "title": "System Administrator", "company": "NetServe", "location": "Surat", "skills": ["Linux", "Windows Server", "Networking", "Active Directory", "VMware"], "experience": 6},
+    {"name": "Rekha Nambiar", "title": "Finance Analyst", "company": "FinEdge Consulting", "location": "Chennai", "skills": ["Excel", "Financial Modeling", "SAP", "Budgeting", "Forecasting"], "experience": 5},
+    {"name": "Nikhil Chawla", "title": "Business Analyst", "company": "BizInsights", "location": "Gurugram", "skills": ["SQL", "Excel", "Power BI", "JIRA", "Requirements Analysis"], "experience": 4},
+    {"name": "Deepak Rao", "title": "Data Engineer", "company": "DataStream", "location": "Bengaluru", "skills": ["Python", "Spark", "Airflow", "Snowflake", "ETL", "AWS"], "experience": 6},
+    {"name": "Swati Kulkarni", "title": "Node.js Backend Engineer", "company": "APIWorks", "location": "Pune", "skills": ["Node.js", "Express", "MongoDB", "GraphQL", "Docker"], "experience": 4},
+    {"name": "Farhan Ali", "title": "Full Stack Engineer", "company": "WebForge", "location": "Lucknow", "skills": ["JavaScript", "React", "Express", "PostgreSQL", "Node.js"], "experience": 5},
+    {"name": "Lakshmi Venkatesan", "title": "Project Coordinator", "company": "BuildRight", "location": "Coimbatore", "skills": ["MS Project", "JIRA", "Agile", "Communication", "Risk Management"], "experience": 4},
+    {"name": "Gaurav Bhatia", "title": "Cybersecurity Analyst", "company": "SecureShield", "location": "Bengaluru", "skills": ["Penetration Testing", "Firewalls", "SIEM", "Network Security", "Compliance"], "experience": 5},
+]
+
+
+def search_demo(search_name, jd_name, keywords):
+    """Return realistic sample candidates matched to the JD (zero-key mode).
+
+    Demo Data mode lets users experience the full search → review → import →
+    rank pipeline without any API keys. Candidates are matched against the JD
+    title + skills so results look like a real search.
+    """
+    config = frappe.get_single("Job Portal Config")
+    if not getattr(config, "demo_enabled", 0):
+        return []
+
+    limit = getattr(config, "demo_search_limit", 0) or 15
+
+    try:
+        jd = frappe.get_doc("Job Description", jd_name)
+        jd_skills = list(jd.get_all_skills_with_importance().keys()) if jd else []
+    except Exception:
+        jd = None
+        jd_skills = []
+
+    haystack_keywords = (keywords or "").lower().replace(",", " ").split()
+
+    scored = []
+    for cand in DEMO_CANDIDATES:
+        score = 0
+        haystack = " ".join([cand["title"], " ".join(cand["skills"])]).lower()
+        for kw in haystack_keywords:
+            kw = kw.strip()
+            if kw and len(kw) > 2 and kw in haystack:
+                score += 1
+        for skill in jd_skills:
+            if skill and skill.lower() in haystack:
+                score += 2
+        scored.append((score, cand))
+
+    scored.sort(key=lambda x: x[0], reverse=True)
+
+    results = []
+    for index, (score, cand) in enumerate(scored[:limit]):
+        results.append({
+            "name": cand["name"],
+            "url": "https://demo.hrmaster.local/candidates/{0}".format(index + 1),
+            "title": cand["title"],
+            "company": cand["company"],
+            "location": cand["location"],
+            "skills": ", ".join(cand["skills"]),
+            "experience": cand["experience"],
+            "source_url": "https://demo.hrmaster.local/candidates/{0}".format(index + 1),
+        })
+
+    return results
+
+
+def score_result_against_jd(jd, result):
+    """Compute a smart match % for a raw portal result against a JD.
+
+    Uses weighted skill overlap (Required/Preferred/Good to Have) plus an
+    experience-range match, mirroring the main ranking formula so HR sees a
+    meaningful percentage before importing.
+    """
+    jd_skills = jd.get_all_skills_with_importance() if jd else {}
+    weights = {"Required": 3, "Preferred": 2, "Good to Have": 1}
+
+    result_text = " ".join(filter(None, [
+        result.get("skills_summary") or result.get("skills") or "",
+        result.get("current_title") or result.get("title") or "",
+        result.get("current_company") or result.get("company") or "",
+    ])).lower()
+
+    matched = []
+    missing = []
+    weighted_sum = 0
+    total_weight = 0
+
+    for skill_name, info in (jd_skills or {}).items():
+        weight = weights.get(info.get("importance", "Required"), 1)
+        total_weight += weight * 100
+        if skill_name and skill_name.lower() in result_text:
+            matched.append(skill_name)
+            weighted_sum += 100 * weight
+        else:
+            missing.append(skill_name)
+            if info.get("importance") == "Required":
+                weighted_sum -= 10 * weight
+
+    skill_score = (weighted_sum / total_weight * 100) if total_weight else 50
+
+    # Experience match (mirrors ranking_api.calculate_experience_match)
+    jd_min = (jd.min_experience_years or 0) if jd else 0
+    jd_max = (jd.max_experience_years or 20) if jd else 20
+    cand_exp = result.get("experience_years") or 0
+
+    if cand_exp == 0:
+        exp_score = 40  # unknown experience → neutral
+    elif jd_min <= cand_exp <= jd_max:
+        exp_score = 100
+    elif cand_exp < jd_min:
+        gap = jd_min - cand_exp
+        exp_score = max(0, 100 - (gap / max(jd_min, 1) * 100))
+    else:
+        exp_score = 90  # over-qualified
+
+    # Education can't be inferred from a raw result → neutral 50 (15% weight)
+    total = skill_score * 0.60 + exp_score * 0.25 + 50 * 0.15
+    total = round(min(total, 100), 1)
+
+    return {
+        "match_score": total,
+        "skill_score": round(skill_score, 1),
+        "experience_score": round(exp_score, 1),
+        "matched_skills": matched,
+        "missing_skills": missing,
+    }

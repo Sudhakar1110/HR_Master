@@ -26,6 +26,7 @@ def process_candidate_search(search_name, job_description_name):
             search_indeed,
             search_monster,
             search_serpapi,
+            search_demo,
         )
 
         total_results = 0
@@ -48,6 +49,9 @@ def process_candidate_search(search_name, job_description_name):
 
         if search.search_serpapi:
             portal_searches.append(("SerpAPI", search_serpapi))
+
+        if search.search_demo:
+            portal_searches.append(("Demo", search_demo))
 
         for portal_name, search_func in portal_searches:
             try:

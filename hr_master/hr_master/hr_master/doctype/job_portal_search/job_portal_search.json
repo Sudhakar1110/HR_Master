@@ -19,12 +19,14 @@
   "search_indeed",
   "search_monster",
   "search_serpapi",
+  "search_demo",
   "column_break_9",
   "linkedin_results",
   "naukri_results",
   "indeed_results",
   "monster_results",
   "serpapi_results",
+  "demo_results",
   "sb_results",
   "search_results",
   "sb_errors",
@@ -117,6 +119,12 @@
    "label": "Search SerpAPI (Google Jobs)"
   },
   {
+   "default": "0",
+   "fieldname": "search_demo",
+   "fieldtype": "Check",
+   "label": "Search Demo Data (no key)"
+  },
+  {
    "fieldname": "column_break_9",
    "fieldtype": "Column Break"
   },
@@ -148,6 +156,12 @@
    "fieldname": "serpapi_results",
    "fieldtype": "Int",
    "label": "SerpAPI Results",
+   "read_only": 1
+  },
+  {
+   "fieldname": "demo_results",
+   "fieldtype": "Int",
+   "label": "Demo Results",
    "read_only": 1
   },
   {

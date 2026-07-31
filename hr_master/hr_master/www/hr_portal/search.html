@@ -47,12 +47,12 @@
                 <div class="hrp-kpi-value">{{ results|length }}</div>
             </div>
             <div class="hrp-card hrp-kpi">
-                <div class="hrp-kpi-top"><span class="hrp-kpi-icon">✅</span><span class="hrp-kpi-label">Imported</span></div>
-                <div class="hrp-kpi-value">{{ imported_count }}</div>
+                <div class="hrp-kpi-top"><span class="hrp-kpi-icon">🎯</span><span class="hrp-kpi-label">Avg Match</span></div>
+                <div class="hrp-kpi-value">{{ avg_match }}%</div>
             </div>
             <div class="hrp-card hrp-kpi">
-                <div class="hrp-kpi-top"><span class="hrp-kpi-icon">⏳</span><span class="hrp-kpi-label">Pending</span></div>
-                <div class="hrp-kpi-value">{{ pending_count }}</div>
+                <div class="hrp-kpi-top"><span class="hrp-kpi-icon">✅</span><span class="hrp-kpi-label">Imported</span></div>
+                <div class="hrp-kpi-value">{{ imported_count }}<span class="hrp-hint">/ {{ pending_count }} pending</span></div>
             </div>
         </div>
 
@@ -62,13 +62,24 @@
                 <table class="hrp-table">
                     <thead>
                         <tr>
-                            <th>Source</th><th>Name</th><th>Title</th><th>Company</th>
+                            <th>Match %</th><th>Source</th><th>Name</th><th>Title</th><th>Company</th>
                             <th>Location</th><th>Exp</th><th>Skills</th><th>Import</th><th></th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for r in results %}
                         <tr>
+                            <td>
+                                {% set score = r.match_score or 0 %}
+                                <div class="hrp-flex" style="min-width:110px">
+                                    <span class="hrp-score">{{ score|int }}%</span>
+                                    <div class="hrp-progress" style="flex:1;min-width:60px">
+                                        <div class="hrp-progress-fill {{ 'hrp-badge-green' if score >= 80 else ('hrp-badge-orange' if score >= 50 else 'hrp-badge-red') }}"
+                                             style="width: {{ score|int }}%;background: currentColor"></div>
+                                    </div>
+                                </div>
+                                <span class="hrp-hint">skill {{ r.skill_score|int }}% · exp {{ r.experience_score|int }}%</span>
+                            </td>
                             <td><span class="hrp-badge hrp-badge-blue">{{ r.source }}</span></td>
                             <td><strong>{{ r.candidate_name }}</strong></td>
                             <td>{{ r.current_title or '—' }}</td>
@@ -76,7 +87,16 @@
                             <td>{{ r.location or '—' }}</td>
                             <td>{{ r.experience_years or 0 }} yrs</td>
                             <td>
-                                {% if r.skills_summary %}
+                                {% if r.matched_skills %}
+                                <div class="hrp-chips" style="gap:4px">
+                                    {% for s in r.matched_skills %}
+                                    <span class="hrp-chip hrp-chip-required" style="font-size:11px;padding:2px 8px">✓ {{ s }}</span>
+                                    {% endfor %}
+                                    {% for s in r.missing_skills[:3] %}
+                                    <span class="hrp-chip hrp-chip-preferred" style="font-size:11px;padding:2px 8px;opacity:.7">✗ {{ s }}</span>
+                                    {% endfor %}
+                                </div>
+                                {% elif r.skills_summary %}
                                 <span class="hrp-hint" title="{{ r.skills_summary }}" style="display:block;max-width:220px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.skills_summary }}</span>
                                 {% else %}—{% endif %}
                             </td>

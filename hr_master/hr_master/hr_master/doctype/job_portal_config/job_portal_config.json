@@ -43,6 +43,9 @@
   "column_break_27",
   "serpapi_search_limit",
   "serpapi_country",
+  "sb_demo",
+  "demo_enabled",
+  "demo_search_limit",
   "sb_notifications",
   "notify_on_high_match",
   "notify_on_search_complete",
@@ -256,6 +259,24 @@
    "fieldtype": "Data",
    "label": "SerpAPI Country Code (gl)",
    "description": "Two-letter country code, e.g. us, uk, in"
+  },
+  {
+   "fieldname": "sb_demo",
+   "fieldtype": "Section Break",
+   "label": "Demo Data Mode (no API key required)"
+  },
+  {
+   "default": "0",
+   "fieldname": "demo_enabled",
+   "fieldtype": "Check",
+   "label": "Enable Demo Search",
+   "description": "Search returns realistic sample candidates — great for testing the full flow without any API keys"
+  },
+  {
+   "default": "15",
+   "fieldname": "demo_search_limit",
+   "fieldtype": "Int",
+   "label": "Demo Search Limit"
   },
   {
    "fieldname": "sb_notifications",

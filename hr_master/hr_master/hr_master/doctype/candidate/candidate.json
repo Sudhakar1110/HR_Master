@@ -160,7 +160,7 @@
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Source",
-   "options": "\nLinkedIn\nNaukri\nIndeed\nMonster\nSerpAPI\nInternal Referral\nDirect Apply\nOther"
+   "options": "\nLinkedIn\nNaukri\nIndeed\nMonster\nSerpAPI\nDemo\nInternal Referral\nDirect Apply\nOther"
   },
   {
    "fieldname": "source_url",

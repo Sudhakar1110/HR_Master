@@ -13,7 +13,11 @@ from hr_master.api.portal_actions import (
     render_flash,
     set_portal_context,
 )
-from hr_master.api.search_api import import_search_results, import_single_search_result
+from hr_master.api.search_api import (
+    import_search_results,
+    import_single_search_result,
+    score_result_against_jd,
+)
 
 
 def get_context(context):
@@ -67,10 +71,39 @@ def get_context(context):
 
     context.jd = frappe.get_doc("Job Description", search.job_description)
     context.results = search.search_results or []
+
+    # Smart match % per result (skills + experience vs the JD), best matches first
+    scored = []
+    for r in context.results:
+        score_info = score_result_against_jd(context.jd, r)
+        scored.append({
+            "name": r.name,
+            "candidate_name": r.candidate_name,
+            "source": r.source,
+            "profile_url": r.profile_url,
+            "current_title": r.current_title,
+            "current_company": r.current_company,
+            "location": r.location,
+            "skills_summary": r.skills_summary,
+            "experience_years": r.experience_years,
+            "is_imported": r.is_imported,
+            "import_status": r.import_status,
+            "match_score": score_info["match_score"],
+            "skill_score": score_info["skill_score"],
+            "experience_score": score_info["experience_score"],
+            "matched_skills": score_info["matched_skills"],
+            "missing_skills": score_info["missing_skills"],
+        })
+    scored.sort(key=lambda x: x["match_score"], reverse=True)
+    context.results = scored
+
     context.pending_count = len(
         [r for r in context.results if not r.is_imported and r.import_status == "Pending"]
     )
     context.imported_count = len([r for r in context.results if r.is_imported])
+    context.avg_match = round(
+        sum(r["match_score"] for r in context.results) / len(context.results), 1
+    ) if context.results else 0
     context.page_title = "Search Results — {0}".format(search.job_title)
     context.page_description = "Raw portal search results for {0} — review before importing as candidates.".format(search.job_title)
 
