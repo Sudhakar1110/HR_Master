@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{ page_title }} · HR Master</title>
-    <link rel="stylesheet" href="/assets/hr_master/css/hr_portal.css">
+    {% include "templates/includes/hr_portal_css.html" %}
 </head>
 <body class="hrp-body">
     {% include "templates/includes/hr_portal_header.html" %}
@@ -293,6 +293,6 @@
     </main>
 
     {% include "templates/includes/hr_portal_footer.html" %}
-    <script src="/assets/hr_master/js/hr_portal.js"></script>
+    {% include "templates/includes/hr_portal_js.html" %}
 </body>
 </html>
