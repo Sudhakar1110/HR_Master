@@ -11,14 +11,27 @@
 	onReady(function () {
 		var nav = document.getElementById("hrpNav");
 
-		/* Scroll shadow on the dark nav */
+		/* Scroll shadow on the dark nav + back-to-top visibility */
+		var backTop = document.getElementById("hrpBackTop");
+		var reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
 		function onScroll() {
 			if (nav) {
 				nav.classList.toggle("hrp-scrolled", window.scrollY > 8);
 			}
+			if (backTop) {
+				backTop.classList.toggle("hrp-visible", window.scrollY > 400);
+			}
 		}
 		window.addEventListener("scroll", onScroll, { passive: true });
 		onScroll();
+
+		/* Smooth scroll to top */
+		if (backTop) {
+			backTop.addEventListener("click", function () {
+				window.scrollTo({ top: 0, behavior: reduceMotion ? "auto" : "smooth" });
+			});
+		}
 
 		/* Close the mobile nav when a link inside it is clicked */
 		document.querySelectorAll("#hrpNavLinks a").forEach(function (link) {

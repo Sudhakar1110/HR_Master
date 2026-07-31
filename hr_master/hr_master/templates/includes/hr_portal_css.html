@@ -856,6 +856,57 @@ html[data-theme="dark"] .hrp-empty-icon { background: rgba(99, 91, 255, 0.14); b
 html[data-theme="dark"] .hrp-card-hover:hover { border-color: rgba(99, 91, 255, 0.45); }
 html[data-theme="dark"] ::-webkit-scrollbar-thumb { background: #2e3a5c; border-color: var(--hrp-bg); }
 html[data-theme="dark"] ::-webkit-scrollbar-thumb:hover { background: #3a476e; }
+
+/* ============================================================
+   Back-to-top button + smooth scrolling
+   ============================================================ */
+html { scroll-behavior: smooth; }
+
+.hrp-back-top {
+  position: fixed;
+  right: 22px;
+  bottom: 22px;
+  z-index: 200;
+  width: 46px;
+  height: 46px;
+  border: none;
+  border-radius: 14px;
+  background: var(--hrp-grad);
+  color: #fff;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 22px rgba(99, 91, 255, 0.45);
+  opacity: 0;
+  transform: translateY(14px);
+  pointer-events: none;
+  transition: opacity 0.25s ease, transform 0.25s ease, box-shadow 0.2s ease;
+}
+.hrp-back-top.hrp-visible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+.hrp-back-top:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(99, 91, 255, 0.55);
+  filter: brightness(1.05);
+}
+.hrp-back-top:focus-visible { outline: 2px solid var(--hrp-primary); outline-offset: 2px; }
+
+@media (max-width: 640px) {
+  .hrp-back-top { right: 16px; bottom: 16px; width: 42px; height: 42px; font-size: 18px; }
+}
+
+/* Respect users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .hrp-back-top { transition: none; }
+}
 </style>
 <script>
 /* Theme init — set before first paint to avoid a light flash */
