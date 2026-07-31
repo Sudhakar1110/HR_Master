@@ -1,8 +1,8 @@
 {
  "charts": [],
- "content": "[{\"id\":\"N9JxkPAYhO\",\"type\":\"header\",\"data\":{\"text\":\"HR Master Dashboard\",\"level\":1,\"show_on\":[\"HR Master Admin\",\"HR Master Recruiter\",\"HR Master Hiring Manager\",\"HR Master Viewer\"]}},{\"id\":\"a4JdtBZBxd\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"New Job Description\",\"type\":\"DocType\",\"doc_type\":\"Job Description\",\"label\":\"New Job Description\",\"icon\":\"job\",\"link_to\":\"Job Description\",\"stats_filter\":\"{\\\"status\\\":\\\"Open\\\"}\",\"show_on\":[\"HR Master Admin\",\"HR Master Recruiter\"],\"format\":\"{\\\"type\\\":\\\"button\\\",\\\"variant\\\":\\\"primary\\\"}\"}},{\"id\":\"c7Kf2DhEnE\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Search Portals\",\"type\":\"DocType\",\"doc_type\":\"Job Portal Search\",\"label\":\"Search Portals\",\"icon\":\"search\",\"link_to\":\"Job Portal Search\",\"show_on\":[\"HR Master Admin\",\"HR Master Recruiter\"]}},{\"id\":\"o3LpRmNxVq\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Candidate Rankings\",\"type\":\"DocType\",\"doc_type\":\"Candidate Ranking\",\"label\":\"Candidate Rankings\",\"icon\":\"rating\",\"link_to\":\"Candidate Ranking\",\"stats_filter\":\"{\\\"status\\\":\\\"Evaluated\\\"}\",\"show_on\":[\"HR Master Admin\",\"HR Master Recruiter\",\"HR Master Hiring Manager\"]}},{\"id\":\"r6StUvWxYz\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Interview Schedule\",\"type\":\"DocType\",\"doc_type\":\"Interview Schedule\",\"label\":\"Interview Schedule\",\"icon\":\"calendar\",\"link_to\":\"Interview Schedule\",\"stats_filter\":\"{\\\"status\\\":\\\"Scheduled\\\"}\",\"show_on\":[\"HR Master Admin\",\"HR Master Recruiter\",\"HR Master Hiring Manager\"]}},{\"id\":\"r7StUvWxYa\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Resumes\",\"type\":\"DocType\",\"doc_type\":\"Resume\",\"label\":\"Resumes\",\"icon\":\"file\",\"link_to\":\"Resume\",\"show_on\":[\"HR Master Admin\",\"HR Master Recruiter\"]}},{\"id\":\"r8StUvWxYb\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Offers\",\"type\":\"DocType\",\"doc_type\":\"Offer Management\",\"label\":\"Offer Management\",\"icon\":\"money\",\"link_to\":\"Offer Management\",\"stats_filter\":\"{\\\"status\\\":\\\"Approval Pending\\\"}\",\"show_on\":[\"HR Master Admin\",\"HR Master Recruiter\"]}},{\"id\":\"r9StUvWxYc\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Feedback\",\"type\":\"DocType\",\"doc_type\":\"Interview Feedback\",\"label\":\"Interview Feedback\",\"icon\":\"feedback\",\"link_to\":\"Interview Feedback\",\"show_on\":[\"HR Master Admin\",\"HR Master Recruiter\",\"HR Master Hiring Manager\"]}},{\"id\":\"l2KoPlQrSt\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Candidates\",\"type\":\"DocType\",\"doc_type\":\"Candidate\",\"label\":\"Candidates\",\"icon\":\"people\",\"link_to\":\"Candidate\",\"show_on\":[\"HR Master Admin\",\"HR Master Recruiter\",\"HR Master Hiring Manager\"]}},{\"id\":\"h1OpQrStUv\",\"type\":\"card\",\"data\":{\"card_name\":\"Recruitment Overview\",\"col\":6,\"show_on\":[\"HR Master Admin\",\"HR Master Recruiter\",\"HR Master Hiring Manager\"],\"widgets\":[{\"label\":\"Total Candidates\",\"type\":\"number_card\",\"name\":\"Total Candidates\",\"card_name\":\"Recruitment Overview\"},{\"label\":\"Active JDs\",\"type\":\"number_card\",\"name\":\"Active Job Descriptions\",\"card_name\":\"Recruitment Overview\"},{\"label\":\"New Applications\",\"type\":\"number_card\",\"name\":\"New Applications\",\"card_name\":\"Recruitment Overview\"},{\"label\":\"Avg Match Score\",\"type\":\"number_card\",\"name\":\"Average Match Score\",\"card_name\":\"Recruitment Overview\"}]}},{\"id\":\"h2OpQrStUv\",\"type\":\"card\",\"data\":{\"card_name\":\"Pipeline Status\",\"col\":6,\"show_on\":[\"HR Master Admin\",\"HR Master Recruiter\",\"HR Master Hiring Manager\"],\"widgets\":[{\"label\":\"Shortlisted\",\"type\":\"number_card\",\"name\":\"Shortlisted Candidates\",\"card_name\":\"Pipeline Status\"},{\"label\":\"Interviews Scheduled\",\"type\":\"number_card\",\"name\":\"Interviews Scheduled\",\"card_name\":\"Pipeline Status\"},{\"label\":\"Offers Released\",\"type\":\"number_card\",\"name\":\"Offers Released\",\"card_name\":\"Pipeline Status\"},{\"label\":\"Offers Accepted\",\"type\":\"number_card\",\"name\":\"Offers Accepted\",\"card_name\":\"Pipeline Status\"}]}},{\"id\":\"h3OpQrStUv\",\"type\":\"card\",\"data\":{\"card_name\":\"Outcomes\",\"col\":4,\"show_on\":[\"HR Master Admin\",\"HR Master Recruiter\",\"HR Master Hiring Manager\"],\"widgets\":[{\"label\":\"Hired\",\"type\":\"number_card\",\"name\":\"Hired Candidates\",\"card_name\":\"Outcomes\"},{\"label\":\"Rejected\",\"type\":\"number_card\",\"name\":\"Rejected Candidates\",\"card_name\":\"Outcomes\"},{\"label\":\"Open JDs\",\"type\":\"number_card\",\"name\":\"Open JDs\",\"card_name\":\"Outcomes\"}]}},{\"id\":\"k3WxYzAbCd\",\"type\":\"card\",\"data\":{\"card_name\":\"Quick Actions\",\"col\":4,\"show_on\":[\"HR Master Admin\",\"HR Master Recruiter\"],\"widgets\":[{\"label\":\"Skills Master\",\"type\":\"link\",\"name\":\"Skill\",\"card_name\":\"Quick Actions\"},{\"label\":\"Departments\",\"type\":\"link\",\"name\":\"Department\",\"card_name\":\"Quick Actions\"},{\"label\":\"Settings\",\"type\":\"link\",\"name\":\"Recruitment Settings\",\"card_name\":\"Quick Actions\"},{\"label\":\"Email Templates\",\"type\":\"link\",\"name\":\"Email Template Config\",\"card_name\":\"Quick Actions\"}]}},{\"id\":\"m5EfGhIjKl\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"n7OpQrStUv\",\"type\":\"card\",\"data\":{\"card_name\":\"Reports & Analytics\",\"col\":12,\"show_on\":[\"HR Master Admin\",\"HR Master Recruiter\",\"HR Master Hiring Manager\"],\"widgets\":[{\"label\":\"Candidate Match Report\",\"type\":\"link\",\"name\":\"Candidate Match Report\",\"card_name\":\"Reports & Analytics\"},{\"label\":\"JD Analysis Report\",\"type\":\"link\",\"name\":\"JD Analysis Report\",\"card_name\":\"Reports & Analytics\"},{\"label\":\"Recruitment Dashboard\",\"type\":\"link\",\"name\":\"Recruitment Dashboard Report\",\"card_name\":\"Reports & Analytics\"},{\"label\":\"Hiring Funnel\",\"type\":\"link\",\"name\":\"Hiring Funnel Report\",\"card_name\":\"Reports & Analytics\"},{\"label\":\"Candidate Source\",\"type\":\"link\",\"name\":\"Candidate Source Report\",\"card_name\":\"Reports & Analytics\"},{\"label\":\"Recruiter Performance\",\"type\":\"link\",\"name\":\"Recruiter Performance Report\",\"card_name\":\"Reports & Analytics\"},{\"label\":\"Interview Performance\",\"type\":\"link\",\"name\":\"Interview Performance Report\",\"card_name\":\"Reports & Analytics\"},{\"label\":\"Offer Acceptance\",\"type\":\"link\",\"name\":\"Offer Acceptance Report\",\"card_name\":\"Reports & Analytics\"},{\"label\":\"Skill Gap Analysis\",\"type\":\"link\",\"name\":\"Skill Gap Analysis Report\",\"card_name\":\"Reports & Analytics\"},{\"label\":\"Time-to-Hire\",\"type\":\"link\",\"name\":\"Time-to-Hire Report\",\"card_name\":\"Reports & Analytics\"},{\"label\":\"Recruitment Analytics\",\"type\":\"link\",\"name\":\"Recruitment Analytics Report\",\"card_name\":\"Reports & Analytics\"}]}}]",
+ "content": "[{\"id\":\"a1\",\"type\":\"header\",\"data\":{\"text\":\"HR Master Dashboard\",\"col\":12}},{\"id\":\"a2\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"New Job Description\",\"col\":3}},{\"id\":\"a3\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Search Portals\",\"col\":3}},{\"id\":\"a4\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Candidate Rankings\",\"col\":3}},{\"id\":\"a5\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Interview Schedule\",\"col\":3}},{\"id\":\"a6\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Resumes\",\"col\":3}},{\"id\":\"a7\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Offers\",\"col\":3}},{\"id\":\"a8\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Feedback\",\"col\":3}},{\"id\":\"a9\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Candidates\",\"col\":3}},{\"id\":\"a10\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"a11\",\"type\":\"header\",\"data\":{\"text\":\"Key Metrics\",\"col\":12}},{\"id\":\"a12\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Total Candidates\",\"col\":3}},{\"id\":\"a13\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Active Job Descriptions\",\"col\":3}},{\"id\":\"a14\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"New Applications\",\"col\":3}},{\"id\":\"a15\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Shortlisted Candidates\",\"col\":3}},{\"id\":\"a16\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Interviews Scheduled\",\"col\":3}},{\"id\":\"a17\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Offers Released\",\"col\":3}},{\"id\":\"a18\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Offers Accepted\",\"col\":3}},{\"id\":\"a19\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Hired Candidates\",\"col\":3}},{\"id\":\"a20\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Rejected Candidates\",\"col\":3}},{\"id\":\"a21\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Open JDs\",\"col\":3}},{\"id\":\"a22\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Average Match Score\",\"col\":3}},{\"id\":\"a23\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"a24\",\"type\":\"header\",\"data\":{\"text\":\"Masters & Reports\",\"col\":12}},{\"id\":\"a25\",\"type\":\"card\",\"data\":{\"card_name\":\"Recruitment Masters\",\"col\":4}},{\"id\":\"a26\",\"type\":\"card\",\"data\":{\"card_name\":\"Interviews & Offers\",\"col\":4}},{\"id\":\"a27\",\"type\":\"card\",\"data\":{\"card_name\":\"Settings\",\"col\":4}},{\"id\":\"a28\",\"type\":\"card\",\"data\":{\"card_name\":\"Reports & Analytics\",\"col\":12}}]",
  "creation": "2026-01-01 00:00:00",
- "custom_links": [],
+ "custom_blocks": [],
  "docstatus": 0,
  "doctype": "Workspace",
  "for_user": "",
@@ -13,64 +13,439 @@
  "is_hidden": 0,
  "label": "HR Master",
  "links": [
-  {"dependencies":"","hidden":0,"icon":"job","is_query_report":0,"label":"Job Descriptions","link_count":2,"link_to":"Job Description","link_type":"DocType","onboard":1,"parent":"HR Master","type":"Link"},
-  {"dependencies":"","hidden":0,"icon":"people","is_query_report":0,"label":"Candidates","link_count":2,"link_to":"Candidate","link_type":"DocType","onboard":1,"parent":"HR Master","type":"Link"},
-  {"dependencies":"","hidden":0,"icon":"file","is_query_report":0,"label":"Resumes","link_count":2,"link_to":"Resume","link_type":"DocType","onboard":1,"parent":"HR Master","type":"Link"},
-  {"dependencies":"","hidden":0,"icon":"rating","is_query_report":0,"label":"Candidate Rankings","link_count":2,"link_to":"Candidate Ranking","link_type":"DocType","onboard":1,"parent":"HR Master","type":"Link"},
-  {"dependencies":"","hidden":0,"icon":"calendar","is_query_report":0,"label":"Interview Schedules","link_count":2,"link_to":"Interview Schedule","link_type":"DocType","onboard":1,"parent":"HR Master","type":"Link"},
-  {"dependencies":"","hidden":0,"icon":"feedback","is_query_report":0,"label":"Interview Feedback","link_count":2,"link_to":"Interview Feedback","link_type":"DocType","onboard":1,"parent":"HR Master","type":"Link"},
-  {"dependencies":"","hidden":0,"icon":"money","is_query_report":0,"label":"Offer Management","link_count":2,"link_to":"Offer Management","link_type":"DocType","onboard":1,"parent":"HR Master","type":"Link"},
-  {"dependencies":"","hidden":0,"icon":"search","is_query_report":0,"label":"Portal Searches","link_count":2,"link_to":"Job Portal Search","link_type":"DocType","onboard":1,"parent":"HR Master","type":"Link"},
-  {"dependencies":"","hidden":0,"icon":"log","is_query_report":0,"label":"Activity Log","link_count":2,"link_to":"Candidate Activity Log","link_type":"DocType","onboard":1,"parent":"HR Master","type":"Link"},
-  {"dependencies":"","hidden":0,"icon":"search","is_query_report":0,"label":"Search History","link_count":2,"link_to":"Search History","link_type":"DocType","onboard":1,"parent":"HR Master","type":"Link"},
-  {"dependencies":"","hidden":0,"icon":"star","is_query_report":0,"label":"Skills","link_count":2,"link_to":"Skill","link_type":"DocType","onboard":1,"parent":"HR Master","type":"Link"},
-  {"dependencies":"","hidden":0,"icon":"building","is_query_report":0,"label":"Departments","link_count":2,"link_to":"Department","link_type":"DocType","onboard":1,"parent":"HR Master","type":"Link"},
-  {"dependencies":"","hidden":0,"icon":"setting","is_query_report":0,"label":"Recruitment Settings","link_count":2,"link_to":"Recruitment Settings","link_type":"DocType","onboard":1,"parent":"HR Master","type":"Link"},
-  {"dependencies":"","hidden":0,"icon":"mail","is_query_report":0,"label":"Email Templates","link_count":2,"link_to":"Email Template Config","link_type":"DocType","onboard":1,"parent":"HR Master","type":"Link"},
-  {"dependencies":"","hidden":0,"icon":"setting","is_query_report":0,"label":"Job Portal Config","link_count":2,"link_to":"Job Portal Config","link_type":"DocType","onboard":1,"parent":"HR Master","type":"Link"},
-  {"dependencies":"","hidden":0,"icon":"chart","is_query_report":0,"label":"Candidate Match Report","link_count":2,"link_to":"Candidate Match Report","link_type":"Report","onboard":1,"parent":"HR Master","type":"Link"},
-  {"dependencies":"","hidden":0,"icon":"chart","is_query_report":0,"label":"JD Analysis Report","link_count":2,"link_to":"JD Analysis Report","link_type":"Report","onboard":1,"parent":"HR Master","type":"Link"},
-  {"dependencies":"","hidden":0,"icon":"chart","is_query_report":0,"label":"Recruitment Dashboard","link_count":2,"link_to":"Recruitment Dashboard Report","link_type":"Report","onboard":1,"parent":"HR Master","type":"Link"},
-  {"dependencies":"","hidden":0,"icon":"chart","is_query_report":0,"label":"Hiring Funnel","link_count":2,"link_to":"Hiring Funnel Report","link_type":"Report","onboard":1,"parent":"HR Master","type":"Link"},
-  {"dependencies":"","hidden":0,"icon":"chart","is_query_report":0,"label":"Candidate Source","link_count":2,"link_to":"Candidate Source Report","link_type":"Report","onboard":1,"parent":"HR Master","type":"Link"},
-  {"dependencies":"","hidden":0,"icon":"chart","is_query_report":0,"label":"Recruiter Performance","link_count":2,"link_to":"Recruiter Performance Report","link_type":"Report","onboard":1,"parent":"HR Master","type":"Link"},
-  {"dependencies":"","hidden":0,"icon":"chart","is_query_report":0,"label":"Interview Performance","link_count":2,"link_to":"Interview Performance Report","link_type":"Report","onboard":1,"parent":"HR Master","type":"Link"},
-  {"dependencies":"","hidden":0,"icon":"chart","is_query_report":0,"label":"Offer Acceptance","link_count":2,"link_to":"Offer Acceptance Report","link_type":"Report","onboard":1,"parent":"HR Master","type":"Link"},
-  {"dependencies":"","hidden":0,"icon":"chart","is_query_report":0,"label":"Skill Gap Analysis","link_count":2,"link_to":"Skill Gap Analysis Report","link_type":"Report","onboard":1,"parent":"HR Master","type":"Link"},
-  {"dependencies":"","hidden":0,"icon":"chart","is_query_report":0,"label":"Time-to-Hire","link_count":2,"link_to":"Time-to-Hire Report","link_type":"Report","onboard":1,"parent":"HR Master","type":"Link"},
-  {"dependencies":"","hidden":0,"icon":"chart","is_query_report":0,"label":"Recruitment Analytics","link_count":2,"link_to":"Recruitment Analytics Report","link_type":"Report","onboard":1,"parent":"HR Master","type":"Link"}
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Recruitment Masters",
+   "link_count": 7,
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "dependencies": "",
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Job Descriptions",
+   "link_count": 0,
+   "link_to": "Job Description",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "dependencies": "",
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Candidates",
+   "link_count": 0,
+   "link_to": "Candidate",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "dependencies": "",
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Resumes",
+   "link_count": 0,
+   "link_to": "Resume",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "dependencies": "",
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Skills",
+   "link_count": 0,
+   "link_to": "Skill",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "dependencies": "",
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Departments",
+   "link_count": 0,
+   "link_to": "Department",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "dependencies": "",
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Search History",
+   "link_count": 0,
+   "link_to": "Search History",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "dependencies": "",
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Activity Log",
+   "link_count": 0,
+   "link_to": "Candidate Activity Log",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Interviews & Offers",
+   "link_count": 6,
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "dependencies": "",
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Interview Schedules",
+   "link_count": 0,
+   "link_to": "Interview Schedule",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "dependencies": "",
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Interview Feedback",
+   "link_count": 0,
+   "link_to": "Interview Feedback",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "dependencies": "",
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Candidate Rankings",
+   "link_count": 0,
+   "link_to": "Candidate Ranking",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "dependencies": "",
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Offer Management",
+   "link_count": 0,
+   "link_to": "Offer Management",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "dependencies": "",
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Portal Searches",
+   "link_count": 0,
+   "link_to": "Job Portal Search",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "dependencies": "",
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Job Portal Config",
+   "link_count": 0,
+   "link_to": "Job Portal Config",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Settings",
+   "link_count": 2,
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "dependencies": "",
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Recruitment Settings",
+   "link_count": 0,
+   "link_to": "Recruitment Settings",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "dependencies": "",
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Email Templates",
+   "link_count": 0,
+   "link_to": "Email Template Config",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Reports & Analytics",
+   "link_count": 11,
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "dependencies": "",
+   "hidden": 0,
+   "is_query_report": 1,
+   "label": "Candidate Match Report",
+   "link_count": 0,
+   "link_to": "Candidate Match Report",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "dependencies": "",
+   "hidden": 0,
+   "is_query_report": 1,
+   "label": "JD Analysis Report",
+   "link_count": 0,
+   "link_to": "JD Analysis Report",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "dependencies": "",
+   "hidden": 0,
+   "is_query_report": 1,
+   "label": "Recruitment Dashboard Report",
+   "link_count": 0,
+   "link_to": "Recruitment Dashboard Report",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "dependencies": "",
+   "hidden": 0,
+   "is_query_report": 1,
+   "label": "Hiring Funnel Report",
+   "link_count": 0,
+   "link_to": "Hiring Funnel Report",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "dependencies": "",
+   "hidden": 0,
+   "is_query_report": 1,
+   "label": "Candidate Source Report",
+   "link_count": 0,
+   "link_to": "Candidate Source Report",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "dependencies": "",
+   "hidden": 0,
+   "is_query_report": 1,
+   "label": "Recruiter Performance Report",
+   "link_count": 0,
+   "link_to": "Recruiter Performance Report",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "dependencies": "",
+   "hidden": 0,
+   "is_query_report": 1,
+   "label": "Interview Performance Report",
+   "link_count": 0,
+   "link_to": "Interview Performance Report",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "dependencies": "",
+   "hidden": 0,
+   "is_query_report": 1,
+   "label": "Offer Acceptance Report",
+   "link_count": 0,
+   "link_to": "Offer Acceptance Report",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "dependencies": "",
+   "hidden": 0,
+   "is_query_report": 1,
+   "label": "Skill Gap Analysis Report",
+   "link_count": 0,
+   "link_to": "Skill Gap Analysis Report",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "dependencies": "",
+   "hidden": 0,
+   "is_query_report": 1,
+   "label": "Time-to-Hire Report",
+   "link_count": 0,
+   "link_to": "Time-to-Hire Report",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "dependencies": "",
+   "hidden": 0,
+   "is_query_report": 1,
+   "label": "Recruitment Analytics Report",
+   "link_count": 0,
+   "link_to": "Recruitment Analytics Report",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
+  }
  ],
  "modified": "2026-01-01 00:00:00",
  "modified_by": "Administrator",
  "module": "HR Master",
  "name": "HR Master",
  "number_cards": [
-  {"number_card_name": "Total Candidates"},
-  {"number_card_name": "Active Job Descriptions"},
-  {"number_card_name": "New Applications"},
-  {"number_card_name": "Shortlisted Candidates"},
-  {"number_card_name": "Interviews Scheduled"},
-  {"number_card_name": "Offers Released"},
-  {"number_card_name": "Offers Accepted"},
-  {"number_card_name": "Hired Candidates"},
-  {"number_card_name": "Rejected Candidates"},
-  {"number_card_name": "Open JDs"},
-  {"number_card_name": "Average Match Score"}
+  {
+   "label": "Total Candidates",
+   "number_card_name": "Total Candidates"
+  },
+  {
+   "label": "Active Job Descriptions",
+   "number_card_name": "Active Job Descriptions"
+  },
+  {
+   "label": "New Applications",
+   "number_card_name": "New Applications"
+  },
+  {
+   "label": "Shortlisted Candidates",
+   "number_card_name": "Shortlisted Candidates"
+  },
+  {
+   "label": "Interviews Scheduled",
+   "number_card_name": "Interviews Scheduled"
+  },
+  {
+   "label": "Offers Released",
+   "number_card_name": "Offers Released"
+  },
+  {
+   "label": "Offers Accepted",
+   "number_card_name": "Offers Accepted"
+  },
+  {
+   "label": "Hired Candidates",
+   "number_card_name": "Hired Candidates"
+  },
+  {
+   "label": "Rejected Candidates",
+   "number_card_name": "Rejected Candidates"
+  },
+  {
+   "label": "Open JDs",
+   "number_card_name": "Open JDs"
+  },
+  {
+   "label": "Average Match Score",
+   "number_card_name": "Average Match Score"
+  }
  ],
  "owner": "Administrator",
  "parent_page": "",
  "public": 1,
+ "quick_lists": [],
+ "restrict_to_domain": "",
+ "roles": [],
+ "sequence_id": 1,
  "shortcuts": [
-  {"color":"Blue","doc_view":"New","format":"JSON","icon":"job","label":"New Job Description","link_to":"Job Description","stats_filter":"{\"status\":\"Open\"}","type":"DocType"},
-  {"color":"Blue","doc_view":"List","format":"JSON","icon":"people","label":"Candidates","link_to":"Candidate","type":"DocType"},
-  {"color":"Blue","doc_view":"List","format":"JSON","icon":"file","label":"Resumes","link_to":"Resume","type":"DocType"},
-  {"color":"Blue","doc_view":"List","format":"JSON","icon":"money","label":"Offers","link_to":"Offer Management","stats_filter":"{\"status\":\"Approval Pending\"}","type":"DocType"},
-  {"color":"Blue","doc_view":"List","format":"JSON","icon":"feedback","label":"Feedback","link_to":"Interview Feedback","type":"DocType"},
-  {"color":"Blue","doc_view":"List","format":"JSON","icon":"rating","label":"Rankings","link_to":"Candidate Ranking","stats_filter":"{\"status\":\"Evaluated\"}","type":"DocType"},
-  {"color":"Blue","doc_view":"List","format":"JSON","icon":"calendar","label":"Interviews","link_to":"Interview Schedule","stats_filter":"{\"status\":\"Scheduled\"}","type":"DocType"},
-  {"color":"Blue","doc_view":"List","format":"JSON","icon":"chart","label":"Reports","link_to":"Candidate Match Report","type":"Report"},
-  {"color":"Blue","doc_view":"List","format":"JSON","icon":"setting","label":"Settings","link_to":"Job Portal Config","type":"DocType"},
-  {"color":"Blue","doc_view":"List","format":"JSON","icon":"log","label":"Activity Log","link_to":"Candidate Activity Log","type":"DocType"}
+  {
+   "label": "New Job Description",
+   "link_to": "Job Description",
+   "type": "DocType",
+   "doc_view": "List",
+   "icon": "job"
+  },
+  {
+   "label": "Search Portals",
+   "link_to": "Job Portal Search",
+   "type": "DocType",
+   "doc_view": "List",
+   "icon": "search"
+  },
+  {
+   "label": "Candidate Rankings",
+   "link_to": "Candidate Ranking",
+   "type": "DocType",
+   "doc_view": "List",
+   "icon": "rating"
+  },
+  {
+   "label": "Interview Schedule",
+   "link_to": "Interview Schedule",
+   "type": "DocType",
+   "doc_view": "List",
+   "icon": "calendar"
+  },
+  {
+   "label": "Resumes",
+   "link_to": "Resume",
+   "type": "DocType",
+   "doc_view": "List",
+   "icon": "file"
+  },
+  {
+   "label": "Offers",
+   "link_to": "Offer Management",
+   "type": "DocType",
+   "doc_view": "List",
+   "icon": "money"
+  },
+  {
+   "label": "Feedback",
+   "link_to": "Interview Feedback",
+   "type": "DocType",
+   "doc_view": "List",
+   "icon": "feedback"
+  },
+  {
+   "label": "Candidates",
+   "link_to": "Candidate",
+   "type": "DocType",
+   "doc_view": "List",
+   "icon": "people"
+  }
  ],
  "title": "HR Master"
 }
