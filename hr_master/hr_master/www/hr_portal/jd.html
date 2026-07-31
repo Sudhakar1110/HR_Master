@@ -76,6 +76,12 @@
                     {% if search_in_progress %}
                     <div class="hrp-alert hrp-alert-info">⏳ Search in progress — this page refreshes automatically when it finishes.</div>
                     {% endif %}
+                    {% if search_zero_hint %}
+                    <div class="hrp-alert hrp-alert-warning">
+                        <strong>{{ search_zero_hint.title }}</strong>
+                        <div style="margin-top:4px">{{ search_zero_hint.body }}</div>
+                    </div>
+                    {% endif %}
                     <div class="hrp-actions hrp-mb">
                         <form method="post" style="display:inline">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token }}">

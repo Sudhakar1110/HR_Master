@@ -97,4 +97,41 @@ def get_context(context):
         or any(s.status in ("Queued", "In Progress") for s in context.searches)
     )
 
+    # Explain a search that finished with 0 results or failed (config-aware hint)
+    context.search_zero_hint = None
+    latest = context.searches[0] if context.searches else None
+    if latest and latest.status in ("Completed", "Partial", "Failed"):
+        if latest.status == "Failed":
+            context.search_zero_hint = {
+                "title": "Search failed",
+                "body": (
+                    "The search job hit an error (check the Error Log in the Desk for details). "
+                    "Common causes: an invalid/expired SerpAPI key, no network access to the API, "
+                    "or a portal that is enabled but not actually available."
+                ),
+            }
+        elif not latest.total_candidates_found:
+            config = frappe.get_single("Job Portal Config")
+            serpapi_ready = bool(getattr(config, "serpapi_enabled", 0)) and bool(
+                getattr(config, "serpapi_api_key", None)
+            )
+            if not serpapi_ready:
+                context.search_zero_hint = {
+                    "title": "Search finished, but 0 results",
+                    "body": (
+                        "The only live connector is SerpAPI (Google Jobs) — LinkedIn, Naukri and "
+                        "Monster are placeholders and Indeed's free API was retired. Enable SerpAPI "
+                        "and add an API key in Desk → HR Master → Job Portal Config, then search again."
+                    ),
+                }
+            else:
+                context.search_zero_hint = {
+                    "title": "Search finished, but 0 results",
+                    "body": (
+                        "SerpAPI is configured but returned no matching listings for these keywords. "
+                        "Try broader keywords, a different country in Job Portal Config, or check your "
+                        "SerpAPI key/quota."
+                    ),
+                }
+
     return context
