@@ -29,23 +29,58 @@ def after_migrate():
 
 
 def ensure_module_def():
-    """Ensure the 'HR Master' Module Def record exists.
+    """Ensure the 'HR Master' Module Def record exists and that the runtime
+    module maps can resolve it.
 
-    Frappe's native migrate sync only scans a module's folder (doctypes,
-    reports, workspaces, print formats, notifications) when the app's
-    Module Def exists in the site DB. Sites installed before the standard
-    modules.py registration may be missing it, which silently stops native
-    sync - this recreates it idempotently on every migrate.
+    Frappe resolves modules (controller imports, native migrate sync) via
+    ``frappe.local.module_app``, which is built once at process start from
+    the app's ``modules.txt`` file. Apps missing that file fail with
+    'Module HR Master not found'. This recreates the record if needed and
+    refreshes the runtime maps so the current process can resolve it too.
     """
-    if frappe.db.exists("Module Def", "HR Master"):
-        return
+    if not frappe.db.exists("Module Def", "HR Master"):
+        md = frappe.new_doc("Module Def")
+        md.module_name = "HR Master"
+        md.app_name = "hr_master"
+        md.insert(ignore_permissions=True)
+        frappe.db.commit()
+        print("HR Master: created 'HR Master' Module Def")
+    else:
+        # Sites installed with older code may have the record with an
+        # empty or wrong app_name - keep it consistent.
+        md = frappe.get_doc("Module Def", "HR Master")
+        if md.app_name != "hr_master":
+            md.app_name = "hr_master"
+            md.save(ignore_permissions=True)
+            frappe.db.commit()
 
-    md = frappe.new_doc("Module Def")
-    md.module_name = "HR Master"
-    md.app_name = "hr_master"
-    md.insert(ignore_permissions=True)
-    frappe.db.commit()
-    print("HR Master: created 'HR Master' Module Def")
+    # Frappe builds the module maps at connect time; refresh them now so
+    # this process (e.g. a migrate run) can resolve the module too.
+    _refresh_module_maps()
+
+
+def _refresh_module_maps():
+    """Merge Module Def records from the DB into ``frappe.local.app_modules``
+    and ``frappe.local.module_app`` (normally built from ``modules.txt``).
+    """
+    frappe.local.app_modules = frappe.local.app_modules or {}
+    frappe.local.module_app = frappe.local.module_app or {}
+
+    for m in frappe.db.get_all(
+        "Module Def",
+        fields=["name", "app_name"],
+        ignore_permissions=True,
+        limit_page_length=0,
+        order_by=None,
+    ):
+        app = m.get("app_name")
+        module = frappe.scrub(m.get("name"))
+        if not app or not module:
+            continue
+        frappe.local.app_modules.setdefault(app, [])
+        if module not in frappe.local.app_modules[app]:
+            frappe.local.app_modules[app].append(module)
+        frappe.local.module_app[module] = app
 
 
 def _run_phase(phase_name, fn):
