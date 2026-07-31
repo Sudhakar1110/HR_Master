@@ -94,6 +94,8 @@ def get_context(context):
             "job_description",
             "job_title",
             "total_match_score",
+            "experience_match_score",
+            "education_match_score",
             "status",
             "recommendation",
             "evaluation_date",

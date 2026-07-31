@@ -43,7 +43,16 @@
                     <div class="hrp-detail"><dt>Phone</dt><dd>{{ candidate.phone or '—' }}</dd></div>
                     <div class="hrp-detail"><dt>Experience</dt><dd>{{ candidate.total_experience_years or 0 }} yrs</dd></div>
                     <div class="hrp-detail"><dt>Education</dt><dd>{{ candidate.highest_education or '—' }}</dd></div>
-                    <div class="hrp-detail"><dt>Overall Match</dt><dd><span class="hrp-score">{{ candidate.total_match_score|int if candidate.total_match_score else 0 }}%</span></dd></div>
+                    <div class="hrp-detail"><dt>Overall Match</dt><dd>
+                        {% set cm = candidate.total_match_score|int if candidate.total_match_score else 0 %}
+                        <div class="hrp-flex" style="min-width:150px">
+                            <span class="hrp-score">{{ cm }}%</span>
+                            <div class="hrp-progress" style="flex:1;min-width:80px">
+                                <div class="hrp-progress-fill {{ 'hrp-badge-green' if cm >= 80 else ('hrp-badge-orange' if cm >= 50 else 'hrp-badge-red') }}"
+                                     style="width: {{ cm }}%;background: currentColor"></div>
+                            </div>
+                        </div>
+                    </dd></div>
                     <div class="hrp-detail"><dt>Status</dt><dd><span class="hrp-badge hrp-badge-blue">{{ candidate.status }}</span></dd></div>
                 </dl>
 
@@ -75,7 +84,17 @@
                             {% for r in rankings %}
                             <tr>
                                 <td>{{ r.job_title }}</td>
-                                <td><span class="hrp-score">{{ r.total_match_score|int if r.total_match_score else 0 }}%</span></td>
+                                <td>
+                                    {% set rscore = r.total_match_score|int if r.total_match_score else 0 %}
+                                    <div class="hrp-flex" style="min-width:120px">
+                                        <span class="hrp-score">{{ rscore }}%</span>
+                                        <div class="hrp-progress" style="flex:1;min-width:60px">
+                                            <div class="hrp-progress-fill {{ 'hrp-badge-green' if rscore >= 80 else ('hrp-badge-orange' if rscore >= 50 else 'hrp-badge-red') }}"
+                                                 style="width: {{ rscore }}%;background: currentColor"></div>
+                                        </div>
+                                    </div>
+                                    <span class="hrp-hint">exp {{ r.experience_match_score|int or 0 }}% · edu {{ r.education_match_score|int or 0 }}%</span>
+                                </td>
                                 <td>
                                     {% set st = r.status|lower %}
                                     <span class="hrp-badge {{ 'hrp-badge-green' if st in ('shortlisted', 'interview scheduled') else ('hrp-badge-orange' if st in ('pending', 'evaluated', 'on hold') else 'hrp-badge-red') }}">{{ r.status }}</span>

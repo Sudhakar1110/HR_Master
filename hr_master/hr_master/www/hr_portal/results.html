@@ -34,6 +34,25 @@
             </div>
         </div>
 
+        <div class="hrp-grid hrp-grid-4 hrp-mb">
+            <div class="hrp-card hrp-kpi">
+                <div class="hrp-kpi-top"><span class="hrp-kpi-icon">🏆</span><span class="hrp-kpi-label">Best Match</span></div>
+                <div class="hrp-kpi-value" data-count="{{ best_match|int }}">{{ best_match|int }}%</div>
+            </div>
+            <div class="hrp-card hrp-kpi">
+                <div class="hrp-kpi-top"><span class="hrp-kpi-icon">🎯</span><span class="hrp-kpi-label">Avg Match</span></div>
+                <div class="hrp-kpi-value" data-count="{{ avg_match|int }}">{{ avg_match|int }}%</div>
+            </div>
+            <div class="hrp-card hrp-kpi">
+                <div class="hrp-kpi-top"><span class="hrp-kpi-icon">👥</span><span class="hrp-kpi-label">Candidates</span></div>
+                <div class="hrp-kpi-value" data-count="{{ ranked_count }}">{{ ranked_count }}</div>
+            </div>
+            <div class="hrp-card hrp-kpi">
+                <div class="hrp-kpi-top"><span class="hrp-kpi-icon">⭐</span><span class="hrp-kpi-label">Shortlisted</span></div>
+                <div class="hrp-kpi-value" data-count="{{ shortlisted_count }}">{{ shortlisted_count }}</div>
+            </div>
+        </div>
+
         {% if rankings %}
         <div class="hrp-card">
             <div class="hrp-table-wrap">
