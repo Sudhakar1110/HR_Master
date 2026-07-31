@@ -19,8 +19,8 @@
    "next_action_email_template": "",
    "state": "Pending",
    "update_field": "status",
-   "update_value": "Pending",
-   },
+   "update_value": "Pending"
+  },
   {
    "allow_edit": "HR Master Recruiter",
    "doc_status": "0",

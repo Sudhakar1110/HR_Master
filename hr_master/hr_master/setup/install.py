@@ -6,21 +6,40 @@ import os
 import json
 
 import frappe
-from frappe import _
 from frappe.modules.import_file import import_file_by_path
 
 
 def after_install():
     """Run after app installation."""
-    create_seed_data()
-    set_default_config()
-    sync_all_resources()
+    # Import all standard resources first so every later step can rely on
+    # doctypes, reports, workspaces, number cards etc. existing in the DB.
+    _run_phase("sync_all_resources", sync_all_resources)
+    _run_phase("create_seed_data", create_seed_data)
+    _run_phase("set_default_config", set_default_config)
 
 
 def after_migrate():
     """Run after database migration."""
-    create_seed_data()
-    sync_all_resources()
+    _run_phase("sync_all_resources", sync_all_resources)
+    _run_phase("create_seed_data", create_seed_data)
+    _run_phase("set_default_config", set_default_config)
+
+
+def _run_phase(phase_name, fn):
+    """Run a setup phase.
+
+    Failures are logged to the Error Log and as console errors but never
+    re-raised, so a single broken record can never abort a migrate run or
+    block the remaining setup phases.
+    """
+    try:
+        fn()
+    except Exception:
+        frappe.log_error(
+            title=f"HR Master: {phase_name} failed",
+            message=frappe.get_traceback(),
+        )
+        print(f"HR Master: {phase_name} failed - see Error Log")
 
 
 def create_seed_data():
@@ -176,114 +195,154 @@ def create_skills():
 def sync_all_resources():
     """
     Explicitly import all DocType, Report, Workspace, Number Card,
-    Notification, Print Format, and Workflow JSON files from disk.
+    Notification, Print Format, Workflow, Email Template and Letter Head
+    JSON files from disk.
 
-    This bypasses Frappe's auto-discovery mechanism which may fail
-    to find the JSON files due to path resolution issues.
+    Frappe's native migrate sync handles doctype, report, workspace,
+    print format and notification automatically once the app's Module Def
+    exists in the site, but number cards, workflows, email templates and
+    letter heads are only ever imported here. Running all of them keeps
+    every standard record in sync with this repository.
     """
     # Get the module root directory (parent of setup/)
     module_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-    resource_dirs = {
-        "doctype": "DocType",
-        "report": "Report",
-        "workspace": "Workspace",
-        "number_card": "Number Card",
-        "notification": "Notification",
-        "print_format": "Print Format",
-        "letter_head": "Letter Head",
-        "workflow": "Workflow",
-        "email_template": "Email Template",
-    }
+    resource_dirs = [
+        "doctype",
+        "report",
+        "workspace",
+        "number_card",
+        "notification",
+        "print_format",
+        "letter_head",
+        "workflow",
+        "email_template",
+    ]
 
-    for subdir, label in resource_dirs.items():
+    imported = 0
+    skipped = 0
+
+    for subdir in resource_dirs:
         resource_path = os.path.join(module_root, subdir)
         if not os.path.exists(resource_path):
             continue
 
         if subdir == "workspace":
             # Workspaces are nested: workspace/{name}/{name}.json
-            for ws_dir in os.listdir(resource_path):
+            for ws_dir in sorted(os.listdir(resource_path)):
                 ws_path = os.path.join(resource_path, ws_dir)
                 if os.path.isdir(ws_path):
-                    for f in os.listdir(ws_path):
+                    for f in sorted(os.listdir(ws_path)):
                         if f.endswith(".json"):
                             json_path = os.path.join(ws_path, f)
-                            _import_json(json_path, label)
+                            imported, skipped = _import_json(json_path, imported, skipped)
         else:
             # Standard: subdir/{name}/*.json (import ALL json files including child tables)
-            for item_dir in os.listdir(resource_path):
+            for item_dir in sorted(os.listdir(resource_path)):
                 item_path = os.path.join(resource_path, item_dir)
                 if os.path.isdir(item_path):
-                    for f in os.listdir(item_path):
+                    for f in sorted(os.listdir(item_path)):
                         if f.endswith(".json"):
                             json_path = os.path.join(item_path, f)
-                            _import_json(json_path, label)
+                            imported, skipped = _import_json(json_path, imported, skipped)
+
+    print(f"HR Master: synced resources - {imported} imported, {skipped} skipped")
+    frappe.logger().info(
+        f"HR Master: sync_all_resources finished - {imported} imported, {skipped} skipped"
+    )
 
 
-def _import_json(json_path, label):
-    """Safely import a single JSON file as a Frappe document."""
+def _import_json(json_path, imported=0, skipped=0):
+    """Import a single JSON file as a Frappe document.
+
+    Existing DocTypes are skipped to avoid clobbering site-level changes
+    (Frappe's native migrate keeps standard doctypes in sync). All other
+    records (reports, workspaces, number cards, workflows, ...) are
+    force-imported on every run so they always match this repository.
+    """
+    doc_data = {}
     try:
-        with open(json_path, "r") as f:
+        with open(json_path, "r", encoding="utf-8") as f:
             doc_data = json.load(f)
 
         doctype_name = doc_data.get("doctype", "")
         doc_name = doc_data.get("name", "")
 
-        if doctype_name and doc_name:
-            # For workspaces, always re-import (may have been created bare)
-            # For other doctypes, skip if already exists
-            if doctype_name != "Workspace" and frappe.db.exists(doctype_name, doc_name):
-                return
+        if not doctype_name or not doc_name:
+            frappe.logger().warning(
+                f"HR Master: Skipping {json_path} - missing doctype/name"
+            )
+            return imported, skipped + 1
 
-        import_file_by_path(json_path, force=True)
+        if doctype_name == "DocType" and frappe.db.exists("DocType", doc_name):
+            return imported, skipped + 1
+
+        import_file_by_path(json_path, force=True, ignore_version=True)
         frappe.db.commit()
+        return imported + 1, skipped
     except Exception as e:
-        frappe.logger().warning(
-            f"HR Master: Skipped importing {json_path} - {str(e)}"
+        frappe.log_error(
+            title=f"HR Master: Failed to import {doc_data.get('name', os.path.basename(json_path))}",
+            message=frappe.get_traceback(),
         )
+        frappe.logger().error(f"HR Master: Failed importing {json_path} - {e}")
+        return imported, skipped + 1
 
 
 def set_default_config():
-    """Set default configuration values."""
-    config = frappe.get_single("Job Portal Config")
-    if not config.get("__onload"):
-        config.auto_search_enabled = 0
-        config.auto_shortlist_threshold = 80
-        config.max_candidates_per_search = 50
-        config.search_delay_seconds = 2
-        config.default_country = "India"
-        config.notify_on_high_match = 1
-        config.notify_on_search_complete = 0
-        config.email_notifications = 1
-        config.desktop_notifications = 1
-        config.save(ignore_permissions=True)
+    """Set default configuration values only when not already configured.
 
-    frappe.db.commit()
+    Previously defaults were applied on every migrate, silently overwriting
+    admin changes. Now they are applied only for Singles with no saved values.
+    """
+    _set_single_defaults(
+        "Job Portal Config",
+        {
+            "auto_search_enabled": 0,
+            "auto_shortlist_threshold": 80,
+            "max_candidates_per_search": 50,
+            "search_delay_seconds": 2,
+            "default_country": "India",
+            "notify_on_high_match": 1,
+            "notify_on_search_complete": 0,
+            "email_notifications": 1,
+            "desktop_notifications": 1,
+        },
+    )
 
-    # Set default Recruitment Settings
-    rs = frappe.get_single("Recruitment Settings")
-    if not rs.get("__onload"):
-        rs.auto_parse_resumes = 1
-        rs.max_resume_size_kb = 10240
-        rs.allowed_file_types = "pdf,docx,txt"
-        rs.enable_duplicate_detection = 1
-        rs.duplicate_threshold = 85
-        rs.notify_on_new_candidate = 1
-        rs.notify_on_offer_acceptance = 1
-        rs.daily_digest_enabled = 1
-        rs.weekly_report_enabled = 1
-        rs.enable_audit_logging = 1
-        rs.enable_rate_limiting = 0
-        rs.max_api_requests_per_minute = 60
-        rs.session_timeout_minutes = 60
-        rs.require_approval_for_offers = 1
-        rs.save(ignore_permissions=True)
-
-    frappe.db.commit()
+    _set_single_defaults(
+        "Recruitment Settings",
+        {
+            "auto_parse_resumes": 1,
+            "max_resume_size_kb": 10240,
+            "allowed_file_types": "pdf,docx,txt",
+            "enable_duplicate_detection": 1,
+            "duplicate_threshold": 85,
+            "notify_on_new_candidate": 1,
+            "notify_on_offer_acceptance": 1,
+            "daily_digest_enabled": 1,
+            "weekly_report_enabled": 1,
+            "enable_audit_logging": 1,
+            "enable_rate_limiting": 0,
+            "max_api_requests_per_minute": 60,
+            "session_timeout_minutes": 60,
+            "require_approval_for_offers": 1,
+        },
+    )
 
     # Create default Email Templates
     create_default_email_templates()
+
+
+def _set_single_defaults(single_doctype, defaults):
+    """Populate a Single doctype's defaults only if it has no saved values yet."""
+    if frappe.db.get_singles_dict(single_doctype):
+        return
+
+    doc = frappe.get_single(single_doctype)
+    doc.update(defaults)
+    doc.save(ignore_permissions=True)
+    frappe.db.commit()
 
 
 def create_default_email_templates():
