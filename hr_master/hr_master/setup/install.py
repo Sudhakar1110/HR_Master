@@ -279,6 +279,8 @@ def create_workflow_masters():
             state.workflow_state_name = state_name
             state.style = style
             state.save(ignore_permissions=True)
+            print("HR Master: created Workflow State {0}".format(state_name))
+            frappe.logger().info("HR Master: created Workflow State {0}".format(state_name))
 
     workflow_actions = [
         "Evaluate",
@@ -294,8 +296,12 @@ def create_workflow_masters():
             action = frappe.new_doc("Workflow Action Master")
             action.workflow_action_name = action_name
             action.save(ignore_permissions=True)
+            print("HR Master: created Workflow Action Master {0}".format(action_name))
+            frappe.logger().info("HR Master: created Workflow Action Master {0}".format(action_name))
 
     frappe.db.commit()
+    print("HR Master: workflow masters ready")
+    frappe.logger().info("HR Master: workflow masters ready")
 
 
 def sync_all_resources():
