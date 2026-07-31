@@ -11,8 +11,10 @@ from frappe.modules.import_file import import_file_by_path
 
 def after_install():
     """Run after app installation."""
-    # Import all standard resources first so every later step can rely on
-    # doctypes, reports, workspaces, number cards etc. existing in the DB.
+    # Register the module and import all standard resources first so every
+    # later step can rely on doctypes, reports, workspaces, number cards
+    # etc. existing in the DB.
+    _run_phase("ensure_module_def", ensure_module_def)
     _run_phase("sync_all_resources", sync_all_resources)
     _run_phase("create_seed_data", create_seed_data)
     _run_phase("set_default_config", set_default_config)
@@ -20,26 +22,47 @@ def after_install():
 
 def after_migrate():
     """Run after database migration."""
+    _run_phase("ensure_module_def", ensure_module_def)
     _run_phase("sync_all_resources", sync_all_resources)
     _run_phase("create_seed_data", create_seed_data)
     _run_phase("set_default_config", set_default_config)
 
 
+def ensure_module_def():
+    """Ensure the 'HR Master' Module Def record exists.
+
+    Frappe's native migrate sync only scans a module's folder (doctypes,
+    reports, workspaces, print formats, notifications) when the app's
+    Module Def exists in the site DB. Sites installed before the standard
+    modules.py registration may be missing it, which silently stops native
+    sync - this recreates it idempotently on every migrate.
+    """
+    if frappe.db.exists("Module Def", "HR Master"):
+        return
+
+    md = frappe.new_doc("Module Def")
+    md.module_name = "HR Master"
+    md.app_name = "hr_master"
+    md.insert(ignore_permissions=True)
+    frappe.db.commit()
+    print("HR Master: created 'HR Master' Module Def")
+
+
 def _run_phase(phase_name, fn):
     """Run a setup phase.
 
-    Failures are logged to the Error Log and as console errors but never
-    re-raised, so a single broken record can never abort a migrate run or
-    block the remaining setup phases.
+    Failures are logged to the Error Log and printed to the console (with
+    the exception message) but never re-raised, so a single broken record
+    can never abort a migrate run or block the remaining setup phases.
     """
     try:
         fn()
-    except Exception:
+    except Exception as e:
         frappe.log_error(
             title=f"HR Master: {phase_name} failed",
             message=frappe.get_traceback(),
         )
-        print(f"HR Master: {phase_name} failed - see Error Log")
+        print(f"HR Master: {phase_name} failed: {e}")
 
 
 def create_seed_data():
@@ -294,44 +317,51 @@ def set_default_config():
 
     Previously defaults were applied on every migrate, silently overwriting
     admin changes. Now they are applied only for Singles with no saved values.
+    Each step is isolated so one failure cannot hide the others.
     """
-    _set_single_defaults(
-        "Job Portal Config",
-        {
-            "auto_search_enabled": 0,
-            "auto_shortlist_threshold": 80,
-            "max_candidates_per_search": 50,
-            "search_delay_seconds": 2,
-            "default_country": "India",
-            "notify_on_high_match": 1,
-            "notify_on_search_complete": 0,
-            "email_notifications": 1,
-            "desktop_notifications": 1,
-        },
+    _run_phase(
+        "set_defaults:Job Portal Config",
+        lambda: _set_single_defaults(
+            "Job Portal Config",
+            {
+                "auto_search_enabled": 0,
+                "auto_shortlist_threshold": 80,
+                "max_candidates_per_search": 50,
+                "search_delay_seconds": 2,
+                "default_country": "India",
+                "notify_on_high_match": 1,
+                "notify_on_search_complete": 0,
+                "email_notifications": 1,
+                "desktop_notifications": 1,
+            },
+        ),
     )
 
-    _set_single_defaults(
-        "Recruitment Settings",
-        {
-            "auto_parse_resumes": 1,
-            "max_resume_size_kb": 10240,
-            "allowed_file_types": "pdf,docx,txt",
-            "enable_duplicate_detection": 1,
-            "duplicate_threshold": 85,
-            "notify_on_new_candidate": 1,
-            "notify_on_offer_acceptance": 1,
-            "daily_digest_enabled": 1,
-            "weekly_report_enabled": 1,
-            "enable_audit_logging": 1,
-            "enable_rate_limiting": 0,
-            "max_api_requests_per_minute": 60,
-            "session_timeout_minutes": 60,
-            "require_approval_for_offers": 1,
-        },
+    _run_phase(
+        "set_defaults:Recruitment Settings",
+        lambda: _set_single_defaults(
+            "Recruitment Settings",
+            {
+                "auto_parse_resumes": 1,
+                "max_resume_size_kb": 10240,
+                "allowed_file_types": "pdf,docx,txt",
+                "enable_duplicate_detection": 1,
+                "duplicate_threshold": 85,
+                "notify_on_new_candidate": 1,
+                "notify_on_offer_acceptance": 1,
+                "daily_digest_enabled": 1,
+                "weekly_report_enabled": 1,
+                "enable_audit_logging": 1,
+                "enable_rate_limiting": 0,
+                "max_api_requests_per_minute": 60,
+                "session_timeout_minutes": 60,
+                "require_approval_for_offers": 1,
+            },
+        ),
     )
 
     # Create default Email Templates
-    create_default_email_templates()
+    _run_phase("create_default_email_templates", create_default_email_templates)
 
 
 def _set_single_defaults(single_doctype, defaults):
