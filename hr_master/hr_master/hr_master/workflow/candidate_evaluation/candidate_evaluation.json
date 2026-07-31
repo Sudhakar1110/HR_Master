@@ -139,5 +139,5 @@
   }
  ],
  "workflow_name": "Candidate Evaluation",
- "workflow_state_field": ""
+ "workflow_state_field": "workflow_state"
 }

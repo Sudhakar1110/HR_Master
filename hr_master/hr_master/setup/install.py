@@ -11,10 +11,12 @@ from frappe.modules.import_file import import_file_by_path
 
 def after_install():
     """Run after app installation."""
-    # Register the module and import all standard resources first so every
-    # later step can rely on doctypes, reports, workspaces, number cards
-    # etc. existing in the DB.
+    # Register the module, create the workflow master records the workflow
+    # fixture links to, then import all standard resources so every later
+    # step can rely on doctypes, reports, workspaces, number cards etc.
+    # existing in the DB.
     _run_phase("ensure_module_def", ensure_module_def)
+    _run_phase("create_workflow_masters", create_workflow_masters)
     _run_phase("sync_all_resources", sync_all_resources)
     _run_phase("create_seed_data", create_seed_data)
     _run_phase("set_default_config", set_default_config)
@@ -23,6 +25,7 @@ def after_install():
 def after_migrate():
     """Run after database migration."""
     _run_phase("ensure_module_def", ensure_module_def)
+    _run_phase("create_workflow_masters", create_workflow_masters)
     _run_phase("sync_all_resources", sync_all_resources)
     _run_phase("create_seed_data", create_seed_data)
     _run_phase("set_default_config", set_default_config)
@@ -246,6 +249,51 @@ def create_skills():
             skill.category = category
             skill.is_active = 1
             skill.save(ignore_permissions=True)
+
+    frappe.db.commit()
+
+
+def create_workflow_masters():
+    """Create Workflow State and Workflow Action Master records.
+
+    Since Frappe v13 the 'Workflow State' and 'Workflow Action Master'
+    doctypes are standalone records, and a Workflow document's child rows
+    link to them by name. Importing the Workflow fixture does NOT create
+    them, so without this seed step the Desk raises
+    "Workflow State <name> not found" (404) whenever the workflow loads.
+    These are the exact states/actions referenced by the
+    'Candidate Evaluation' workflow fixture.
+    """
+    workflow_states = [
+        ("Pending", "Info"),
+        ("Evaluated", "Primary"),
+        ("Shortlisted", "Success"),
+        ("Interview Scheduled", "Info"),
+        ("Rejected", "Danger"),
+        ("On Hold", "Warning"),
+    ]
+
+    for state_name, style in workflow_states:
+        if not frappe.db.exists("Workflow State", state_name):
+            state = frappe.new_doc("Workflow State")
+            state.workflow_state_name = state_name
+            state.style = style
+            state.save(ignore_permissions=True)
+
+    workflow_actions = [
+        "Evaluate",
+        "Shortlist",
+        "Reject",
+        "Schedule Interview",
+        "Put on Hold",
+        "Re-evaluate",
+    ]
+
+    for action_name in workflow_actions:
+        if not frappe.db.exists("Workflow Action Master", action_name):
+            action = frappe.new_doc("Workflow Action Master")
+            action.workflow_action_name = action_name
+            action.save(ignore_permissions=True)
 
     frappe.db.commit()
 
