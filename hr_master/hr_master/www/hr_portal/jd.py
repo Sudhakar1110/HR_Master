@@ -91,4 +91,10 @@ def get_context(context):
         "Candidate Ranking", filters={"job_description": jd_name}
     )
 
+    # Whether a background portal search is still running (drives auto-refresh polling)
+    context.search_in_progress = (
+        jd.portal_search_status == "Searching"
+        or any(s.status in ("Queued", "In Progress") for s in context.searches)
+    )
+
     return context

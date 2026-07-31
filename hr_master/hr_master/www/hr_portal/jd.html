@@ -7,7 +7,7 @@
     {% include "templates/includes/hr_portal_meta.html" %}
     {% include "templates/includes/hr_portal_css.html" %}
 </head>
-<body class="hrp-body">
+<body class="hrp-body" {% if search_in_progress %}data-hrp-poll="1" data-hrp-poll-url="/api/method/hr_master.api.search_api.get_jd_search_status?job_description_name={{ jd.name }}"{% endif %}>
     {% include "templates/includes/hr_portal_header.html" %}
 
     <main class="hrp-container">
@@ -73,11 +73,14 @@
             <div>
                 <div class="hrp-card">
                     <h2 class="hrp-card-title">Portal Search</h2>
+                    {% if search_in_progress %}
+                    <div class="hrp-alert hrp-alert-info">⏳ Search in progress — this page refreshes automatically when it finishes.</div>
+                    {% endif %}
                     <div class="hrp-actions hrp-mb">
                         <form method="post" style="display:inline">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
                             <input type="hidden" name="action" value="search">
-                            <button class="hrp-btn hrp-btn-primary" type="submit" {{ 'disabled' if not can_write else '' }}>🔎 Search Portals</button>
+                            <button class="hrp-btn hrp-btn-primary" type="submit" {{ 'disabled' if (not can_write or search_in_progress) else '' }}>🔎 Search Portals</button>
                         </form>
                         <form method="post" style="display:inline">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token }}">

@@ -109,6 +109,53 @@ def get_search_status(search_name):
         return {"status": "error", "message": str(e)}
 
 
+@frappe.whitelist()
+def get_jd_search_status(job_description_name):
+    """Get the live search state for a JD (used by the portal page poller).
+
+    Returns whether any background search is still in progress plus the latest
+    per-portal counts and the number of ranked candidates, so the JD page can
+    auto-refresh itself once the queued search finishes.
+    """
+    from hr_master.api.portal_actions import has_hr_role
+
+    if frappe.session.user == "Guest" or not has_hr_role():
+        return {"status": "error", "message": _("Not permitted")}
+
+    try:
+        jd = frappe.get_doc("Job Description", job_description_name)
+        searches = frappe.get_all(
+            "Job Portal Search",
+            fields=[
+                "name",
+                "status",
+                "total_candidates_found",
+                "linkedin_results",
+                "naukri_results",
+                "indeed_results",
+                "monster_results",
+                "serpapi_results",
+            ],
+            filters={"job_description": job_description_name},
+            order_by="search_date desc",
+            limit_page_length=20,
+        )
+        in_progress = jd.portal_search_status == "Searching" or any(
+            s.status in ("Queued", "In Progress") for s in searches
+        )
+        return {
+            "status": "success",
+            "in_progress": bool(in_progress),
+            "portal_search_status": jd.portal_search_status,
+            "searches": searches,
+            "ranking_count": frappe.db.count(
+                "Candidate Ranking", filters={"job_description": job_description_name}
+            ),
+        }
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+
+
 # ------------------------------------------
 # Helper Functions
 # ------------------------------------------

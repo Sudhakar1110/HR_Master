@@ -117,6 +117,57 @@
 				}
 			});
 		});
+
+		/* Auto-refresh polling: pages opt in with data-hrp-poll + data-hrp-poll-url.
+		   Polls a whitelisted endpoint and reloads once a background job finishes,
+		   so search results appear on the JD page without a manual refresh. */
+		var pollBody = document.body;
+		if (pollBody && pollBody.getAttribute("data-hrp-poll") === "1" && pollBody.getAttribute("data-hrp-poll-url")) {
+			var pollUrl = pollBody.getAttribute("data-hrp-poll-url");
+			var pollTimer = null;
+			var pollTries = 0;
+			var maxPollTries = 150; /* ~10 min at 4s, matching the long-queue job timeout */
+
+			function stopPolling() {
+				if (pollTimer) {
+					clearInterval(pollTimer);
+					pollTimer = null;
+				}
+			}
+
+			function reloadFresh() {
+				stopPolling();
+				try {
+					/* strip flash query params so a stale "Search initiated" message isn't re-shown */
+					var url = new URL(window.location.href);
+					url.searchParams.delete("msg");
+					url.searchParams.delete("type");
+					window.location.replace(url.toString());
+				} catch (e) {
+					window.location.reload();
+				}
+			}
+
+			function poll() {
+				if (document.hidden) { return; } /* pause while the tab is hidden */
+				pollTries += 1;
+				fetch(pollUrl, { credentials: "same-origin" })
+					.then(function (r) { return r.json(); })
+					.then(function (data) {
+						if (data && data.status === "success" && !data.in_progress) {
+							reloadFresh();
+						} else if (pollTries >= maxPollTries) {
+							stopPolling();
+						}
+					})
+					.catch(function () {
+						if (pollTries >= maxPollTries) { stopPolling(); }
+					});
+			}
+
+			pollTimer = setInterval(poll, 4000);
+			poll(); /* first check immediately */
+		}
 	});
 })();
 </script>
