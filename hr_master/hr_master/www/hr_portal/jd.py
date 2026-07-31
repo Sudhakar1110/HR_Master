@@ -116,27 +116,27 @@ def get_context(context):
             serpapi_ready = bool(getattr(config, "serpapi_enabled", 0)) and bool(
                 getattr(config, "serpapi_api_key", None)
             )
-        if not serpapi_ready:
-            demo_ready = bool(getattr(config, "demo_enabled", 0))
-            if demo_ready:
-                context.search_zero_hint = {
-                    "title": "Search finished, but 0 results",
-                    "body": (
-                        "SerpAPI has no API key configured, so no live results were returned. "
-                        "Demo mode is on — check that the JD has keywords/skills and try again, "
-                        "or add a SerpAPI key in Desk → HR Master → Job Portal Config."
-                    ),
-                }
-            else:
-                context.search_zero_hint = {
-                    "title": "Search finished, but 0 results",
-                    "body": (
-                        "No portal returned results. For a quick test with zero keys, enable "
-                        "Demo Search in Desk → HR Master → Job Portal Config (returns realistic "
-                        "sample candidates). For live data, add a free SerpAPI key there instead — "
-                        "LinkedIn, Naukri and Monster are placeholders and Indeed's free API was retired."
-                    ),
-                }
+            if not serpapi_ready:
+                demo_ready = bool(getattr(config, "demo_enabled", 0))
+                if demo_ready:
+                    context.search_zero_hint = {
+                        "title": "Search finished, but 0 results",
+                        "body": (
+                            "SerpAPI has no API key configured, so no live results were returned. "
+                            "Demo mode is on — check that the JD has keywords/skills and try again, "
+                            "or add a SerpAPI key in Desk → HR Master → Job Portal Config."
+                        ),
+                    }
+                else:
+                    context.search_zero_hint = {
+                        "title": "Search finished, but 0 results",
+                        "body": (
+                            "No portal returned results. For a quick test with zero keys, enable "
+                            "Demo Search in Desk → HR Master → Job Portal Config (returns realistic "
+                            "sample candidates). For live data, add a free SerpAPI key there instead — "
+                            "LinkedIn, Naukri and Monster are placeholders and Indeed's free API was retired."
+                        ),
+                    }
             else:
                 context.search_zero_hint = {
                     "title": "Search finished, but 0 results",
