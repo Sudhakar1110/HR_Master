@@ -4,12 +4,13 @@ from __future__ import unicode_literals
 
 import frappe
 
-from hr_master.api.portal_actions import require_hr_access
+from hr_master.api.portal_actions import require_hr_access, set_portal_context
 
 
 def get_context(context):
     """Render the dashboard with live KPIs, recent JDs and top matches."""
     require_hr_access()
+    set_portal_context(context)
     context.no_cache = 1
     context.active = "dashboard"
     context.page_title = "HR Dashboard"

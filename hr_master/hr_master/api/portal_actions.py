@@ -49,6 +49,19 @@ def can_write(user=None):
     return any(r in ("HR Master Admin", "HR Master Recruiter") for r in user_roles)
 
 
+def set_portal_context(context):
+    """Populate shared portal page context (CSRF token for form POSTs).
+
+    Frappe v15 renders website pages without a ``csrf_token`` Jinja variable
+    (it only replaces the ``<!-- csrf_token -->`` HTML comment with a script
+    tag). The portal forms post ``{{ csrf_token }}`` hidden fields, which
+    otherwise render empty and every POST fails with an HTTP 400
+    (CSRFTokenError). Injecting the real session token here fixes that.
+    """
+    context.csrf_token = frappe.sessions.get_csrf_token()
+    return context
+
+
 def require_hr_access():
     """Guard for portal pages: redirect guests / non-HR users to login."""
     if frappe.session.user == "Guest" or not has_hr_role():

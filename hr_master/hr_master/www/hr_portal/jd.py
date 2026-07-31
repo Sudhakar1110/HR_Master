@@ -11,6 +11,7 @@ from hr_master.api.portal_actions import (
     require_write_access,
     redirect_with_flash,
     render_flash,
+    set_portal_context,
 )
 from hr_master.api.search_api import search_candidates_for_jd, import_search_results
 from hr_master.api.ranking_api import rank_all_candidates_for_jd
@@ -19,6 +20,7 @@ from hr_master.api.ranking_api import rank_all_candidates_for_jd
 def get_context(context):
     """Render JD details, trigger portal search/import/rank via POST."""
     require_hr_access()
+    set_portal_context(context)
     context.no_cache = 1
     context.active = "jds"
     context.can_write = can_write()

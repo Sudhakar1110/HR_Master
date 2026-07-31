@@ -17,12 +17,14 @@ from hr_master.api.portal_actions import (
     submit_feedback,
     redirect_with_flash,
     render_flash,
+    set_portal_context,
 )
 
 
 def get_context(context):
     """Render candidate details; handle workflow / interview / offer / feedback actions."""
     require_hr_access()
+    set_portal_context(context)
     context.no_cache = 1
     context.active = "candidates"
     context.can_write = can_write()

@@ -6,12 +6,13 @@ import json
 
 import frappe
 
-from hr_master.api.portal_actions import require_hr_access, can_write, create_jd
+from hr_master.api.portal_actions import require_hr_access, can_write, create_jd, set_portal_context
 
 
 def get_context(context):
     """Render the JD list and handle JD creation via POST."""
     require_hr_access()
+    set_portal_context(context)
     context.no_cache = 1
     context.active = "jds"
     context.page_title = "Job Descriptions"

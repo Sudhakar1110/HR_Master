@@ -4,9 +4,12 @@ from __future__ import unicode_literals
 
 import frappe
 
+from hr_master.api.portal_actions import set_portal_context
+
 
 def get_context(context):
     """Render the privacy policy (public page, no login required)."""
+    set_portal_context(context)
     context.no_cache = 1
     context.active = "legal"
     context.page_title = "Privacy Policy"
