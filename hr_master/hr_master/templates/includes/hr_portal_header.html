@@ -8,6 +8,7 @@
       </span>
     </a>
     <button class="hrp-nav-toggle" type="button" aria-label="Toggle navigation" onclick="var l=document.getElementById('hrpNavLinks');if(l){l.classList.toggle('hrp-open');}">☰</button>
+    <button class="hrp-theme-toggle" id="hrpThemeToggle" type="button" aria-label="Toggle dark mode" title="Toggle dark mode">🌙</button>
     <div class="hrp-nav-links" id="hrpNavLinks">
       <a href="/hr_portal" class="{{ 'hrp-active' if active == 'dashboard' else '' }}">Dashboard</a>
       <a href="/hr_portal/jds" class="{{ 'hrp-active' if active == 'jds' else '' }}">Job Descriptions</a>

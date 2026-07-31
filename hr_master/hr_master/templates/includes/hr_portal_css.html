@@ -27,6 +27,7 @@
   --hrp-text: #101828;
   --hrp-muted: #64708a;
   --hrp-subtle: #98a2b8;
+  --hrp-heading: var(--hrp-ink);
 
   /* Status */
   --hrp-green: #059669;  --hrp-green-bg: #ecfdf5;  --hrp-green-border: #a7f3d0;
@@ -225,6 +226,24 @@ body.hrp-body {
   cursor: pointer;
 }
 
+/* Theme toggle */
+.hrp-theme-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+  font-size: 17px;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.18s ease;
+}
+.hrp-theme-toggle:hover { background: rgba(255, 255, 255, 0.14); transform: translateY(-1px); }
+
 /* ============================================================
    Layout
    ============================================================ */
@@ -264,7 +283,7 @@ body.hrp-body {
   font-weight: 800;
   letter-spacing: -0.03em;
   margin: 0;
-  color: var(--hrp-ink);
+  color: var(--hrp-heading);
   line-height: 1.15;
 }
 .hrp-page-sub {
@@ -513,7 +532,7 @@ body.hrp-body {
   font-size: 34px;
   font-weight: 800;
   letter-spacing: -0.04em;
-  color: var(--hrp-ink);
+  color: var(--hrp-heading);
   line-height: 1.1;
 }
 .hrp-kpi-label {
@@ -587,7 +606,7 @@ table.hrp-table { width: 100%; border-collapse: collapse; font-size: 14px; }
   border-radius: 999px;
   transition: width 0.7s cubic-bezier(0.22, 1, 0.36, 1);
 }
-.hrp-score { font-weight: 800; font-size: 15px; color: var(--hrp-ink); }
+.hrp-score { font-weight: 800; font-size: 15px; color: var(--hrp-heading); }
 
 /* ============================================================
    Forms
@@ -729,8 +748,8 @@ table.hrp-table { width: 100%; border-collapse: collapse; font-size: 14px; }
    Legal pages
    ============================================================ */
 .hrp-legal { max-width: 860px; margin: 0 auto; }
-.hrp-legal h2 { font-size: 22px; margin: 34px 0 10px; color: var(--hrp-ink); letter-spacing: -0.02em; }
-.hrp-legal h3 { font-size: 16.5px; margin: 26px 0 8px; color: var(--hrp-ink); }
+.hrp-legal h2 { font-size: 22px; margin: 34px 0 10px; color: var(--hrp-heading); letter-spacing: -0.02em; }
+.hrp-legal h3 { font-size: 16.5px; margin: 26px 0 8px; color: var(--hrp-heading); }
 .hrp-legal p, .hrp-legal li { font-size: 14.5px; color: #3d4a63; line-height: 1.7; }
 .hrp-legal ul { padding-left: 22px; }
 .hrp-legal li { margin-bottom: 6px; }
@@ -787,4 +806,65 @@ summary.hrp-link::-webkit-details-marker { display: none; }
   .hrp-footer-inner { justify-content: center; text-align: center; }
   .hrp-footer-links { justify-content: center; }
 }
+
+/* ============================================================
+   Dark mode
+   ============================================================ */
+html[data-theme="dark"] {
+  --hrp-bg: #0d1426;
+  --hrp-card: #141c33;
+  --hrp-border: #232c47;
+  --hrp-border-strong: #2e3a5c;
+  --hrp-text: #e6e9f2;
+  --hrp-muted: #9aa4bd;
+  --hrp-subtle: #6f7a96;
+  --hrp-heading: #eef1f8;
+  --hrp-shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 1px 3px rgba(0, 0, 0, 0.3);
+  --hrp-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.45);
+  --hrp-shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.55);
+}
+html[data-theme="dark"] body.hrp-body {
+  background:
+    radial-gradient(900px 420px at 85% -120px, rgba(124, 58, 237, 0.16), transparent 60%),
+    radial-gradient(700px 360px at -60px 40px, rgba(79, 70, 229, 0.14), transparent 55%),
+    var(--hrp-bg);
+}
+html[data-theme="dark"] .hrp-page-head {
+  background: linear-gradient(120deg, rgba(79, 70, 229, 0.14), rgba(124, 58, 237, 0.16) 60%, rgba(192, 38, 211, 0.10));
+  border-color: rgba(99, 91, 255, 0.32);
+}
+html[data-theme="dark"] .hrp-table th { background: #1a2240; }
+html[data-theme="dark"] .hrp-table td { color: #cdd4e6; }
+html[data-theme="dark"] .hrp-table tbody tr:nth-child(even) { background: rgba(255, 255, 255, 0.03); }
+html[data-theme="dark"] .hrp-table tbody tr:hover { background: rgba(99, 91, 255, 0.12); }
+html[data-theme="dark"] .hrp-table tbody tr:nth-child(even):hover { background: rgba(99, 91, 255, 0.15); }
+html[data-theme="dark"] .hrp-input, html[data-theme="dark"] .hrp-select, html[data-theme="dark"] .hrp-textarea {
+  background: #0f1730;
+  color: var(--hrp-text);
+}
+html[data-theme="dark"] .hrp-input::placeholder, html[data-theme="dark"] .hrp-textarea::placeholder { color: var(--hrp-subtle); }
+html[data-theme="dark"] .hrp-btn-secondary { background: #1a2240; color: var(--hrp-text); border-color: var(--hrp-border-strong); }
+html[data-theme="dark"] .hrp-btn-secondary:hover { border-color: var(--hrp-primary); color: var(--hrp-primary); }
+html[data-theme="dark"] .hrp-detail dd { color: #dbe1ee; }
+html[data-theme="dark"] .hrp-chip { background: #1a2240; border-color: var(--hrp-border-strong); color: #cdd4e6; }
+html[data-theme="dark"] .hrp-chip-required { background: rgba(29, 78, 216, 0.18); border-color: #1e40af; color: #bfdbfe; }
+html[data-theme="dark"] .hrp-chip-preferred { background: rgba(5, 150, 105, 0.16); border-color: #047857; color: #a7f3d0; }
+html[data-theme="dark"] .hrp-progress { background: #232c47; }
+html[data-theme="dark"] .hrp-legal p, html[data-theme="dark"] .hrp-legal li { color: #aab3ca; }
+html[data-theme="dark"] .hrp-empty { color: var(--hrp-muted); }
+html[data-theme="dark"] .hrp-empty-icon { background: rgba(99, 91, 255, 0.14); border-color: rgba(99, 91, 255, 0.3); }
+html[data-theme="dark"] .hrp-card-hover:hover { border-color: rgba(99, 91, 255, 0.45); }
+html[data-theme="dark"] ::-webkit-scrollbar-thumb { background: #2e3a5c; border-color: var(--hrp-bg); }
+html[data-theme="dark"] ::-webkit-scrollbar-thumb:hover { background: #3a476e; }
 </style>
+<script>
+/* Theme init — set before first paint to avoid a light flash */
+(function () {
+	var t = null;
+	try { t = localStorage.getItem("hr_portal_theme"); } catch (e) {}
+	if (t !== "dark" && t !== "light") {
+		t = (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) ? "dark" : "light";
+	}
+	document.documentElement.setAttribute("data-theme", t);
+})();
+</script>

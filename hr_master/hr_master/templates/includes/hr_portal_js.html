@@ -63,6 +63,27 @@
 			requestAnimationFrame(frame);
 		});
 
+		/* Dark / light theme toggle (persisted in localStorage) */
+		var themeToggle = document.getElementById("hrpThemeToggle");
+		var themeIcons = { dark: "☀️", light: "🌙" };
+		function currentTheme() {
+			return document.documentElement.getAttribute("data-theme") || "light";
+		}
+		function applyTheme(theme) {
+			document.documentElement.setAttribute("data-theme", theme);
+			if (themeToggle) {
+				themeToggle.textContent = themeIcons[theme] || "🌙";
+				themeToggle.setAttribute("aria-label", theme === "dark" ? "Switch to light mode" : "Switch to dark mode");
+			}
+			try { localStorage.setItem("hr_portal_theme", theme); } catch (e) {}
+		}
+		if (themeToggle) {
+			applyTheme(currentTheme()); /* sync the button icon with the init-time theme */
+			themeToggle.addEventListener("click", function () {
+				applyTheme(currentTheme() === "dark" ? "light" : "dark");
+			});
+		}
+
 		/* Confirm dialog for destructive / state-changing actions */
 		document.querySelectorAll("form[data-confirm]").forEach(function (form) {
 			form.addEventListener("submit", function (e) {
