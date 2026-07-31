@@ -13,9 +13,6 @@ from urllib.parse import quote
 import frappe
 from frappe import _
 
-from hr_master.api.search_api import search_candidates_for_jd, import_search_results
-from hr_master.api.ranking_api import rank_all_candidates_for_jd
-
 HR_ROLES = [
     "HR Master Admin",
     "HR Master Recruiter",
