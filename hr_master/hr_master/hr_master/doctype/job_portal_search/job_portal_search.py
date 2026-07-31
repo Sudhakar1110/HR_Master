@@ -32,6 +32,7 @@ class JobPortalSearch(Document):
             self.naukri_results = len([r for r in self.search_results if r.source == "Naukri"])
             self.indeed_results = len([r for r in self.search_results if r.source == "Indeed"])
             self.monster_results = len([r for r in self.search_results if r.source == "Monster"])
+            self.serpapi_results = len([r for r in self.search_results if r.source == "SerpAPI"])
 
     def import_results_to_candidates(self):
         """Import unimported search results as Candidate documents."""

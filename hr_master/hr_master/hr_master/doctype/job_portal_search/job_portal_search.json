@@ -18,11 +18,13 @@
   "search_naukri",
   "search_indeed",
   "search_monster",
+  "search_serpapi",
   "column_break_9",
   "linkedin_results",
   "naukri_results",
   "indeed_results",
   "monster_results",
+  "serpapi_results",
   "sb_results",
   "search_results",
   "sb_errors",
@@ -109,6 +111,12 @@
    "label": "Search Monster"
   },
   {
+   "default": "0",
+   "fieldname": "search_serpapi",
+   "fieldtype": "Check",
+   "label": "Search SerpAPI (Google Jobs)"
+  },
+  {
    "fieldname": "column_break_9",
    "fieldtype": "Column Break"
   },
@@ -134,6 +142,12 @@
    "fieldname": "monster_results",
    "fieldtype": "Int",
    "label": "Monster Results",
+   "read_only": 1
+  },
+  {
+   "fieldname": "serpapi_results",
+   "fieldtype": "Int",
+   "label": "SerpAPI Results",
    "read_only": 1
   },
   {

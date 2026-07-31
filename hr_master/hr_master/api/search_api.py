@@ -35,6 +35,7 @@ def search_candidates_for_jd(job_description_name):
         search.search_naukri = 1 if "Naukri" in portals else 0
         search.search_indeed = 1 if "Indeed" in portals else 0
         search.search_monster = 1 if "Monster" in portals else 0
+        search.search_serpapi = 1 if "SerpAPI" in portals else 0
 
         search.save(ignore_permissions=True)
 
@@ -102,6 +103,7 @@ def get_search_status(search_name):
             "naukri": search.naukri_results,
             "indeed": search.indeed_results,
             "monster": search.monster_results,
+            "serpapi": search.serpapi_results,
         }
     except Exception as e:
         return {"status": "error", "message": str(e)}
@@ -182,17 +184,61 @@ def search_naukri(search_name, jd_name, keywords):
 
 
 def search_indeed(search_name, jd_name, keywords):
-    """Search Indeed for candidates matching the JD."""
+    """Search Indeed for candidates matching the JD (legacy Publisher API).
+
+    Note: Indeed retired the free Publisher API program; this endpoint only
+    still works for Publisher IDs obtained before the shutdown. It fails
+    gracefully (returns []) when the API is unavailable or the ID is invalid.
+    """
     config = frappe.get_single("Job Portal Config")
     if not config.indeed_enabled:
         return []
 
-    try:
-        results = []
+    publisher_id = config.indeed_publisher_id
+    if not publisher_id:
+        return []
 
-        if config.indeed_publisher_id:
-            # TODO: Implement Indeed API integration
-            pass
+    try:
+        import requests
+
+        limit = config.indeed_search_limit or 25
+        country = config.default_country or ""
+        user_ip = _get_client_ip()
+
+        params = {
+            "publisher": publisher_id,
+            "v": "2",
+            "format": "json",
+            "q": keywords,
+            "l": country,
+            "co": country,
+            "userip": user_ip,
+            "useragent": _get_user_agent(),
+            "start": "0",
+            "limit": str(limit),
+            "sort": "relevance",
+        }
+
+        response = requests.get(
+            "https://api.indeed.com/ads/apisearch",
+            params=params,
+            timeout=30,
+        )
+        response.raise_for_status()
+        data = response.json()
+
+        results = []
+        for job in (data.get("results") or [])[:limit]:
+            results.append({
+                "name": job.get("jobtitle") or job.get("company") or "Unknown",
+                "url": job.get("url") or "",
+                "title": job.get("jobtitle") or "",
+                "company": job.get("company") or "",
+                "location": job.get("formattedLocation") or "",
+                "skills": job.get("snippet") or "",
+                "experience": 0,
+                "source_url": job.get("url") or "",
+            })
 
         return results
 
@@ -202,6 +248,113 @@ def search_indeed(search_name, jd_name, keywords):
             title="Indeed Search Error",
         )
         return []
+
+
+def search_serpapi(search_name, jd_name, keywords):
+    """Search SerpAPI (Google Jobs) for candidates matching the JD.
+
+    SerpAPI's Google Jobs engine returns live job postings; each posting is
+    mapped into a candidate-like search result so the existing import & rank
+    pipeline works unchanged. Requires a SerpAPI API key (free tier: 100
+    searches/month).
+    """
+    config = frappe.get_single("Job Portal Config")
+    if not config.serpapi_enabled:
+        return []
+
+    api_key = config.serpapi_api_key
+    if not api_key:
+        return []
+
+    try:
+        import requests
+
+        limit = config.serpapi_search_limit or 10
+        country = config.serpapi_country or config.default_country or "us"
+
+        params = {
+            "engine": "google_jobs",
+            "q": keywords,
+            "gl": country,
+            "hl": "en",
+            "api_key": api_key,
+        }
+
+        response = requests.get(
+            "https://serpapi.com/search.json",
+            params=params,
+            timeout=30,
+        )
+        response.raise_for_status()
+        data = response.json()
+
+        if data.get("error"):
+            frappe.log_error(
+                message=f"SerpAPI returned an error: {data['error']}",
+                title="SerpAPI Search Error",
+            )
+            return []
+
+        results = []
+        for job in (data.get("jobs_results") or [])[:limit]:
+            description = job.get("description") or ""
+            skills = _extract_skills_from_description(description)
+
+            results.append({
+                "name": job.get("company_name") or job.get("title") or "Unknown",
+                "url": job.get("job_id") or job.get("apply_link") or "",
+                "title": job.get("title") or "",
+                "company": job.get("company_name") or "",
+                "location": job.get("location") or "",
+                "skills": skills,
+                "experience": _extract_experience_years(description),
+                "source_url": job.get("apply_link") or job.get("job_id") or "",
+            })
+
+        return results
+
+    except Exception as e:
+        frappe.log_error(
+            message=f"SerpAPI search error: {str(e)}",
+            title="SerpAPI Search Error",
+        )
+        return []
+
+
+def _get_client_ip():
+    """Best-effort client IP for APIs that require userip."""
+    try:
+        return frappe.local.request_ip or "1.2.3.4"
+    except Exception:
+        return "1.2.3.4"
+
+
+def _get_user_agent():
+    """User agent for the Indeed Publisher API."""
+    return "Mozilla/5.0 (HR Master Recruiting; +frappe)"
+
+
+def _extract_skills_from_description(description):
+    """Extract a concise skills/snippet summary from a job description."""
+    if not description:
+        return ""
+    # Truncate to a reasonable length to keep the search record tidy
+    return " ".join(description.split())[:1500]
+
+
+def _extract_experience_years(description):
+    """Best-effort numeric years of experience from a job description."""
+    if not description:
+        return 0
+    import re
+
+    match = re.search(r"(\d+)\s*\+?\s*(?:years|yrs)", description, re.IGNORECASE)
+    if match:
+        try:
+            return float(match.group(1))
+        except ValueError:
+            return 0
+    return 0
 
 
 def search_monster(search_name, jd_name, keywords):

@@ -77,6 +77,7 @@ def get_context(context):
             "naukri_results",
             "indeed_results",
             "monster_results",
+            "serpapi_results",
         ],
         filters={"job_description": jd_name},
         order_by="search_date desc",

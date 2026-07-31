@@ -32,6 +32,10 @@ class JobPortalConfig(Document):
             if not self.monster_api_key:
                 frappe.throw("Monster API Key is required when Monster is enabled")
 
+        if getattr(self, "serpapi_enabled", 0):
+            if not getattr(self, "serpapi_api_key", None):
+                frappe.throw("SerpAPI API Key is required when SerpAPI is enabled")
+
     def get_enabled_portals(self):
         """Get list of enabled portals."""
         portals = []
@@ -43,6 +47,8 @@ class JobPortalConfig(Document):
             portals.append("Indeed")
         if self.monster_enabled:
             portals.append("Monster")
+        if getattr(self, "serpapi_enabled", 0):
+            portals.append("SerpAPI")
         return portals
 
     def get_search_limit(self, portal):
@@ -52,8 +58,9 @@ class JobPortalConfig(Document):
             "Naukri": self.naukri_search_limit or 25,
             "Indeed": self.indeed_search_limit or 25,
             "Monster": self.monster_search_limit or 25,
+            "SerpAPI": self.serpapi_search_limit or 10,
         }
-        return limits.get(portal, 25)
+        return limits.get(portal, 10)
 
     def get_notification_recipients(self):
         """Get list of notification recipients."""

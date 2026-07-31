@@ -37,6 +37,12 @@
   "monster_api_key",
   "column_break_26",
   "monster_search_limit",
+  "sb_serpapi",
+  "serpapi_enabled",
+  "serpapi_api_key",
+  "column_break_27",
+  "serpapi_search_limit",
+  "serpapi_country",
   "sb_notifications",
   "notify_on_high_match",
   "notify_on_search_complete",
@@ -217,6 +223,39 @@
    "fieldname": "monster_search_limit",
    "fieldtype": "Int",
    "label": "Monster Search Limit"
+  },
+  {
+   "fieldname": "sb_serpapi",
+   "fieldtype": "Section Break",
+   "label": "SerpAPI (Google Jobs) Configuration"
+  },
+  {
+   "default": "0",
+   "fieldname": "serpapi_enabled",
+   "fieldtype": "Check",
+   "label": "Enable SerpAPI (Google Jobs) Search"
+  },
+  {
+   "fieldname": "serpapi_api_key",
+   "fieldtype": "Password",
+   "label": "SerpAPI API Key"
+  },
+  {
+   "fieldname": "column_break_27",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "10",
+   "fieldname": "serpapi_search_limit",
+   "fieldtype": "Int",
+   "label": "SerpAPI Search Limit"
+  },
+  {
+   "default": "us",
+   "fieldname": "serpapi_country",
+   "fieldtype": "Data",
+   "label": "SerpAPI Country Code (gl)",
+   "description": "Two-letter country code, e.g. us, uk, in"
   },
   {
    "fieldname": "sb_notifications",
