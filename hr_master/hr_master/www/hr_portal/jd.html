@@ -117,6 +117,7 @@
                                     </td>
                                     <td>{{ s.search_date }}</td>
                                     <td class="hrp-right">
+                                        <a class="hrp-link" href="/hr_portal/search?name={{ s.name }}">View →</a>
                                         {% if can_write %}
                                         <form method="post" style="display:inline" data-confirm="Import all results of this search as candidates?">
                                             <input type="hidden" name="csrf_token" value="{{ csrf_token }}">

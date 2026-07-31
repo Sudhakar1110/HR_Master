@@ -92,6 +92,45 @@ def import_search_results(search_name):
 
 @frappe.whitelist()
 @rate_limit_decorator
+def import_single_search_result(search_name, result_name):
+    """Import a single portal search result row as a Candidate document."""
+    try:
+        search = frappe.get_doc("Job Portal Search", search_name)
+        if not search:
+            return {"status": "error", "message": _("Search record not found")}
+
+        result = next(
+            (r for r in search.search_results if r.name == result_name),
+            None,
+        )
+        if not result:
+            return {"status": "error", "message": _("Result row not found")}
+
+        imported = search.import_result_to_candidate(result)
+        if imported:
+            search.save(ignore_permissions=True)
+            return {
+                "status": "success",
+                "imported_count": 1,
+                "message": _("Imported {0}").format(result.candidate_name),
+            }
+
+        # Not imported: either it was already imported (is_imported / Imported)
+        # or the import attempt failed (import_status set to Failed on the row).
+        if result.is_imported or result.import_status == "Imported":
+            return {"status": "error", "message": _("Result already imported")}
+        return {"status": "error", "message": _("Import failed — check the Error Log")}
+
+    except Exception as e:
+        frappe.log_error(
+            message=f"Error importing single result: {str(e)}",
+            title="Candidate Import Error",
+        )
+        return {"status": "error", "message": str(e)}
+
+
+@frappe.whitelist()
+@rate_limit_decorator
 def get_search_status(search_name):
     """Get the status of a portal search."""
     try:

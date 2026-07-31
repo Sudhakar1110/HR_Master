@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ page_title }} · HR Master</title>
+    {% include "templates/includes/hr_portal_meta.html" %}
+    {% include "templates/includes/hr_portal_css.html" %}
+</head>
+<body class="hrp-body">
+    {% include "templates/includes/hr_portal_header.html" %}
+
+    <main class="hrp-container">
+        {% if flash %}
+        <div class="hrp-alert {{ 'hrp-alert-success' if flash.type == 'success' else 'hrp-alert-error' }}" data-dismiss>
+            {{ flash.message }}
+        </div>
+        {% endif %}
+
+        <div class="hrp-page-head">
+            <div>
+                <h1 class="hrp-page-title">Search Results</h1>
+                <p class="hrp-page-sub">{{ search.job_title }} · {{ search.name }} · {{ search.search_date }}</p>
+            </div>
+            <div class="hrp-actions">
+                <a class="hrp-btn hrp-btn-secondary" href="/hr_portal/jd?name={{ jd.name }}">← Back to JD</a>
+                {% if can_write and pending_count > 0 %}
+                <form method="post" style="display:inline">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                    <input type="hidden" name="action" value="import_all">
+                    <button class="hrp-btn hrp-btn-primary" type="submit" data-confirm="Import all {{ pending_count }} pending results as candidates?">Import All ({{ pending_count }})</button>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="hrp-grid hrp-grid-4 hrp-mb">
+            <div class="hrp-card hrp-kpi">
+                <div class="hrp-kpi-top"><span class="hrp-kpi-icon">🔎</span><span class="hrp-kpi-label">Status</span></div>
+                <div class="hrp-kpi-value">
+                    {% set st = search.status|lower %}
+                    <span class="hrp-badge {{ 'hrp-badge-green' if st in ('completed', 'partial') else ('hrp-badge-orange' if st in ('queued', 'in progress') else 'hrp-badge-red') }}">{{ search.status }}</span>
+                </div>
+            </div>
+            <div class="hrp-card hrp-kpi">
+                <div class="hrp-kpi-top"><span class="hrp-kpi-icon">📥</span><span class="hrp-kpi-label">Found</span></div>
+                <div class="hrp-kpi-value">{{ results|length }}</div>
+            </div>
+            <div class="hrp-card hrp-kpi">
+                <div class="hrp-kpi-top"><span class="hrp-kpi-icon">✅</span><span class="hrp-kpi-label">Imported</span></div>
+                <div class="hrp-kpi-value">{{ imported_count }}</div>
+            </div>
+            <div class="hrp-card hrp-kpi">
+                <div class="hrp-kpi-top"><span class="hrp-kpi-icon">⏳</span><span class="hrp-kpi-label">Pending</span></div>
+                <div class="hrp-kpi-value">{{ pending_count }}</div>
+            </div>
+        </div>
+
+        {% if results %}
+        <div class="hrp-card">
+            <div class="hrp-table-wrap">
+                <table class="hrp-table">
+                    <thead>
+                        <tr>
+                            <th>Source</th><th>Name</th><th>Title</th><th>Company</th>
+                            <th>Location</th><th>Exp</th><th>Skills</th><th>Import</th><th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for r in results %}
+                        <tr>
+                            <td><span class="hrp-badge hrp-badge-blue">{{ r.source }}</span></td>
+                            <td><strong>{{ r.candidate_name }}</strong></td>
+                            <td>{{ r.current_title or '—' }}</td>
+                            <td>{{ r.current_company or '—' }}</td>
+                            <td>{{ r.location or '—' }}</td>
+                            <td>{{ r.experience_years or 0 }} yrs</td>
+                            <td>
+                                {% if r.skills_summary %}
+                                <span class="hrp-hint" title="{{ r.skills_summary }}" style="display:block;max-width:220px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.skills_summary }}</span>
+                                {% else %}—{% endif %}
+                            </td>
+                            <td>
+                                {% if r.is_imported %}
+                                <span class="hrp-badge hrp-badge-green">Imported</span>
+                                {% elif r.import_status == 'Failed' %}
+                                <span class="hrp-badge hrp-badge-red">Failed</span>
+                                {% else %}
+                                <span class="hrp-badge hrp-badge-orange">Pending</span>
+                                {% endif %}
+                            </td>
+                            <td class="hrp-right">
+                                {% if can_write and not r.is_imported and r.import_status != 'Failed' %}
+                                <form method="post" style="display:inline">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                                    <input type="hidden" name="action" value="import_one">
+                                    <input type="hidden" name="result_name" value="{{ r.name }}">
+                                    <button class="hrp-btn hrp-btn-success hrp-btn-sm" type="submit" data-confirm="Import {{ r.candidate_name }} as a candidate?">Import</button>
+                                </form>
+                                {% else %}
+                                <span class="hrp-hint">—</span>
+                                {% endif %}
+                                {% if r.profile_url %}
+                                <a class="hrp-btn hrp-btn-secondary hrp-btn-sm" href="{{ r.profile_url }}" target="_blank" rel="noopener">↗</a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <p class="hrp-hint hrp-mt">Review results below the fold — hovering a skills cell shows the full snippet. Use <strong>Import</strong> per row to pick only the candidates you want, or <strong>Import All</strong> for the full set.</p>
+        </div>
+        {% else %}
+        <div class="hrp-card">
+            <div class="hrp-empty">
+                <div class="hrp-empty-icon">🔎</div>
+                <p>This search returned no results.</p>
+                <a class="hrp-btn hrp-btn-primary hrp-btn-sm" href="/hr_portal/jd?name={{ jd.name }}">Back to JD →</a>
+            </div>
+        </div>
+        {% endif %}
+    </main>
+
+    {% include "templates/includes/hr_portal_footer.html" %}
+    {% include "templates/includes/hr_portal_js.html" %}
+</body>
+</html>
