@@ -27,6 +27,7 @@
   "education_analysis",
   "sb_notes",
   "notes",
+  "ai_explanation",
   "recommendation"
  ],
  "fields": [
@@ -161,6 +162,13 @@
    "fieldname": "notes",
    "fieldtype": "Small Text",
    "label": "Notes"
+  },
+  {
+   "fieldname": "ai_explanation",
+   "fieldtype": "Small Text",
+   "label": "AI Match Explanation",
+   "read_only": 1,
+   "description": "LLM-generated reasoning behind the match score (when AI is enabled)."
   },
   {
    "fieldname": "recommendation",

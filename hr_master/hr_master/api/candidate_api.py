@@ -8,7 +8,12 @@ from frappe import _
 
 @frappe.whitelist()
 def parse_resume(candidate_name, file_url):
-    """Parse resume file and extract text and skills."""
+    """Parse resume file and extract text, skills and structured profile.
+
+    Uses the configured LLM (if AI is enabled) for rich extraction — skills
+    with proficiency + years, education, certifications, current role — and
+    falls back to the rule-based skill extractor when AI is off or fails.
+    """
     try:
         candidate = frappe.get_doc("Candidate", candidate_name)
         if not candidate:
@@ -20,17 +25,31 @@ def parse_resume(candidate_name, file_url):
             file_path = frappe.get_site_path(file_url.lstrip("/"))
             resume_text = extract_text_from_file(file_path)
 
-        # Extract skills from resume text
-        skills = []
+        # Rule-based fallback skill extraction
+        rule_skills = []
         if resume_text:
             from hr_master.hr_master.doctype.skill.skill import extract_skills_from_text
 
-            skills = extract_skills_from_text(resume_text)
+            rule_skills = extract_skills_from_text(resume_text)
+
+        # LLM structured extraction (when AI is configured)
+        from hr_master.utils.llm import is_llm_configured
+
+        structured = {}
+        llm_skills = []
+        if resume_text:
+            structured = _llm_extract_resume_profile(resume_text)
+            llm_skills = structured.get("skills") or []
+
+        # Prefer LLM skills; fall back to rule-based list
+        skills = [s.get("skill") for s in llm_skills if s.get("skill")] or rule_skills
 
         return {
             "status": "success",
             "resume_text": resume_text,
             "skills": skills,
+            "ai_enabled": is_llm_configured(),
+            "structured": structured,
         }
 
     except Exception as e:
@@ -39,6 +58,31 @@ def parse_resume(candidate_name, file_url):
             title="Resume Parse Error",
         )
         return {"status": "error", "message": str(e)}
+
+
+def _llm_extract_resume_profile(resume_text):
+    """Ask the configured LLM to extract a structured profile from resume text."""
+    from hr_master.utils.llm import call_llm_json, is_llm_configured
+
+    if not is_llm_configured():
+        return {}
+
+    system = (
+        "You are an expert resume parser for a recruiting system. "
+        "Extract only facts present in the resume. Reply with JSON only, no prose."
+    )
+    prompt = (
+        "Extract a structured profile from this resume. Return a JSON object with keys:\n"
+        '- "skills": array of {\"skill\": string, \"proficiency\": "Beginner|Intermediate|Advanced|Expert", \"years\": number}\n'
+        '- "highest_education": string (e.g. Bachelor's, Master's, PhD)\n'
+        '- "certifications": array of strings\n'
+        '- "current_title": string, "current_company": string\n'
+        '- "total_experience_years": number\n'
+        '- "location": string\n'
+        '- "notice_period_days": number or null\n\n'
+        "Resume text:\n{0}".format((resume_text or "")[:9000])
+    )
+    return call_llm_json(prompt, system=system, max_tokens=1200, temperature=0.1)
 
 
 @frappe.whitelist()

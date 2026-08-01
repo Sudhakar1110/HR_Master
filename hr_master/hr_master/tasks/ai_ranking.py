@@ -93,6 +93,9 @@ def ai_rank_single_candidate(jd_name, candidate_name):
         ranking.education_match_score = round(education_score, 1)
         ranking.evaluation_date = now_datetime()
         ranking.status = "Evaluated"
+        ranking.ai_explanation = generate_match_explanation(
+            jd, candidate, total, skill_score, experience_score, education_score
+        )
 
         # Set recommendation with more granularity
         if total >= 85:
@@ -123,6 +126,49 @@ def ai_rank_single_candidate(jd_name, candidate_name):
             message=f"Error ranking candidate {candidate_name} for JD {jd_name}: {str(e)}",
             title="AI Single Ranking Error"
         )
+
+
+def generate_match_explanation(jd, candidate, total, skill_score, experience_score, education_score):
+    """Ask the LLM to explain a match score in 2-3 readable sentences.
+
+    Fails soft: returns an empty string when AI is off or the call errors,
+    so ranking still completes normally.
+    """
+    from hr_master.utils.llm import call_llm, is_llm_configured
+
+    if not is_llm_configured():
+        return ""
+
+    jd_skills = jd.get_all_skills_with_importance() if hasattr(jd, "get_all_skills_with_importance") else {}
+    candidate_skills = candidate.get_skills_with_details() if hasattr(candidate, "get_skills_with_details") else {}
+
+    system = (
+        "You are a senior technical recruiter. Explain a candidate's match score for a role "
+        "in 2-3 crisp, factual sentences. Mention strengths, gaps and the single most "
+        "important reason for the score. No fluff, no markdown."
+    )
+    prompt = (
+        "Explain why this candidate scores {0:.0f}% for the role.\n\n"
+        "ROLE: {1}\n"
+        "JD SKILLS: {2}\n"
+        "CANDIDATE: {3}\n"
+        "CANDIDATE SKILLS: {4}\n"
+        "EXPERIENCE: {5} years\n"
+        "EDUCATION: {6}\n\n"
+        "SUB-SCORES — skills {7:.0f}%, experience {8:.0f}%, education {9:.0f}%."
+    ).format(
+        total,
+        jd.job_title or jd.name,
+        ", ".join(jd_skills.keys())[:600] or "n/a",
+        candidate.candidate_name or candidate.name,
+        ", ".join(candidate_skills.keys())[:600] or "n/a",
+        candidate.total_experience_years or 0,
+        candidate.highest_education or "n/a",
+        skill_score,
+        experience_score,
+        education_score,
+    )
+    return call_llm(prompt, system=system, max_tokens=250, temperature=0.3)
 
 
 def calculate_advanced_skill_score(jd, candidate):

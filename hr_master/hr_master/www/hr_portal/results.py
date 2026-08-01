@@ -74,6 +74,7 @@ def get_context(context):
             "recommendation",
             "experience_match_score",
             "education_match_score",
+            "ai_explanation",
             "evaluation_date",
         ],
         filters={"job_description": jd_name},

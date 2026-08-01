@@ -98,6 +98,16 @@
                 </div>
 
                 <div class="hrp-card hrp-mt">
+                    <h2 class="hrp-card-title">✨ AI Assist</h2>
+                    <p class="hrp-hint">Generate tailored interview questions or skill suggestions for this JD using your configured AI provider (Recruitment Settings → AI Configuration).</p>
+                    <div class="hrp-actions hrp-mb">
+                        <button class="hrp-btn hrp-btn-primary hrp-btn-sm" type="button" id="hrpAiQuestions" data-jd="{{ jd.name }}">✨ Generate Interview Questions</button>
+                        <button class="hrp-btn hrp-btn-secondary hrp-btn-sm" type="button" id="hrpAiSkills" data-jd="{{ jd.name }}">✨ Suggest Skills</button>
+                    </div>
+                    <div id="hrpAiOutput"></div>
+                </div>
+
+                <div class="hrp-card hrp-mt">
                     <h2 class="hrp-card-title">Search History</h2>
                     {% if searches %}
                     <div class="hrp-table-wrap">

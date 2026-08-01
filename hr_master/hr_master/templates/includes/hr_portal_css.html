@@ -808,6 +808,21 @@ a.hrp-link:hover { color: var(--hrp-primary-dark); text-decoration: underline; }
 summary.hrp-link { list-style: none; }
 summary.hrp-link::-webkit-details-marker { display: none; }
 
+/* AI match explanation (ranked results page) */
+.hrp-ai-explain {
+  margin-top: 6px;
+  font-size: 12.5px;
+  color: var(--hrp-muted);
+}
+.hrp-ai-explain summary {
+  cursor: pointer;
+  color: var(--hrp-primary);
+  font-weight: 600;
+  user-select: none;
+}
+.hrp-ai-explain summary:hover { color: var(--hrp-primary-dark); }
+.hrp-ai-explain[open] summary { margin-bottom: 4px; }
+
 /* ============================================================
    Responsive
    ============================================================ */

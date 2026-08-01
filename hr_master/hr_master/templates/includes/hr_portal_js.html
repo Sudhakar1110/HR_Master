@@ -146,6 +146,105 @@
 			});
 		}
 
+		/* AI Assist (JD page) — call whitelisted AI endpoints via fetch and
+		   render suggestions / interview questions inline. No-op unless the
+		   #hrpAiOutput container exists. */
+		var aiOutput = document.getElementById("hrpAiOutput");
+		var aiQuestionsBtn = document.getElementById("hrpAiQuestions");
+		var aiSkillsBtn = document.getElementById("hrpAiSkills");
+		if (aiOutput && (aiQuestionsBtn || aiSkillsBtn)) {
+			var aiCsrf = document.querySelector('meta[name="csrf-token"]');
+			var aiCsrfToken = aiCsrf ? aiCsrf.getAttribute("content") : "";
+
+			function aiCall(endpoint, body) {
+				return fetch(endpoint, {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+						"X-Frappe-CSRF-Token": aiCsrfToken
+					},
+					body: body,
+					credentials: "same-origin"
+				}).then(function (r) { return r.json(); });
+			}
+
+			function aiShowLoading(text) {
+				aiOutput.innerHTML = '<span class="hrp-hint">⏳ ' + text + '…</span>';
+			}
+
+			function aiShowError(message) {
+				aiOutput.innerHTML = '<div class="hrp-alert hrp-alert-error" style="margin-bottom:0">⚠ ' + aiEscape(message || "AI request failed.") + "</div>";
+			}
+
+			var aiSectionLabels = {
+				technical: "Technical",
+				behavioral: "Behavioral",
+				"role_specific": "Role Specific",
+				"Required Skills": "Required Skills",
+				"Preferred Skills": "Preferred Skills"
+			};
+
+			function aiEscape(text) {
+				return String(text == null ? "" : text)
+					.replace(/&/g, "&amp;").replace(/</g, "&lt;")
+					.replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+			}
+
+			function aiRenderSections(sections) {
+				var html = "";
+				Object.keys(sections || {}).forEach(function (key) {
+					var items = sections[key] || [];
+					if (!items.length) { return; }
+					var label = aiSectionLabels[key] || key;
+					html += '<div style="margin-top:10px"><strong>' + aiEscape(label) + "</strong>";
+					html += '<ol style="margin:6px 0 0 18px;padding:0">';
+					items.forEach(function (item) { html += '<li style="margin-bottom:4px">' + aiEscape(item) + "</li>"; });
+					html += "</ol></div>";
+				});
+				aiOutput.innerHTML = html || '<span class="hrp-hint">No results returned.</span>';
+			}
+
+			function aiRun(endpoint, jdName, params, loadingText, sections) {
+				aiShowLoading(loadingText);
+				var body = "job_description_name=" + encodeURIComponent(jdName);
+				Object.keys(params || {}).forEach(function (k) {
+					body += "&" + k + "=" + encodeURIComponent(params[k]);
+				});
+				aiCall(endpoint, body).then(function (data) {
+					if (data && data.exc_type) {
+						aiShowError((data._server_messages && data._server_messages[0]) || data.message || "AI not configured.");
+						return;
+					}
+					if (data && data.status === "success") {
+						aiRenderSections(sections || data.questions || { "Required Skills": data.required, "Preferred Skills": data.preferred });
+					} else {
+						aiShowError("Unexpected response.");
+					}
+				}).catch(function () { aiShowError("Network error while calling the AI service."); });
+			}
+
+			if (aiQuestionsBtn) {
+				aiQuestionsBtn.addEventListener("click", function () {
+					aiRun(
+						"/api/method/hr_master.api.ai_api.generate_interview_questions",
+						aiQuestionsBtn.getAttribute("data-jd") || "",
+						{ count: 6 },
+						"Generating interview questions"
+					);
+				});
+			}
+			if (aiSkillsBtn) {
+				aiSkillsBtn.addEventListener("click", function () {
+					aiRun(
+						"/api/method/hr_master.api.ai_api.suggest_jd_skills",
+						aiSkillsBtn.getAttribute("data-jd") || "",
+						{},
+						"Suggesting skills"
+					);
+				});
+			}
+		}
+
 		/* Confirm dialog for destructive / state-changing actions */
 		document.querySelectorAll("form[data-confirm]").forEach(function (form) {
 			form.addEventListener("submit", function (e) {

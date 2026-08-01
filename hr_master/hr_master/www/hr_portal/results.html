@@ -83,6 +83,12 @@
                             <td>
                                 {% set rec = (r.recommendation or '')|lower %}
                                 <span class="hrp-badge {{ 'hrp-badge-green' if 'yes' in rec else ('hrp-badge-orange' if rec == 'maybe' else 'hrp-badge-gray') }}">{{ r.recommendation or '—' }}</span>
+                                {% if r.ai_explanation %}
+                                <details class="hrp-ai-explain">
+                                    <summary>Why this score?</summary>
+                                    {{ r.ai_explanation }}
+                                </details>
+                                {% endif %}
                             </td>
                             <td>
                                 {% set st = r.status|lower %}
