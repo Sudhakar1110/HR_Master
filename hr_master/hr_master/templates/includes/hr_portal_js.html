@@ -83,6 +83,23 @@
 			return document.documentElement.getAttribute("data-theme") || "light";
 		}
 		var themeTimer = null;
+		/* Persist the theme per-user in the database (User Defaults) so it
+		   follows the user across browsers/devices. Non-fatal on failure — the
+		   theme still applies for this session. */
+		function persistTheme(theme) {
+			var csrfMeta = document.querySelector('meta[name="csrf-token"]');
+			try {
+				fetch("/api/method/hr_master.api.portal_actions.set_portal_theme", {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+						"X-Frappe-CSRF-Token": csrfMeta ? csrfMeta.getAttribute("content") : ""
+					},
+					body: "theme=" + encodeURIComponent(theme),
+					credentials: "same-origin"
+				}).catch(function () { /* non-fatal */ });
+			} catch (e) {}
+		}
 		function applyTheme(theme) {
 			var root = document.documentElement;
 			var isChange = currentTheme() !== theme;
@@ -104,8 +121,8 @@
 					themeToggle.classList.add("hrp-theme-flip");
 				}
 			}
-			try { localStorage.setItem("hr_portal_theme", theme); } catch (e) {}
 			if (isChange) {
+				persistTheme(theme);
 				clearTimeout(themeTimer);
 				themeTimer = window.setTimeout(function () {
 					root.classList.remove("hrp-theme-transition");

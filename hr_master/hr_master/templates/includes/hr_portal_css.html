@@ -938,10 +938,13 @@ html { scroll-behavior: smooth; }
 }
 </style>
 <script>
-/* Theme init — set before first paint to avoid a light flash */
+/* Theme init — set before first paint to avoid a light flash.
+   The theme is persisted per-user in the database and injected into the
+   page context (set_portal_context), so it follows the user across
+   browsers/devices without relying on localStorage. Falls back to the
+   OS preference only when nothing is saved yet. */
 (function () {
-	var t = null;
-	try { t = localStorage.getItem("hr_portal_theme"); } catch (e) {}
+	var t = "{{ hr_portal_theme or '' }}";
 	if (t !== "dark" && t !== "light") {
 		t = (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) ? "dark" : "light";
 	}

@@ -50,16 +50,41 @@ def can_write(user=None):
 
 
 def set_portal_context(context):
-    """Populate shared portal page context (CSRF token for form POSTs).
+    """Populate shared portal page context (CSRF token + per-user theme).
 
     Frappe v15 renders website pages without a ``csrf_token`` Jinja variable
     (it only replaces the ``<!-- csrf_token -->`` HTML comment with a script
     tag). The portal forms post ``{{ csrf_token }}`` hidden fields, which
     otherwise render empty and every POST fails with an HTTP 400
     (CSRFTokenError). Injecting the real session token here fixes that.
+
+    The portal dark/light theme is persisted per-user in the database
+    (User Defaults) so it follows the user across browsers and devices —
+    it is injected here so the theme-init script can apply it before first
+    paint (no flash, no localStorage dependency).
     """
     context.csrf_token = frappe.sessions.get_csrf_token()
+    context.hr_portal_theme = frappe.defaults.get_user_default("hr_portal_theme") or ""
     return context
+
+
+@frappe.whitelist()
+def set_portal_theme(theme=None):
+    """Persist the HR portal dark/light theme for the current user.
+
+    Stored in the user's Defaults (per-user, DB-backed) so the preference
+    follows the user across browsers and devices.
+    """
+    if frappe.session.user == "Guest":
+        frappe.throw(_("Login required"))
+
+    theme = (theme or "").strip().lower()
+    if theme not in ("light", "dark"):
+        frappe.throw(_("Invalid theme"))
+
+    frappe.defaults.set_user_default("hr_portal_theme", theme)
+    frappe.db.commit()
+    return {"ok": True, "theme": theme}
 
 
 def require_hr_access():
