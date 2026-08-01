@@ -97,10 +97,12 @@ def get_context(context):
     scored.sort(key=lambda x: x["match_score"], reverse=True)
     context.results = scored
 
+    # context.results is a list of dicts (the scored list above), so use
+    # dict access, not attribute access.
     context.pending_count = len(
-        [r for r in context.results if not r.is_imported and r.import_status == "Pending"]
+        [r for r in context.results if not r["is_imported"] and r["import_status"] == "Pending"]
     )
-    context.imported_count = len([r for r in context.results if r.is_imported])
+    context.imported_count = len([r for r in context.results if r["is_imported"]])
     context.avg_match = round(
         sum(r["match_score"] for r in context.results) / len(context.results), 1
     ) if context.results else 0

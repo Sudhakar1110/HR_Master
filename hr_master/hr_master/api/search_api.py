@@ -195,8 +195,9 @@ def get_jd_search_status(job_description_name):
             order_by="search_date desc",
             limit_page_length=20,
         )
+        # searches is a frappe.get_all result (list of dicts) — use dict access
         in_progress = jd.portal_search_status == "Searching" or any(
-            s.status in ("Queued", "In Progress") for s in searches
+            s.get("status") in ("Queued", "In Progress") for s in searches
         )
         ranking_count = frappe.db.count(
             "Candidate Ranking", filters={"job_description": job_description_name}
@@ -208,8 +209,8 @@ def get_jd_search_status(job_description_name):
         latest = searches[0] if searches else None
         has_new_results = bool(
             latest
-            and latest.status in ("Completed", "Partial")
-            and latest.total_candidates_found > 0
+            and latest.get("status") in ("Completed", "Partial")
+            and (latest.get("total_candidates_found") or 0) > 0
         )
         return {
             "status": "success",

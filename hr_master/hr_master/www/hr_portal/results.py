@@ -81,7 +81,8 @@ def get_context(context):
         limit_page_length=200,
     )
 
-    scores = [r.total_match_score or 0 for r in context.rankings]
+    # frappe.get_all returns dicts — use dict access
+    scores = [r.get("total_match_score") or 0 for r in context.rankings]
     context.ranked_count = len(scores)
     context.avg_match = round(sum(scores) / context.ranked_count, 1) if scores else 0
     context.best_match = max(scores) if scores else 0

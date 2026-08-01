@@ -94,16 +94,17 @@ def get_context(context):
     )
 
     # Whether a background portal search is still running (drives auto-refresh polling)
+    # context.searches comes from frappe.get_all (list of dicts) — use dict access.
     context.search_in_progress = (
         jd.portal_search_status == "Searching"
-        or any(s.status in ("Queued", "In Progress") for s in context.searches)
+        or any(s.get("status") in ("Queued", "In Progress") for s in context.searches)
     )
 
     # Explain a search that finished with 0 results or failed (config-aware hint)
     context.search_zero_hint = None
     latest = context.searches[0] if context.searches else None
-    if latest and latest.status in ("Completed", "Partial", "Failed"):
-        if latest.status == "Failed":
+    if latest and latest.get("status") in ("Completed", "Partial", "Failed"):
+        if latest.get("status") == "Failed":
             context.search_zero_hint = {
                 "title": "Search failed",
                 "body": (
@@ -112,7 +113,7 @@ def get_context(context):
                     "or a portal that is enabled but not actually available."
                 ),
             }
-        elif not latest.total_candidates_found:
+        elif not (latest.get("total_candidates_found") or 0):
             config = frappe.get_single("Job Portal Config")
             serpapi_ready = bool(getattr(config, "serpapi_enabled", 0)) and bool(
                 getattr(config, "serpapi_api_key", None)
