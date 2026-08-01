@@ -82,13 +82,35 @@
 		function currentTheme() {
 			return document.documentElement.getAttribute("data-theme") || "light";
 		}
+		var themeTimer = null;
 		function applyTheme(theme) {
-			document.documentElement.setAttribute("data-theme", theme);
+			var root = document.documentElement;
+			var isChange = currentTheme() !== theme;
+			if (isChange) {
+				/* Add a temporary class that enables CSS color transitions so the
+				   switch fades smoothly, then remove it once the animation ends
+				   so normal hover transitions behave as usual. The timer is
+				   cleared on every toggle so a rapid double-click never cuts the
+				   second fade short. */
+				root.classList.add("hrp-theme-transition");
+				root.setAttribute("data-theme", theme);
+			}
 			if (themeToggle) {
 				themeToggle.textContent = themeIcons[theme] || "🌙";
 				themeToggle.setAttribute("aria-label", theme === "dark" ? "Switch to light mode" : "Switch to dark mode");
+				if (isChange) {
+					themeToggle.classList.remove("hrp-theme-flip");
+					void themeToggle.offsetWidth; /* restart the flip on rapid clicks */
+					themeToggle.classList.add("hrp-theme-flip");
+				}
 			}
 			try { localStorage.setItem("hr_portal_theme", theme); } catch (e) {}
+			if (isChange) {
+				clearTimeout(themeTimer);
+				themeTimer = window.setTimeout(function () {
+					root.classList.remove("hrp-theme-transition");
+				}, 400);
+			}
 		}
 		if (themeToggle) {
 			applyTheme(currentTheme()); /* sync the button icon with the init-time theme */

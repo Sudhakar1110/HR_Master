@@ -859,6 +859,30 @@ html[data-theme="dark"] ::-webkit-scrollbar-thumb { background: #2e3a5c; border-
 html[data-theme="dark"] ::-webkit-scrollbar-thumb:hover { background: #3a476e; }
 
 /* ============================================================
+   Smooth theme transition
+   The .hrp-theme-transition class is added by JS only while the user
+   toggles dark/light, so colors fade smoothly instead of snapping — and
+   pages still render instantly on first load (no fade-in).
+   ============================================================ */
+html.hrp-theme-transition *,
+html.hrp-theme-transition *::before,
+html.hrp-theme-transition *::after {
+  transition:
+    background-color 0.35s ease,
+    color 0.35s ease,
+    border-color 0.35s ease,
+    box-shadow 0.35s ease,
+    fill 0.35s ease,
+    stroke 0.35s ease !important;
+}
+.hrp-theme-toggle.hrp-theme-flip { animation: hrpThemeFlip 0.4s ease; }
+@keyframes hrpThemeFlip {
+  0%   { transform: rotate(0deg) scale(1); }
+  50%  { transform: rotate(180deg) scale(1.18); }
+  100% { transform: rotate(360deg) scale(1); }
+}
+
+/* ============================================================
    Back-to-top button + smooth scrolling
    ============================================================ */
 html { scroll-behavior: smooth; }
@@ -907,6 +931,10 @@ html { scroll-behavior: smooth; }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   .hrp-back-top { transition: none; }
+  html.hrp-theme-transition *,
+  html.hrp-theme-transition *::before,
+  html.hrp-theme-transition *::after { transition: none !important; }
+  .hrp-theme-toggle.hrp-theme-flip { animation: none; }
 }
 </style>
 <script>
