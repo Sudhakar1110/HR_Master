@@ -122,27 +122,18 @@ def get_context(context):
             ) and bool(getattr(config, "adzuna_api_key", None))
             live_ready = serpapi_ready or adzuna_ready
             if not live_ready:
-                demo_ready = bool(getattr(config, "demo_enabled", 0))
-                if demo_ready:
-                    context.search_zero_hint = {
-                        "title": "Search finished, but 0 results",
-                        "body": (
-                            "No live portals have keys configured, so no live results were returned. "
-                            "Demo mode is on — check that the JD has keywords/skills and try again, "
-                            "or add a free SerpAPI or Adzuna key in Desk → HR Master → Job Portal Config."
-                        ),
-                    }
-                else:
-                    context.search_zero_hint = {
-                        "title": "Search finished, but 0 results",
-                        "body": (
-                            "No portal returned results. For a quick test with zero keys, enable "
-                            "Demo Search in Desk → HR Master → Job Portal Config (returns realistic "
-                            "sample candidates). For live data, add a free SerpAPI or Adzuna key there "
-                            "instead — LinkedIn, Naukri and Monster are placeholders and Indeed's free "
-                            "API was retired."
-                        ),
-                    }
+                # No live portal keys configured: point the user to Demo Search
+                # (zero-key sample candidates) and the free live options.
+                context.search_zero_hint = {
+                    "title": "Search finished, but 0 results",
+                    "body": (
+                        "No portal returned results. For a quick test with zero keys, enable "
+                        "Demo Search in Desk → HR Master → Job Portal Config (returns realistic "
+                        "sample candidates). For live data, add a free SerpAPI or Adzuna key there "
+                        "instead — LinkedIn, Naukri and Monster are placeholders and Indeed's free "
+                        "API was retired."
+                    ),
+                }
             else:
                 configured = []
                 if serpapi_ready:
