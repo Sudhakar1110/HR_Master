@@ -57,6 +57,10 @@ class JobPortalConfig(Document):
             portals.append("SerpAPI")
         if getattr(self, "adzuna_enabled", 0):
             portals.append("Adzuna")
+        if getattr(self, "remotive_enabled", 0):
+            portals.append("Remotive")
+        if getattr(self, "arbeitnow_enabled", 0):
+            portals.append("Arbeitnow")
         if getattr(self, "demo_enabled", 0):
             portals.append("Demo")
         return portals
@@ -70,6 +74,8 @@ class JobPortalConfig(Document):
             "Monster": self.monster_search_limit or 25,
             "SerpAPI": self.serpapi_search_limit or 10,
             "Adzuna": getattr(self, "adzuna_search_limit", 0) or 25,
+            "Remotive": getattr(self, "remotive_search_limit", 0) or 15,
+            "Arbeitnow": getattr(self, "arbeitnow_search_limit", 0) or 15,
             "Demo": getattr(self, "demo_search_limit", 0) or 15,
         }
         return limits.get(portal, 10)

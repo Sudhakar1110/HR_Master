@@ -20,6 +20,8 @@
   "search_monster",
   "search_serpapi",
   "search_adzuna",
+  "search_remotive",
+  "search_arbeitnow",
   "search_demo",
   "column_break_9",
   "linkedin_results",
@@ -28,6 +30,8 @@
   "monster_results",
   "serpapi_results",
   "adzuna_results",
+  "remotive_results",
+  "arbeitnow_results",
   "demo_results",
   "sb_results",
   "search_results",
@@ -128,6 +132,18 @@
   },
   {
    "default": "0",
+   "fieldname": "search_remotive",
+   "fieldtype": "Check",
+   "label": "Search Remotive (free remote jobs)"
+  },
+  {
+   "default": "0",
+   "fieldname": "search_arbeitnow",
+   "fieldtype": "Check",
+   "label": "Search Arbeitnow (free jobs feed)"
+  },
+  {
+   "default": "0",
    "fieldname": "search_demo",
    "fieldtype": "Check",
    "label": "Search Demo Data (no key)"
@@ -170,6 +186,18 @@
    "fieldname": "adzuna_results",
    "fieldtype": "Int",
    "label": "Adzuna Results",
+   "read_only": 1
+  },
+  {
+   "fieldname": "remotive_results",
+   "fieldtype": "Int",
+   "label": "Remotive Results",
+   "read_only": 1
+  },
+  {
+   "fieldname": "arbeitnow_results",
+   "fieldtype": "Int",
+   "label": "Arbeitnow Results",
    "read_only": 1
   },
   {

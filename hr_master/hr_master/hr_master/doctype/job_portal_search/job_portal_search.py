@@ -34,6 +34,8 @@ class JobPortalSearch(Document):
             self.monster_results = len([r for r in self.search_results if r.source == "Monster"])
             self.serpapi_results = len([r for r in self.search_results if r.source == "SerpAPI"])
             self.adzuna_results = len([r for r in self.search_results if r.source == "Adzuna"])
+            self.remotive_results = len([r for r in self.search_results if r.source == "Remotive"])
+            self.arbeitnow_results = len([r for r in self.search_results if r.source == "Arbeitnow"])
             self.demo_results = len([r for r in self.search_results if r.source == "Demo"])
 
     def import_result_to_candidate(self, result):

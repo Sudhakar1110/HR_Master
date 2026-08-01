@@ -82,6 +82,8 @@ def get_context(context):
             "monster_results",
             "serpapi_results",
             "adzuna_results",
+            "remotive_results",
+            "arbeitnow_results",
             "demo_results",
         ],
         filters={"job_description": jd_name},
@@ -121,22 +123,29 @@ def get_context(context):
             adzuna_ready = bool(getattr(config, "adzuna_enabled", 0)) and bool(
                 getattr(config, "adzuna_app_id", None)
             ) and bool(getattr(config, "adzuna_api_key", None))
-            live_ready = serpapi_ready or adzuna_ready
+            remotive_ready = bool(getattr(config, "remotive_enabled", 0))
+            arbeitnow_ready = bool(getattr(config, "arbeitnow_enabled", 0))
+            live_ready = serpapi_ready or adzuna_ready or remotive_ready or arbeitnow_ready
             if not live_ready:
-                # No live portal keys configured: point the user to Demo Search
-                # (zero-key sample candidates) and the free live options.
+                # No live portal configured: point the user to the free no-key
+                # sources (Remotive / Arbeitnow) and Demo Search.
                 context.search_zero_hint = {
                     "title": "Search finished, but 0 results",
                     "body": (
-                        "No portal returned results. For a quick test with zero keys, enable "
-                        "Demo Search in Desk → HR Master → Job Portal Config (returns realistic "
-                        "sample candidates). For live data, add a free SerpAPI or Adzuna key there "
-                        "instead — LinkedIn, Naukri and Monster are placeholders and Indeed's free "
+                        "No portal returned results. Enable Remotive or Arbeitnow in "
+                        "Desk → HR Master → Job Portal Config — both are 100% free with no "
+                        "API key (real live job data). For a quick zero-key test, enable "
+                        "Demo Search instead (returns realistic sample candidates). "
+                        "LinkedIn, Naukri and Monster are placeholders and Indeed's free "
                         "API was retired."
                     ),
                 }
             else:
                 configured = []
+                if remotive_ready:
+                    configured.append("Remotive")
+                if arbeitnow_ready:
+                    configured.append("Arbeitnow")
                 if serpapi_ready:
                     configured.append("SerpAPI")
                 if adzuna_ready:
@@ -144,10 +153,12 @@ def get_context(context):
                 context.search_zero_hint = {
                     "title": "Search finished, but 0 results",
                     "body": (
-                        "{0} {1} configured but returned no matching listings for these keywords. ".format(
+                        "{0} {1} enabled but returned no matching listings for these keywords. ".format(
                             " and ".join(configured), "are" if len(configured) > 1 else "is"
                         )
-                        + "Try broader keywords, a different country in Job Portal Config, or check your key/quota."
+                        + "Try broader keywords, or a different Adzuna country / search limit in Job "
+                        + "Portal Config. You can also enable Demo Search to see the full pipeline "
+                        + "with sample data."
                     ),
                 }
 

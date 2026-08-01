@@ -27,6 +27,8 @@ def process_candidate_search(search_name, job_description_name):
             search_monster,
             search_serpapi,
             search_adzuna,
+            search_remotive,
+            search_arbeitnow,
             search_demo,
         )
 
@@ -53,6 +55,12 @@ def process_candidate_search(search_name, job_description_name):
 
         if search.search_adzuna:
             portal_searches.append(("Adzuna", search_adzuna))
+
+        if search.search_remotive:
+            portal_searches.append(("Remotive", search_remotive))
+
+        if search.search_arbeitnow:
+            portal_searches.append(("Arbeitnow", search_arbeitnow))
 
         if search.search_demo:
             portal_searches.append(("Demo", search_demo))

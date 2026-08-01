@@ -50,6 +50,12 @@
   "column_break_28",
   "adzuna_country",
   "adzuna_search_limit",
+  "sb_remotive",
+  "remotive_enabled",
+  "remotive_search_limit",
+  "sb_arbeitnow",
+  "arbeitnow_enabled",
+  "arbeitnow_search_limit",
   "sb_demo",
   "demo_enabled",
   "demo_search_limit",
@@ -305,6 +311,42 @@
    "fieldname": "adzuna_search_limit",
    "fieldtype": "Int",
    "label": "Adzuna Search Limit"
+  },
+  {
+   "fieldname": "sb_remotive",
+   "fieldtype": "Section Break",
+   "label": "Remotive Configuration (free remote jobs)"
+  },
+  {
+   "default": "1",
+   "fieldname": "remotive_enabled",
+   "fieldtype": "Check",
+   "label": "Enable Remotive Search",
+   "description": "100% free remote-jobs API — no API key required. Returns live remote job postings."
+  },
+  {
+   "default": "15",
+   "fieldname": "remotive_search_limit",
+   "fieldtype": "Int",
+   "label": "Remotive Search Limit"
+  },
+  {
+   "fieldname": "sb_arbeitnow",
+   "fieldtype": "Section Break",
+   "label": "Arbeitnow Configuration (free jobs feed)"
+  },
+  {
+   "default": "1",
+   "fieldname": "arbeitnow_enabled",
+   "fieldtype": "Check",
+   "label": "Enable Arbeitnow Search",
+   "description": "100% free jobs API — no API key required. Returns live job postings."
+  },
+  {
+   "default": "15",
+   "fieldname": "arbeitnow_search_limit",
+   "fieldtype": "Int",
+   "label": "Arbeitnow Search Limit"
   },
   {
    "fieldname": "sb_demo",

@@ -94,7 +94,7 @@
                             <button class="hrp-btn hrp-btn-secondary" type="submit" {{ 'disabled' if not can_write else '' }}>📊 Rank Candidates</button>
                         </form>
                     </div>
-                    <p class="hrp-hint">Search queues a background job across enabled portals (LinkedIn, Naukri, Indeed, Monster, SerpAPI/Google Jobs, Adzuna). Import converts results into Candidate records; Rank scores them against this JD.</p>
+                    <p class="hrp-hint">Search queues a background job across enabled portals (LinkedIn, Naukri, Indeed, Monster, SerpAPI/Google Jobs, Adzuna, Remotive, Arbeitnow). Import converts results into Candidate records; Rank scores them against this JD.</p>
                 </div>
 
                 <div class="hrp-card hrp-mt">
@@ -113,7 +113,7 @@
                                         <span class="hrp-badge {{ 'hrp-badge-green' if st in ('completed', 'partial') else ('hrp-badge-orange' if st in ('queued', 'in progress') else 'hrp-badge-red') }}">{{ s.status }}</span>
                                     </td>
                                     <td>{{ s.total_candidates_found or 0 }}
-                                        <span class="hrp-hint">(LI {{ s.linkedin_results or 0 }} · NK {{ s.naukri_results or 0 }} · IN {{ s.indeed_results or 0 }} · MN {{ s.monster_results or 0 }} · SP {{ s.serpapi_results or 0 }} · AZ {{ s.adzuna_results or 0 }} · DM {{ s.demo_results or 0 }})</span>
+                                        <span class="hrp-hint">(LI {{ s.linkedin_results or 0 }} · NK {{ s.naukri_results or 0 }} · IN {{ s.indeed_results or 0 }} · MN {{ s.monster_results or 0 }} · SP {{ s.serpapi_results or 0 }} · AZ {{ s.adzuna_results or 0 }} · RM {{ s.remotive_results or 0 }} · AB {{ s.arbeitnow_results or 0 }} · DM {{ s.demo_results or 0 }})</span>
                                     </td>
                                     <td>{{ s.search_date }}</td>
                                     <td class="hrp-right">

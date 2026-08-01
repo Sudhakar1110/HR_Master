@@ -49,6 +49,8 @@ def search_candidates_for_jd(job_description_name):
         search.search_monster = 1 if "Monster" in portals else 0
         search.search_serpapi = 1 if "SerpAPI" in portals else 0
         search.search_adzuna = 1 if "Adzuna" in portals else 0
+        search.search_remotive = 1 if "Remotive" in portals else 0
+        search.search_arbeitnow = 1 if "Arbeitnow" in portals else 0
         search.search_demo = 1 if "Demo" in portals else 0
 
         search.save(ignore_permissions=True)
@@ -190,6 +192,8 @@ def get_jd_search_status(job_description_name):
                 "monster_results",
                 "serpapi_results",
                 "adzuna_results",
+                "remotive_results",
+                "arbeitnow_results",
             ],
             filters={"job_description": job_description_name},
             order_by="search_date desc",
@@ -234,14 +238,17 @@ def get_jd_search_status(job_description_name):
 
 
 def _has_live_portal(config):
-    """Return True if at least one live portal has API keys configured.
+    """Return True if at least one live portal is ready to return results.
 
-    LinkedIn, Naukri and Monster are placeholders that always return [] (no
-    public API), and Indeed's free Publisher API was retired, so only SerpAPI
-    and Adzuna count as live sources today.
+    Remotive and Arbeitnow need no API keys at all (100% free), so they count
+    as live whenever enabled. SerpAPI and Adzuna count as live when their keys
+    are configured. LinkedIn, Naukri and Monster are placeholders that always
+    return [] (no public API), and Indeed's free Publisher API was retired.
     """
     return bool(
-        (getattr(config, "serpapi_enabled", 0) and getattr(config, "serpapi_api_key", None))
+        getattr(config, "remotive_enabled", 0)
+        or getattr(config, "arbeitnow_enabled", 0)
+        or (getattr(config, "serpapi_enabled", 0) and getattr(config, "serpapi_api_key", None))
         or (
             getattr(config, "adzuna_enabled", 0)
             and getattr(config, "adzuna_app_id", None)
@@ -585,6 +592,214 @@ def search_monster(search_name, jd_name, keywords):
         frappe.log_error(
             message=f"Monster search error: {str(e)}",
             title="Monster Search Error",
+        )
+        return []
+
+
+def search_remotive(search_name, jd_name, keywords):
+    """Search Remotive for remote job postings (100% free, no API key).
+
+    Remotive's public API (https://remotive.com/api/remote-jobs) returns live
+    remote job postings with zero signup and zero cost. Each posting is mapped
+    into a candidate-like search result so the existing import & rank pipeline
+    works unchanged. Remotive asks that callers only poll a few times a day
+    (max ~4/day advised) and link back to the source job URL.
+    """
+    config = frappe.get_single("Job Portal Config")
+    if not getattr(config, "remotive_enabled", 0):
+        return []
+
+    try:
+        import requests
+
+        limit = getattr(config, "remotive_search_limit", 0) or 15
+        params = {
+            "search": keywords,
+            "limit": str(min(limit, 50)),
+        }
+
+        response = requests.get(
+            "https://remotive.com/api/remote-jobs",
+            params=params,
+            timeout=30,
+        )
+        response.raise_for_status()
+        data = response.json()
+
+        jobs = data.get("jobs") or []
+        if not jobs:
+            return []
+
+        # Belt-and-braces: even though Remotive honors ?search=, also match
+        # client-side (mirrors search_demo) so results are always relevant to
+        # this JD's keywords.
+        haystack_keywords = (keywords or "").lower().replace(",", " ").split()
+        scored = []
+        for job in jobs:
+            tags = job.get("tags") or []
+            tags_text = ", ".join(str(t) for t in tags) if isinstance(tags, list) else str(tags or "")
+            haystack = " ".join(
+                [
+                    str(job.get("title") or ""),
+                    str(job.get("company_name") or ""),
+                    str(job.get("candidate_required_location") or ""),
+                    tags_text,
+                ]
+            ).lower()
+
+            score = 0
+            for kw in haystack_keywords:
+                kw = kw.strip()
+                if kw and len(kw) > 2 and kw in haystack:
+                    score += 1
+            scored.append((score, job))
+
+        scored.sort(key=lambda x: x[0], reverse=True)
+        matchable = any(len(kw.strip()) > 2 for kw in haystack_keywords)
+        if matchable:
+            scored = [(s, job) for s, job in scored if s > 0][:limit]
+        else:
+            # All keywords are too short to match (e.g. a JD titled "QA" or
+            # "UX") — fall back to the newest listings from the feed.
+            scored = scored[:limit]
+        if not scored:
+            return []
+
+        results = []
+        for s, job in scored:
+            tags = job.get("tags") or []
+            if isinstance(tags, list):
+                skills = ", ".join(str(t) for t in tags[:20])
+            else:
+                skills = str(tags or "")
+
+            results.append({
+                "name": job.get("company_name") or job.get("title") or "Unknown",
+                "url": job.get("url") or "",
+                "title": job.get("title") or "",
+                "company": job.get("company_name") or "",
+                "location": job.get("candidate_required_location") or "Remote",
+                "skills": skills,
+                "experience": _extract_experience_years(job.get("description") or ""),
+                "source_url": job.get("url") or "",
+            })
+
+        return results
+
+    except Exception as e:
+        frappe.log_error(
+            message=f"Remotive search error: {str(e)}",
+            title="Remotive Search Error",
+        )
+        return []
+
+
+def search_arbeitnow(search_name, jd_name, keywords):
+    """Search Arbeitnow for job postings (100% free, no API key).
+
+    Arbeitnow's public feed (https://www.arbeitnow.com/api/job-board-api) is
+    free with no registration. Each posting is mapped into a candidate-like
+    search result so the existing import & rank pipeline works unchanged.
+    """
+    config = frappe.get_single("Job Portal Config")
+    if not getattr(config, "arbeitnow_enabled", 0):
+        return []
+
+    try:
+        import requests
+
+        limit = getattr(config, "arbeitnow_search_limit", 0) or 15
+        params = {"search": keywords}
+
+        response = requests.get(
+            "https://www.arbeitnow.com/api/job-board-api",
+            params=params,
+            timeout=30,
+        )
+        response.raise_for_status()
+        data = response.json()
+
+        jobs = data.get("data") or []
+        if not jobs:
+            return []
+
+        # Arbeitnow's public feed does not reliably honor the ?search= param, so
+        # we always keyword-match client-side (mirrors search_demo) to guarantee
+        # the results are relevant to this JD instead of the first N of the
+        # whole feed.
+        haystack_keywords = (keywords or "").lower().replace(",", " ").split()
+        scored = []
+        for job in jobs:
+            tags = job.get("tags") or []
+            if isinstance(tags, list):
+                tags_text = ", ".join(
+                    str(t.get("name", t)) if isinstance(t, dict) else str(t)
+                    for t in tags
+                )
+            else:
+                tags_text = str(tags or "")
+
+            haystack = " ".join(
+                [
+                    str(job.get("title") or ""),
+                    str(job.get("company_name") or ""),
+                    str(job.get("location") or ""),
+                    tags_text,
+                ]
+            ).lower()
+
+            score = 0
+            for kw in haystack_keywords:
+                kw = kw.strip()
+                if kw and len(kw) > 2 and kw in haystack:
+                    score += 1
+            scored.append((score, job))
+
+        scored.sort(key=lambda x: x[0], reverse=True)
+        matchable = any(len(kw.strip()) > 2 for kw in haystack_keywords)
+        if matchable:
+            scored = [(s, job) for s, job in scored if s > 0][:limit]
+        else:
+            # All keywords are too short to match (e.g. a JD titled "QA" or
+            # "UX") — fall back to the newest listings from the feed.
+            scored = scored[:limit]
+        if not scored:
+            return []
+
+        results = []
+        for s, job in scored:
+            company = job.get("company_name") or ""
+            title = job.get("title") or ""
+            url = job.get("url") or ""
+            if not url and job.get("slug"):
+                url = "https://www.arbeitnow.com/jobs/{0}".format(job.get("slug"))
+
+            tags = job.get("tags") or []
+            if isinstance(tags, list):
+                skills = ", ".join(
+                    str(t.get("name", t)) if isinstance(t, dict) else str(t)
+                    for t in tags[:20]
+                )
+            else:
+                skills = str(tags or "")
+
+            results.append({
+                "name": company or title or "Unknown",
+                "url": url,
+                "title": title,
+                "company": company,
+                "location": job.get("location") or "Remote",
+                "skills": skills,
+                "experience": _extract_experience_years(job.get("description") or ""),
+                "source_url": url,
+            })
+
+        return results
+
+    except Exception as e:
+        frappe.log_error(
+            message=f"Arbeitnow search error: {str(e)}",
+            title="Arbeitnow Search Error",
         )
         return []
 
