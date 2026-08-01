@@ -942,12 +942,17 @@ html { scroll-behavior: smooth; }
    The theme is persisted per-user in the database and injected into the
    page context (set_portal_context), so it follows the user across
    browsers/devices without relying on localStorage. Falls back to the
-   OS preference only when nothing is saved yet. */
+   OS preference only when nothing is saved yet. The browser address-bar
+   color (theme-color meta) is synced to the applied theme too. */
 (function () {
 	var t = "{{ hr_portal_theme or '' }}";
 	if (t !== "dark" && t !== "light") {
 		t = (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) ? "dark" : "light";
 	}
 	document.documentElement.setAttribute("data-theme", t);
+	var themeColorMeta = document.querySelector('meta[name="theme-color"]');
+	if (themeColorMeta) {
+		themeColorMeta.setAttribute("content", t === "dark" ? "#0d1426" : "#f3f5fb");
+	}
 })();
 </script>

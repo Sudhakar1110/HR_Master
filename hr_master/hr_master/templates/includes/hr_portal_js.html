@@ -83,6 +83,15 @@
 			return document.documentElement.getAttribute("data-theme") || "light";
 		}
 		var themeTimer = null;
+		var themeColors = { dark: "#0d1426", light: "#f3f5fb" };
+		/* Keep the browser address-bar color (theme-color meta) in sync with
+		   the applied theme, so it no longer stays a fixed dark navy. */
+		function syncThemeColor(theme) {
+			var meta = document.querySelector('meta[name="theme-color"]');
+			if (meta) {
+				meta.setAttribute("content", themeColors[theme] || "#0b1220");
+			}
+		}
 		/* Persist the theme per-user in the database (User Defaults) so it
 		   follows the user across browsers/devices. Non-fatal on failure — the
 		   theme still applies for this session. */
@@ -121,6 +130,7 @@
 					themeToggle.classList.add("hrp-theme-flip");
 				}
 			}
+			syncThemeColor(theme);
 			if (isChange) {
 				persistTheme(theme);
 				clearTimeout(themeTimer);
