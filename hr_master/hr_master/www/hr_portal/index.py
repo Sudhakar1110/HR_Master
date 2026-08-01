@@ -46,7 +46,7 @@ def get_context(context):
 
     context.top_rankings = frappe.get_all(
         "Candidate Ranking",
-        fields=["name", "candidate_name", "job_title", "total_match_score", "status"],
+        fields=["name", "candidate", "candidate_name", "job_title", "total_match_score", "status"],
         order_by="total_match_score desc",
         limit=6,
     )
