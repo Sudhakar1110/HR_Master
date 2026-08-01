@@ -28,7 +28,7 @@
             </div>
             <div class="hrp-actions">
                 <a class="hrp-btn hrp-btn-secondary" href="javascript:history.back()">← Back</a>
-                {% if candidate.source_url %}
+                {% if candidate.source_url and candidate.source != 'Demo' %}
                 <a class="hrp-btn hrp-btn-secondary" href="{{ candidate.source_url }}" target="_blank">Profile ↗</a>
                 {% endif %}
             </div>

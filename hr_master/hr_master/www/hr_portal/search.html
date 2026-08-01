@@ -120,7 +120,7 @@
                                 {% else %}
                                 <span class="hrp-hint">—</span>
                                 {% endif %}
-                                {% if r.profile_url %}
+                                {% if r.profile_url and r.source != 'Demo' %}
                                 <a class="hrp-btn hrp-btn-secondary hrp-btn-sm" href="{{ r.profile_url }}" target="_blank" rel="noopener">↗</a>
                                 {% endif %}
                             </td>
