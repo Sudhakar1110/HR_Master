@@ -29,8 +29,7 @@ def export_candidates(filters=None, fields=None, file_format="CSV"):
                 "current_title", "current_company", "source", "source_url",
                 "total_experience_years", "highest_education",
                 "total_match_score", "location", "current_salary",
-                "expected_salary", "notice_period_days", "created_at",
-                "creation"
+                "expected_salary", "notice_period_days", "creation"
             ]
 
         candidates = frappe.get_all(

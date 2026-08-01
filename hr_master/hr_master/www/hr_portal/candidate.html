@@ -41,8 +41,12 @@
                 <dl class="hrp-detail-list">
                     <div class="hrp-detail"><dt>Email</dt><dd>{{ candidate.email or '—' }}</dd></div>
                     <div class="hrp-detail"><dt>Phone</dt><dd>{{ candidate.phone or '—' }}</dd></div>
+                    <div class="hrp-detail"><dt>Location</dt><dd>{{ candidate.location or '—' }}</dd></div>
                     <div class="hrp-detail"><dt>Experience</dt><dd>{{ candidate.total_experience_years or 0 }} yrs</dd></div>
                     <div class="hrp-detail"><dt>Education</dt><dd>{{ candidate.highest_education or '—' }}</dd></div>
+                    <div class="hrp-detail"><dt>Current Salary</dt><dd>{{ candidate.current_salary or '—' }}</dd></div>
+                    <div class="hrp-detail"><dt>Expected Salary</dt><dd>{{ candidate.expected_salary or '—' }}</dd></div>
+                    <div class="hrp-detail"><dt>Notice Period</dt><dd>{{ candidate.notice_period_days or 0 }} days</dd></div>
                     <div class="hrp-detail"><dt>Overall Match</dt><dd>
                         {% set cm = candidate.total_match_score|int if candidate.total_match_score else 0 %}
                         <div class="hrp-flex" style="min-width:150px">

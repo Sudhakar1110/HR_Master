@@ -13,6 +13,10 @@
   "current_company",
   "current_title",
   "total_experience_years",
+  "location",
+  "current_salary",
+  "expected_salary",
+  "notice_period_days",
   "sb_skills",
   "skills_section",
   "candidate_skills",
@@ -89,6 +93,27 @@
    "fieldname": "total_experience_years",
    "fieldtype": "Float",
    "label": "Total Experience (Years)"
+  },
+  {
+   "fieldname": "location",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Location"
+  },
+  {
+   "fieldname": "current_salary",
+   "fieldtype": "Currency",
+   "label": "Current Salary"
+  },
+  {
+   "fieldname": "expected_salary",
+   "fieldtype": "Currency",
+   "label": "Expected Salary"
+  },
+  {
+   "fieldname": "notice_period_days",
+   "fieldtype": "Int",
+   "label": "Notice Period (Days)"
   },
   {
    "fieldname": "sb_skills",

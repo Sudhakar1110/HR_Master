@@ -14,7 +14,8 @@ def import_candidates_from_csv(file_url, job_description=None, source="CSV Impor
     """Import candidates from a CSV file.
 
     Expected columns: candidate_name, email, phone, current_title, current_company,
-                      total_experience_years, highest_education, skills, resume_text
+                      total_experience_years, highest_education, skills, resume_text,
+                      location, current_salary, expected_salary, notice_period_days
     """
     try:
         file_doc = frappe.get_doc("File", {"file_url": file_url})
@@ -52,6 +53,26 @@ def import_candidates_from_csv(file_url, job_description=None, source="CSV Impor
                     candidate.total_experience_years = float(exp) if exp else 0
                 except ValueError:
                     candidate.total_experience_years = 0
+
+                candidate.location = row.get("location", "").strip()
+
+                current_salary = row.get("current_salary", "")
+                try:
+                    candidate.current_salary = float(current_salary) if current_salary else 0
+                except ValueError:
+                    candidate.current_salary = 0
+
+                expected_salary = row.get("expected_salary", "")
+                try:
+                    candidate.expected_salary = float(expected_salary) if expected_salary else 0
+                except ValueError:
+                    candidate.expected_salary = 0
+
+                notice_period = row.get("notice_period_days", "")
+                try:
+                    candidate.notice_period_days = int(float(notice_period)) if notice_period else 0
+                except ValueError:
+                    candidate.notice_period_days = 0
 
                 candidate.resume_text = row.get("resume_text", "")
                 candidate.status = "New"
