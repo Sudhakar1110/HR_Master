@@ -422,6 +422,8 @@ def set_default_config():
                 "max_candidates_per_search": 50,
                 "search_delay_seconds": 2,
                 "default_country": "India",
+                "demo_enabled": 1,
+                "demo_search_limit": 15,
                 "notify_on_high_match": 1,
                 "notify_on_search_complete": 0,
                 "email_notifications": 1,

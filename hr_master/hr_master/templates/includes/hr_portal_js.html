@@ -155,7 +155,14 @@
 					.then(function (r) { return r.json(); })
 					.then(function (data) {
 						if (data && data.status === "success" && !data.in_progress) {
-							reloadFresh();
+							stopPolling();
+							/* When the search finishes, the backend may tell us to go
+							   straight to the ranked candidates page — do that. */
+							if (data.redirect_url) {
+								window.location.href = data.redirect_url;
+							} else {
+								reloadFresh();
+							}
 						} else if (pollTries >= maxPollTries) {
 							stopPolling();
 						}

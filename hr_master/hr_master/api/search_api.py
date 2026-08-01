@@ -31,6 +31,18 @@ def search_candidates_for_jd(job_description_name):
         # Determine which portals to search
         config = frappe.get_single("Job Portal Config")
         portals = config.get_enabled_portals()
+
+        # Auto-fallback to Demo data: when no live portal has API keys
+        # configured, enable Demo search so "Search Portals" always returns
+        # candidates (zero-key, out-of-the-box experience).
+        if not _has_live_portal(config):
+            if not getattr(config, "demo_enabled", 0):
+                config.demo_enabled = 1
+                config.save(ignore_permissions=True)
+                frappe.db.commit()
+            if "Demo" not in portals:
+                portals.append("Demo")
+
         search.search_linkedin = 1 if "LinkedIn" in portals else 0
         search.search_naukri = 1 if "Naukri" in portals else 0
         search.search_indeed = 1 if "Indeed" in portals else 0
@@ -186,13 +198,29 @@ def get_jd_search_status(job_description_name):
         in_progress = jd.portal_search_status == "Searching" or any(
             s.status in ("Queued", "In Progress") for s in searches
         )
+        ranking_count = frappe.db.count(
+            "Candidate Ranking", filters={"job_description": job_description_name}
+        )
+        # Redirect only when the just-finished search actually produced results
+        # (the poller only runs while a search is in progress, so searches[0]
+        # is the search that just completed). Avoids redirecting on stale
+        # ranking counts from earlier searches.
+        latest = searches[0] if searches else None
+        has_new_results = bool(
+            latest
+            and latest.status in ("Completed", "Partial")
+            and latest.total_candidates_found > 0
+        )
         return {
             "status": "success",
             "in_progress": bool(in_progress),
             "portal_search_status": jd.portal_search_status,
             "searches": searches,
-            "ranking_count": frappe.db.count(
-                "Candidate Ranking", filters={"job_description": job_description_name}
+            "ranking_count": ranking_count,
+            "redirect_url": (
+                "/hr_portal/results?jd={0}".format(job_description_name)
+                if not in_progress and has_new_results
+                else None
             ),
         }
     except Exception as e:
@@ -202,6 +230,23 @@ def get_jd_search_status(job_description_name):
 # ------------------------------------------
 # Helper Functions
 # ------------------------------------------
+
+
+def _has_live_portal(config):
+    """Return True if at least one live portal has API keys configured.
+
+    LinkedIn, Naukri and Monster are placeholders that always return [] (no
+    public API), and Indeed's free Publisher API was retired, so only SerpAPI
+    and Adzuna count as live sources today.
+    """
+    return bool(
+        (getattr(config, "serpapi_enabled", 0) and getattr(config, "serpapi_api_key", None))
+        or (
+            getattr(config, "adzuna_enabled", 0)
+            and getattr(config, "adzuna_app_id", None)
+            and getattr(config, "adzuna_api_key", None)
+        )
+    )
 
 
 def generate_search_keywords(jd):
