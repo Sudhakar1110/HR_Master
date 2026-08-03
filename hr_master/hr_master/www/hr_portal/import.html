@@ -56,23 +56,39 @@
                 <h2 class="hrp-card-title">Expected columns</h2>
                 <p class="hrp-hint">Only <strong>candidate_name</strong> is required. Column headers are matched exactly.</p>
                 <div class="hrp-chips">
-                    <span class="hrp-chip hrp-chip-required">candidate_name</span>
+                    <span class="hrp-chip hrp-chip-required">candidate_name *</span>
                     <span class="hrp-chip">email</span>
                     <span class="hrp-chip">phone</span>
                     <span class="hrp-chip">current_title</span>
                     <span class="hrp-chip">current_company</span>
                     <span class="hrp-chip">total_experience_years</span>
-                    <span class="hrp-chip">highest_education</span>
-                    <span class="hrp-chip">skills</span>
                     <span class="hrp-chip">location</span>
                     <span class="hrp-chip">current_salary</span>
                     <span class="hrp-chip">expected_salary</span>
                     <span class="hrp-chip">notice_period_days</span>
+                    <span class="hrp-chip">highest_education</span>
+                    <span class="hrp-chip">field_of_study</span>
+                    <span class="hrp-chip">college</span>
+                    <span class="hrp-chip">graduation_year</span>
+                    <span class="hrp-chip">skills</span>
+                    <span class="hrp-chip">languages</span>
+                    <span class="hrp-chip">certifications</span>
+                    <span class="hrp-chip">source</span>
                     <span class="hrp-chip">source_url</span>
+                    <span class="hrp-chip">linkedin_url</span>
+                    <span class="hrp-chip">naukri_url</span>
+                    <span class="hrp-chip">other_portal_url</span>
+                    <span class="hrp-chip">status</span>
+                    <span class="hrp-chip">blacklisted</span>
+                    <span class="hrp-chip">notes</span>
                     <span class="hrp-chip">resume_text</span>
                 </div>
                 <div class="hrp-hint" style="margin-top:12px">
-                    <strong>skills</strong> is a comma-separated list (e.g. <code>Python, Django, SQL</code>).
+                    <strong>skills</strong>, <strong>languages</strong> and <strong>certifications</strong> are
+                    comma-separated lists (e.g. <code>Python, Django, SQL</code>).
+                    <strong>source</strong> and <strong>status</strong> must match the portal's options — anything
+                    unrecognized falls back safely (source → <em>Other</em>, status → <em>New</em>) so rows are never rejected.
+                    <strong>blacklisted</strong> accepts <code>0/1</code> or <code>true/false</code>.
                     Candidates matching an existing email are counted as duplicates and skipped.
                 </div>
             </div>
@@ -164,11 +180,17 @@
 
         document.getElementById("csvSampleBtn").addEventListener("click", function () {
             var cols = ["candidate_name", "email", "phone", "current_title", "current_company",
-                        "total_experience_years", "highest_education", "skills", "location",
-                        "current_salary", "expected_salary", "notice_period_days", "source_url", "resume_text"];
+                        "total_experience_years", "location", "current_salary", "expected_salary",
+                        "notice_period_days", "highest_education", "field_of_study", "college",
+                        "graduation_year", "skills", "languages", "certifications", "source",
+                        "source_url", "linkedin_url", "naukri_url", "other_portal_url", "status",
+                        "blacklisted", "notes", "resume_text"];
             var row = ["Aarav Sharma", "aarav.sharma@example.com", "9876501234", "Senior Python Developer",
-                       "TechNova Solutions", "7", "Master's", "Python, Django, SQL, PostgreSQL",
-                       "Bengaluru", "3200000", "3800000", "60", "", "Experienced backend engineer with 7 years building scalable APIs."];
+                       "TechNova Solutions", "7", "Bengaluru", "3200000", "3800000", "60",
+                       "Master's", "Computer Science", "IIT Bombay", "2017",
+                       "Python, Django, SQL, PostgreSQL", "English, Hindi", "AWS Certified", "LinkedIn",
+                       "", "https://linkedin.com/in/aarav", "", "", "Screened",
+                       "0", "Open to remote roles", "Experienced backend engineer with 7 years building scalable APIs."];
             var csv = cols.join(",") + "\n" + row.map(function (v) {
                 return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v;
             }).join(",") + "\n";

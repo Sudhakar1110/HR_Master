@@ -9,36 +9,59 @@ import json
 import io
 
 
-def _valid_source(value):
-    """Return a Candidate.source value that passes Select validation.
+def _valid_select(doctype, fieldname, value, default=""):
+    """Return a value that passes Select validation for a doctype field.
 
-    The Candidate doctype's ``source`` field is a Select; assigning a value
-    that is not one of its options (e.g. a custom "CSV Import" label on a
-    site where the option has not been synced yet) fails validation and
-    rejects the whole row. Unknown values fall back to "Other" so imports
-    never break.
+    Dropdown fields reject anything that is not one of their options (e.g.
+    "CSV Import" on source, or a typo like "Bachelors" on highest_education),
+    which would otherwise fail the whole row. Unknown values fall back to
+    ``default``; empty values stay empty.
     """
     value = (value or "").strip()
     if not value:
         return ""
     try:
-        meta = frappe.get_meta("Candidate")
-        field = meta.get_field("source")
+        meta = frappe.get_meta(doctype)
+        field = meta.get_field(fieldname)
         options = [o.strip() for o in (field.options or "").split("\n") if o.strip()]
     except Exception:
         options = []
     if options and value in options:
         return value
-    return "Other"
+    return default
+
+
+def _valid_source(value):
+    """Return a Candidate.source value that passes Select validation."""
+    return _valid_select("Candidate", "source", value, default="Other")
+
+
+def _to_float(value):
+    """Coerce a CSV cell to a float (0 for empty/invalid)."""
+    try:
+        return float(value) if value not in (None, "") else 0
+    except (TypeError, ValueError):
+        return 0
+
+
+def _to_int(value):
+    """Coerce a CSV cell to an int (0 for empty/invalid)."""
+    try:
+        return int(float(value)) if value not in (None, "") else 0
+    except (TypeError, ValueError):
+        return 0
 
 
 @frappe.whitelist()
 def import_candidates_from_csv(file_url, job_description=None, source="CSV Import"):
     """Import candidates from a CSV file.
 
-    Expected columns: candidate_name, email, phone, current_title, current_company,
-                      total_experience_years, highest_education, skills, resume_text,
-                      location, current_salary, expected_salary, notice_period_days
+    Columns (only candidate_name is required): candidate_name, email, phone,
+    current_title, current_company, total_experience_years, location,
+    current_salary, expected_salary, notice_period_days, source, source_url,
+    linkedin_url, naukri_url, other_portal_url, highest_education,
+    field_of_study, college, graduation_year, skills, languages,
+    certifications, resume_text, status, blacklisted, notes
     """
     try:
         file_doc = frappe.get_doc("File", {"file_url": file_url})
@@ -68,38 +91,40 @@ def import_candidates_from_csv(file_url, job_description=None, source="CSV Impor
                 candidate.phone = row.get("phone", "").strip()
                 candidate.current_title = row.get("current_title", "").strip()
                 candidate.current_company = row.get("current_company", "").strip()
-                candidate.source = source
-                candidate.source_url = row.get("source_url", "")
-                candidate.highest_education = row.get("highest_education", "").strip()
-
-                exp = row.get("total_experience_years", "0")
-                try:
-                    candidate.total_experience_years = float(exp) if exp else 0
-                except ValueError:
-                    candidate.total_experience_years = 0
-
+                candidate.total_experience_years = _to_float(row.get("total_experience_years"))
                 candidate.location = row.get("location", "").strip()
+                candidate.current_salary = _to_float(row.get("current_salary"))
+                candidate.expected_salary = _to_float(row.get("expected_salary"))
+                candidate.notice_period_days = _to_int(row.get("notice_period_days"))
 
-                current_salary = row.get("current_salary", "")
-                try:
-                    candidate.current_salary = float(current_salary) if current_salary else 0
-                except ValueError:
-                    candidate.current_salary = 0
+                # Source: a per-row "source" column overrides the page source.
+                candidate.source = _valid_source((row.get("source") or "").strip() or source)
+                candidate.source_url = row.get("source_url", "").strip()
+                candidate.linkedin_url = row.get("linkedin_url", "").strip()
+                candidate.naukri_url = row.get("naukri_url", "").strip()
+                candidate.other_portal_url = row.get("other_portal_url", "").strip()
 
-                expected_salary = row.get("expected_salary", "")
-                try:
-                    candidate.expected_salary = float(expected_salary) if expected_salary else 0
-                except ValueError:
-                    candidate.expected_salary = 0
+                # Education
+                candidate.highest_education = _valid_select(
+                    "Candidate", "highest_education", row.get("highest_education")
+                )
+                candidate.field_of_study = row.get("field_of_study", "").strip()
+                candidate.college = row.get("college", "").strip()
+                candidate.graduation_year = _to_int(row.get("graduation_year"))
 
-                notice_period = row.get("notice_period_days", "")
-                try:
-                    candidate.notice_period_days = int(float(notice_period)) if notice_period else 0
-                except ValueError:
-                    candidate.notice_period_days = 0
+                # Skills / languages / certifications
+                candidate.languages = row.get("languages", "")
+                candidate.certifications = row.get("certifications", "")
 
+                # Resume / notes / status
                 candidate.resume_text = row.get("resume_text", "")
-                candidate.status = "New"
+                candidate.notes = row.get("notes", "")
+                status_val = (row.get("status") or "").strip()
+                candidate.status = _valid_select(
+                    "Candidate", "status", status_val, default="New"
+                ) or "New"
+                blacklisted = (row.get("blacklisted") or "").strip().lower()
+                candidate.blacklisted = 1 if blacklisted in ("1", "true", "yes", "y") else 0
 
                 # Parse skills from column
                 skills_str = row.get("skills", "")
