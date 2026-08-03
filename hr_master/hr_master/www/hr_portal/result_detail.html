@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ page_title }} · HR Master</title>
+    {% include "templates/includes/hr_portal_meta.html" %}
+    {% include "templates/includes/hr_portal_css.html" %}
+</head>
+<body class="hrp-body">
+    {% include "templates/includes/hr_portal_header.html" %}
+
+    <main class="hrp-container">
+        {% if flash %}
+        <div class="hrp-alert {{ 'hrp-alert-success' if flash.type == 'success' else 'hrp-alert-error' }}" data-dismiss>
+            {{ flash.message }}
+        </div>
+        {% endif %}
+
+        <div class="hrp-page-head">
+            <div>
+                <h1 class="hrp-page-title">{{ result.candidate_name }}</h1>
+                <p class="hrp-page-sub">
+                    {% if result.current_title %}{{ result.current_title }}{% endif %}
+                    {% if result.current_company %} · {{ result.current_company }}{% endif %}
+                    {% if result.location %} · {{ result.location }}{% endif %}
+                    <span class="hrp-badge hrp-badge-blue" style="margin-left:6px">{{ result.source }}</span>
+                </p>
+            </div>
+            <div class="hrp-actions">
+                <a class="hrp-btn hrp-btn-secondary" href="/hr_portal/search?name={{ search.name }}">← Search Results</a>
+                <a class="hrp-btn hrp-btn-secondary" href="/hr_portal/jd?name={{ jd.name }}">JD</a>
+            </div>
+        </div>
+
+        <div class="hrp-grid hrp-grid-3">
+            <!-- Profile -->
+            <div class="hrp-card">
+                <h2 class="hrp-card-title">Candidate</h2>
+                <dl class="hrp-detail-list">
+                    <div class="hrp-detail"><dt>Current Title</dt><dd>{{ result.current_title or '—' }}</dd></div>
+                    <div class="hrp-detail"><dt>Current Company</dt><dd>{{ result.current_company or '—' }}</dd></div>
+                    <div class="hrp-detail"><dt>Location</dt><dd>{{ result.location or '—' }}</dd></div>
+                    <div class="hrp-detail"><dt>Experience</dt><dd>{{ result.experience_years or 0 }} yrs</dd></div>
+                    <div class="hrp-detail"><dt>Source</dt><dd>{{ result.source }}</dd></div>
+                    <div class="hrp-detail"><dt>Import Status</dt><dd>
+                        {% if result.is_imported or result.import_status == 'Imported' %}
+                        <span class="hrp-badge hrp-badge-green">Imported ✓</span>
+                        {% elif result.import_status == 'Failed' %}
+                        <span class="hrp-badge hrp-badge-red">Failed</span>
+                        {% else %}
+                        <span class="hrp-badge hrp-badge-orange">Pending</span>
+                        {% endif %}
+                    </dd></div>
+                </dl>
+            </div>
+
+            <!-- Match scores -->
+            <div class="hrp-card">
+                <h2 class="hrp-card-title">Match vs {{ jd.job_title }}</h2>
+                {% set ms = score_info.match_score|int %}
+                {% set ss = score_info.skill_score|int %}
+                {% set es = score_info.experience_score|int %}
+                <div class="hrp-detail"><dt>Overall Match</dt><dd>
+                    <div class="hrp-flex" style="min-width:150px">
+                        <span class="hrp-score">{{ ms }}%</span>
+                        <div class="hrp-progress" style="flex:1;min-width:80px">
+                            <div class="hrp-progress-fill {{ 'hrp-badge-green' if ms >= 80 else ('hrp-badge-orange' if ms >= 50 else 'hrp-badge-red') }}"
+                                 style="width: {{ ms }}%;background: currentColor"></div>
+                        </div>
+                    </div>
+                </dd></div>
+                <div class="hrp-detail"><dt>Skill Match</dt><dd>
+                    <div class="hrp-flex" style="min-width:150px">
+                        <span class="hrp-score">{{ ss }}%</span>
+                        <div class="hrp-progress" style="flex:1;min-width:80px">
+                            <div class="hrp-progress-fill {{ 'hrp-badge-green' if ss >= 80 else ('hrp-badge-orange' if ss >= 50 else 'hrp-badge-red') }}"
+                                 style="width: {{ ss }}%;background: currentColor"></div>
+                        </div>
+                    </div>
+                </dd></div>
+                <div class="hrp-detail"><dt>Experience Match</dt><dd>
+                    <div class="hrp-flex" style="min-width:150px">
+                        <span class="hrp-score">{{ es }}%</span>
+                        <div class="hrp-progress" style="flex:1;min-width:80px">
+                            <div class="hrp-progress-fill {{ 'hrp-badge-green' if es >= 80 else ('hrp-badge-orange' if es >= 50 else 'hrp-badge-red') }}"
+                                 style="width: {{ es }}%;background: currentColor"></div>
+                        </div>
+                    </div>
+                </dd></div>
+                <p class="hrp-hint" style="margin-top:8px">Score = 60% skills + 25% experience + 15% education (neutral until a resume is parsed).</p>
+            </div>
+
+            <!-- Skills & actions -->
+            <div>
+                <div class="hrp-card">
+                    <h2 class="hrp-card-title">Skills</h2>
+                    {% if score_info.matched_skills or score_info.missing_skills %}
+                    <div class="hrp-chips">
+                        {% for s in score_info.matched_skills %}
+                        <span class="hrp-chip hrp-chip-required">✓ {{ s }}</span>
+                        {% endfor %}
+                        {% for s in score_info.missing_skills %}
+                        <span class="hrp-chip hrp-chip-preferred">✗ {{ s }}</span>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    {% if result.skills_summary %}
+                    <h3 class="hrp-card-title" style="margin-top:16px">Summary</h3>
+                    <p style="white-space:pre-wrap;font-size:13px;color:#334155;max-height:220px;overflow:auto">{{ result.skills_summary }}</p>
+                    {% endif %}
+                </div>
+
+                <div class="hrp-card hrp-mt">
+                    <h2 class="hrp-card-title">Actions</h2>
+                    {% if can_write and not result.is_imported and result.import_status != 'Failed' %}
+                    <form method="post">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                        <input type="hidden" name="action" value="import_one">
+                        <button class="hrp-btn hrp-btn-success" type="submit" data-confirm="Import {{ result.candidate_name }} as a candidate?">📥 Import as Candidate</button>
+                    </form>
+                    {% elif result.is_imported or result.import_status == 'Imported' %}
+                    {% if candidate_link %}
+                    <a class="hrp-btn hrp-btn-primary" href="{{ candidate_link }}" target="_blank" rel="noopener">Open Candidate Profile →</a>
+                    {% else %}
+                    <p class="hrp-hint">This result has already been imported.</p>
+                    {% endif %}
+                    {% else %}
+                    <p class="hrp-hint">Import unavailable ({{ result.import_status or 'status unknown' }}).</p>
+                    {% endif %}
+                    {% if result.profile_url and result.source != 'Demo' %}
+                    <a class="hrp-btn hrp-btn-secondary" href="{{ result.profile_url }}" target="_blank" rel="noopener" style="margin-top:8px">View on {{ result.source }} ↗</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </main>
+
+    {% include "templates/includes/hr_portal_footer.html" %}
+    {% include "templates/includes/hr_portal_js.html" %}
+</body>
+</html>

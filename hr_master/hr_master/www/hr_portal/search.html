@@ -81,7 +81,9 @@
                                 <span class="hrp-hint">skill {{ r.skill_score|int }}% · exp {{ r.experience_score|int }}%</span>
                             </td>
                             <td><span class="hrp-badge hrp-badge-blue">{{ r.source }}</span></td>
-                            <td><strong>{{ r.candidate_name }}</strong></td>
+                            <td>
+                                <a class="hrp-link" href="{{ r.candidate_link or r.detail_url }}" target="_blank" rel="noopener" title="Open candidate details in a new window">{{ r.candidate_name }} <span class="hrp-hint">↗</span></a>
+                            </td>
                             <td>{{ r.current_title or '—' }}</td>
                             <td>{{ r.current_company or '—' }}</td>
                             <td>{{ r.location or '—' }}</td>

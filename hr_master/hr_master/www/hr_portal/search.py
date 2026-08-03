@@ -76,6 +76,18 @@ def get_context(context):
     scored = []
     for r in context.results:
         score_info = score_result_against_jd(context.jd, r)
+        # Imported results link to the full Candidate profile; everything else
+        # links to the search-result preview page (which offers an Import).
+        candidate_link = ""
+        if r.is_imported or r.import_status == "Imported":
+            candidate_doc = frappe.db.get_value(
+                "Candidate",
+                {"candidate_name": r.candidate_name, "source": r.source},
+                "name",
+                order_by="creation desc",
+            )
+            if candidate_doc:
+                candidate_link = "/hr_portal/candidate?name={0}".format(candidate_doc)
         scored.append({
             "name": r.name,
             "candidate_name": r.candidate_name,
@@ -88,6 +100,10 @@ def get_context(context):
             "experience_years": r.experience_years,
             "is_imported": r.is_imported,
             "import_status": r.import_status,
+            "candidate_link": candidate_link,
+            "detail_url": "/hr_portal/result_detail?search={0}&result={1}".format(
+                search_name, r.name
+            ),
             "match_score": score_info["match_score"],
             "skill_score": score_info["skill_score"],
             "experience_score": score_info["experience_score"],
