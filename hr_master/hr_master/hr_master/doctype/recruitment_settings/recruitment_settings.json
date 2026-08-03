@@ -3,7 +3,7 @@
  "creation": "2026-01-01 00:00:00",
  "doctype": "DocType",
  "engine": "InnoDB",
- "field_order": ["sb_general", "company_name", "default_recruiter", "column_break_3", "default_hiring_manager", "cc_emails", "sb_integrations", "linkedin_enabled", "naukri_enabled", "column_break_8", "google_calendar_enabled", "outlook_calendar_enabled", "sb_ai", "ai_enabled", "ai_provider", "ai_api_key", "column_break_ai", "ai_model", "ai_base_url", "sb_resume", "auto_parse_resumes", "max_resume_size_kb", "allowed_file_types", "column_break_14", "enable_duplicate_detection", "duplicate_threshold", "sb_notifications", "notify_on_new_candidate", "notify_on_offer_acceptance", "column_break_19", "daily_digest_enabled", "weekly_report_enabled", "sb_security", "enable_audit_logging", "enable_rate_limiting", "max_api_requests_per_minute", "column_break_25", "session_timeout_minutes", "require_approval_for_offers"],
+ "field_order": ["sb_general", "company_name", "default_recruiter", "column_break_3", "default_hiring_manager", "cc_emails", "sb_integrations", "linkedin_enabled", "naukri_enabled", "column_break_8", "google_calendar_enabled", "outlook_calendar_enabled", "sb_ai", "ai_enabled", "ai_provider", "ai_api_key", "column_break_ai", "ai_model", "ai_base_url", "sb_resume", "auto_parse_resumes", "max_resume_size_kb", "allowed_file_types", "column_break_14", "enable_duplicate_detection", "auto_merge_duplicates", "duplicate_threshold", "sb_notifications", "notify_on_new_candidate", "notify_on_offer_acceptance", "column_break_19", "daily_digest_enabled", "weekly_report_enabled", "sb_security", "enable_audit_logging", "enable_rate_limiting", "max_api_requests_per_minute", "column_break_25", "session_timeout_minutes", "require_approval_for_offers"],
  "fields": [
   {"fieldname":"sb_general","fieldtype":"Section Break","label":"General Settings"},
   {"fieldname":"company_name","fieldtype":"Data","label":"Company Name"},
@@ -30,6 +30,7 @@
   {"fieldname":"allowed_file_types","fieldtype":"Small Text","label":"Allowed File Types","default":"pdf,docx,txt"},
   {"fieldname":"column_break_14","fieldtype":"Column Break"},
   {"default":"1","fieldname":"enable_duplicate_detection","fieldtype":"Check","label":"Enable Duplicate Detection"},
+  {"default":"1","fieldname":"auto_merge_duplicates","fieldtype":"Check","label":"Auto-Merge Exact Duplicates","description":"Weekly scan automatically merges candidates that match 100% (same email or phone). The record with the most complete data is kept; the other is merged in and marked Blacklisted."},
   {"default":"85","fieldname":"duplicate_threshold","fieldtype":"Percent","label":"Duplicate Match Threshold (%)"},
   {"fieldname":"sb_notifications","fieldtype":"Section Break","label":"Notifications"},
   {"default":"1","fieldname":"notify_on_new_candidate","fieldtype":"Check","label":"Notify on New Candidate"},

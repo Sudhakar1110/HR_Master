@@ -58,7 +58,8 @@ scheduler_events = {
             "hr_master.tasks.report_generation.generate_weekly_report"
         ],
         "0 3 * * 0": [
-            "hr_master.tasks.duplicate_detection.scan_for_duplicates"
+            "hr_master.tasks.duplicate_detection.scan_for_duplicates",
+            "hr_master.tasks.duplicate_detection.auto_merge_exact_duplicates"
         ],
         "0 4 * * *": [
             "hr_master.tasks.ai_ranking.ai_rank_candidates"

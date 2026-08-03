@@ -447,6 +447,7 @@ def set_default_config():
                 "max_resume_size_kb": 10240,
                 "allowed_file_types": "pdf,docx,txt",
                 "enable_duplicate_detection": 1,
+                "auto_merge_duplicates": 1,
                 "duplicate_threshold": 85,
                 "notify_on_new_candidate": 1,
                 "notify_on_offer_acceptance": 1,
