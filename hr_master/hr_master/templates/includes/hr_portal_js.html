@@ -212,13 +212,15 @@
 				});
 				aiCall(endpoint, body).then(function (data) {
 					if (data && data.exc_type) {
-						aiShowError((data._server_messages && data._server_messages[0]) || data.message || "AI not configured.");
+						aiShowError((data._server_messages && data._server_messages[0]) || data.message || "AI request failed.");
 						return;
 					}
-					if (data && data.status === "success") {
-						aiRenderSections(sections || data.questions || { "Required Skills": data.required, "Preferred Skills": data.preferred });
+					/* Frappe wraps whitelisted returns in {"message": <result>} */
+					var result = (data && data.message && typeof data.message === "object") ? data.message : data;
+					if (result && result.status === "success") {
+						aiRenderSections(sections || result.questions || { "Required Skills": result.required, "Preferred Skills": result.preferred });
 					} else {
-						aiShowError((data && data.message) || "Unexpected response.");
+						aiShowError((result && result.message) || "Unexpected response.");
 					}
 				}).catch(function () { aiShowError("Network error while calling the AI service."); });
 			}
@@ -302,12 +304,14 @@
 				fetch(pollUrl, { credentials: "same-origin" })
 					.then(function (r) { return r.json(); })
 					.then(function (data) {
-						if (data && data.status === "success" && !data.in_progress) {
+						/* Frappe wraps whitelisted returns in {"message": <result>} */
+						var result = (data && data.message && typeof data.message === "object") ? data.message : data;
+						if (result && result.status === "success" && !result.in_progress) {
 							stopPolling();
 							/* When the search finishes, the backend may tell us to go
 							   straight to the ranked candidates page — do that. */
-							if (data.redirect_url) {
-								window.location.href = data.redirect_url;
+							if (result.redirect_url) {
+								window.location.href = result.redirect_url;
 							} else {
 								reloadFresh();
 							}
