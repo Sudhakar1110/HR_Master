@@ -159,8 +159,13 @@ def set_portal_theme(theme=None):
 def require_hr_access():
     """Guard for portal pages: redirect guests / non-HR users to login."""
     if frappe.session.user == "Guest" or not has_hr_role():
+        # Werkzeug exposes ``full_path`` (path + query string); ``fullpath``
+        # does not exist on this Frappe/Werkzeug version.
+        request_path = getattr(
+            frappe.request, "full_path", None
+        ) or frappe.request.path
         frappe.local.flags.redirect_location = (
-            "/login?redirect-to=" + frappe.request.fullpath
+            "/login?redirect-to=" + quote(request_path)
         )
         raise frappe.Redirect
 
