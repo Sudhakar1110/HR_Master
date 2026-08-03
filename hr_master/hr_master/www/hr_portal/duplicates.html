@@ -29,6 +29,7 @@
 
         {% if groups %}
             {% for g in groups %}
+            {% set outer_loop = loop %}
             <div class="hrp-card hrp-mb">
                 <div class="hrp-flex" style="justify-content:space-between;align-items:center;margin-bottom:10px">
                     <h2 class="hrp-card-title" style="margin:0">Group {{ loop.index }}</h2>
