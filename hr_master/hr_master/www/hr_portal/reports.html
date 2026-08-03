@@ -67,8 +67,8 @@
                     <span class="hrp-rep-label" title="{{ report.labels[i] }}">{{ report.labels[i] }}</span>
                     <div class="hrp-rep-bars">
                         {% for ds in report.datasets %}
-                        <div class="hrp-rep-bar" style="width: {{ ((ds.values[i] * 100 / report.max_value)|round|int) if report.max_value else 0 }}%; background: {{ ds.color }}">
-                            <span class="hrp-rep-bar-val">{{ ds.values[i] }}</span>
+                        <div class="hrp-rep-bar" style="width: {{ ((ds["values"][i] * 100 / report.max_value)|round|int) if report.max_value else 0 }}%; background: {{ ds.color }}">
+                            <span class="hrp-rep-bar-val">{{ ds["values"][i] }}</span>
                         </div>
                         {% endfor %}
                     </div>
