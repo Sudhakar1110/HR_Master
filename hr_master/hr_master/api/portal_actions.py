@@ -225,17 +225,37 @@ def set_ranking_status(ranking_name, action):
         frappe.throw(_("Unknown workflow action: {0}").format(action))
 
     try:
-        from frappe.workflow import apply_action
+        # Frappe v15 moved the workflow helpers from ``frappe.workflow`` to
+        # ``frappe.model.workflow``; ``apply_action`` no longer exists.
+        from frappe.model.workflow import get_transitions, get_workflow
 
-        apply_action(doc, action)
+        workflow = get_workflow(doc.doctype)
+        transitions = get_transitions(doc, workflow)
+        transition = next((t for t in transitions if t.get("action") == action), None)
+
+        if transition:
+            # Valid workflow transition for the current user - apply it properly.
+            doc.set(workflow.workflow_state_field, transition["next_state"])
+            next_state_row = next(
+                (s for s in workflow.states if s.state == transition["next_state"]),
+                None,
+            )
+            if next_state_row and next_state_row.update_field:
+                doc.set(next_state_row.update_field, next_state_row.update_value)
+            doc.save(ignore_permissions=True)
+        else:
+            # No transition for this state/action (or the user's role has no
+            # access). The portal allows direct status changes, so set the
+            # state via db_set to bypass workflow validation entirely.
+            doc.db_set(workflow.workflow_state_field, target)
+            doc.db_set("status", target)
     except Exception:
-        # Fallback: set the state directly if the workflow cannot resolve it
-        doc.status = target
-        doc.workflow_state = target
-        doc.save(ignore_permissions=True)
+        # Last-resort fallback - never let the workflow block a portal action.
+        doc.db_set("workflow_state", target)
+        doc.db_set("status", target)
 
     frappe.db.commit()
-    return {"status": doc.status}
+    return {"status": target}
 
 
 @frappe.whitelist()

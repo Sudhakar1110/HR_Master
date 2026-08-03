@@ -87,6 +87,38 @@
    "allowed": "HR Master Recruiter",
    "condition": "",
    "next_state": "Shortlisted",
+   "state": "Pending"
+  },
+  {
+   "action": "Reject",
+   "allow_self_approval": 1,
+   "allowed": "HR Master Recruiter",
+   "condition": "",
+   "next_state": "Rejected",
+   "state": "Pending"
+  },
+  {
+   "action": "Put on Hold",
+   "allow_self_approval": 1,
+   "allowed": "HR Master Admin",
+   "condition": "",
+   "next_state": "On Hold",
+   "state": "Pending"
+  },
+  {
+   "action": "Schedule Interview",
+   "allow_self_approval": 1,
+   "allowed": "HR Master Hiring Manager",
+   "condition": "",
+   "next_state": "Interview Scheduled",
+   "state": "Pending"
+  },
+  {
+   "action": "Shortlist",
+   "allow_self_approval": 1,
+   "allowed": "HR Master Recruiter",
+   "condition": "",
+   "next_state": "Shortlisted",
    "state": "Evaluated"
   },
   {
@@ -95,6 +127,22 @@
    "allowed": "HR Master Recruiter",
    "condition": "",
    "next_state": "Rejected",
+   "state": "Evaluated"
+  },
+  {
+   "action": "Put on Hold",
+   "allow_self_approval": 1,
+   "allowed": "HR Master Admin",
+   "condition": "",
+   "next_state": "On Hold",
+   "state": "Evaluated"
+  },
+  {
+   "action": "Schedule Interview",
+   "allow_self_approval": 1,
+   "allowed": "HR Master Hiring Manager",
+   "condition": "",
+   "next_state": "Interview Scheduled",
    "state": "Evaluated"
   },
   {
@@ -119,7 +167,15 @@
    "allowed": "HR Master Admin",
    "condition": "",
    "next_state": "On Hold",
-   "state": "Evaluated"
+   "state": "Shortlisted"
+  },
+  {
+   "action": "Reject",
+   "allow_self_approval": 1,
+   "allowed": "HR Master Hiring Manager",
+   "condition": "",
+   "next_state": "Rejected",
+   "state": "Interview Scheduled"
   },
   {
    "action": "Put on Hold",
@@ -127,7 +183,7 @@
    "allowed": "HR Master Admin",
    "condition": "",
    "next_state": "On Hold",
-   "state": "Shortlisted"
+   "state": "Interview Scheduled"
   },
   {
    "action": "Re-evaluate",
@@ -135,6 +191,14 @@
    "allowed": "HR Master Recruiter",
    "condition": "",
    "next_state": "Evaluated",
+   "state": "On Hold"
+  },
+  {
+   "action": "Reject",
+   "allow_self_approval": 1,
+   "allowed": "HR Master Recruiter",
+   "condition": "",
+   "next_state": "Rejected",
    "state": "On Hold"
   }
  ],
