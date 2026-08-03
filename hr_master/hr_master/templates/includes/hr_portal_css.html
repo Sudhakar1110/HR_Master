@@ -1139,6 +1139,36 @@ html { scroll-behavior: smooth; }
 .hrp-legend-value { font-weight: 700; color: var(--hrp-heading); }
 .hrp-legend-value em { font-style: normal; font-weight: 400; font-size: 11px; color: var(--hrp-muted); margin-left: 4px; }
 html[data-theme="dark"] .hrp-funnel-track { background: #141b31; border-color: var(--hrp-border-strong); }
+/* Interview calendar */
+.hrp-cal-head { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
+.hrp-cal-title { margin: 0 auto; font-size: 18px; color: var(--hrp-heading); letter-spacing: -0.01em; }
+.hrp-cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+.hrp-cal-dow { text-align: center; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: var(--hrp-muted); padding: 6px 0; }
+.hrp-cal-day { min-height: 96px; background: var(--hrp-card); border: 1px solid var(--hrp-border); border-radius: 10px; padding: 6px; display: flex; flex-direction: column; gap: 4px; overflow: hidden; transition: border-color .2s ease, box-shadow .2s ease; }
+.hrp-cal-day:hover { border-color: var(--hrp-border-strong); }
+.hrp-cal-blank { background: transparent; border-color: transparent; }
+.hrp-cal-today { border-color: var(--hrp-primary); box-shadow: 0 0 0 2px rgba(99, 91, 255, 0.18); }
+.hrp-cal-date { font-size: 12px; font-weight: 800; color: var(--hrp-heading); }
+.hrp-cal-today .hrp-cal-date { color: var(--hrp-primary); }
+.hrp-cal-chip { display: block; font-size: 10.5px; line-height: 1.25; color: var(--hrp-text); background: var(--hrp-blue-bg); border: 1px solid var(--hrp-blue-border); border-radius: 6px; padding: 3px 5px; text-decoration: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: transform .15s ease, filter .15s ease; }
+.hrp-cal-chip:hover { transform: translateY(-1px); filter: brightness(1.03); }
+.hrp-cal-chip-time { font-weight: 700; margin-right: 4px; color: var(--hrp-primary); }
+.hrp-cal-more { font-size: 10px; color: var(--hrp-muted); }
+
+/* Portal reports */
+.hrp-rep-legend { display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: 14px; align-items: center; }
+.hrp-rep-chart { display: flex; flex-direction: column; gap: 8px; }
+.hrp-rep-row { display: flex; align-items: center; gap: 10px; }
+.hrp-rep-label { flex: 0 0 170px; font-size: 12px; color: var(--hrp-text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hrp-rep-bars { flex: 1; display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.hrp-rep-bar { position: relative; height: 18px; border-radius: 6px; min-width: 2px; opacity: .9; transition: opacity .2s ease; }
+.hrp-rep-bar:hover { opacity: 1; }
+.hrp-rep-bar-val { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); font-size: 10px; font-weight: 700; color: #fff; text-shadow: 0 1px 2px rgba(0, 0, 0, .35); }
+
+/* CSV import */
+.hrp-list { margin: 4px 0 0 18px; padding: 0; }
+.hrp-list li { margin: 3px 0; font-size: 13px; }
+
 /* Bulk actions bar + row checkboxes (ranked results page) */
 .hrp-bulk-bar {
     display: flex; flex-wrap: wrap; align-items: center; gap: 10px;

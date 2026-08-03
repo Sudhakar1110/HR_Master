@@ -27,6 +27,19 @@
             <div class="hrp-card">
                 <h2 class="hrp-card-title">New Job Description</h2>
                 {% if can_write %}
+                <div class="hrp-form-row">
+                    <label class="hrp-label" for="jdTemplateSelect">⚡ Create from template</label>
+                    <div class="hrp-flex">
+                        <select class="hrp-select" id="jdTemplateSelect" style="flex:1">
+                            <option value="">— Choose a template —</option>
+                            {% for t in templates %}
+                            <option value="{{ t.key }}">{{ t.title }}</option>
+                            {% endfor %}
+                        </select>
+                        <button class="hrp-btn hrp-btn-secondary" type="button" id="jdTemplateUse">Fill form</button>
+                    </div>
+                    <span class="hrp-hint">Templates pre-fill the form below — review everything, then click <strong>Create JD &amp; Open</strong>.</span>
+                </div>
                 <form class="hrp-form" method="post">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
                     <div class="hrp-form-row">
@@ -180,6 +193,40 @@
             </div>
         </div>
     </main>
+
+    <script>
+    (function () {
+        var templates = {{ templates_json | safe }};
+        var sel = document.getElementById("jdTemplateSelect");
+        var useBtn = document.getElementById("jdTemplateUse");
+        if (!sel || !useBtn || !templates) return;
+
+        useBtn.addEventListener("click", function () {
+            var key = sel.value;
+            var t = null;
+            templates.forEach(function (x) { if (x.key === key) t = x; });
+            if (!t) { alert("Choose a template first"); return; }
+
+            function set(id, val) {
+                var el = document.getElementById(id);
+                if (el) el.value = (val == null) ? "" : val;
+            }
+            set("job_title", t.job_title);
+            set("employment_type", t.employment_type || "Full-Time");
+            set("location", t.location);
+            set("remote_option", t.remote_option || "On-site");
+            set("min_experience_years", t.min_experience_years);
+            set("max_experience_years", t.max_experience_years);
+            set("salary_range_min", t.salary_range_min);
+            set("salary_range_max", t.salary_range_max);
+            set("required_skills", (t.required_skills || []).join(", "));
+            set("preferred_skills", (t.preferred_skills || []).join(", "));
+            set("job_description_raw", t.job_description_raw || "");
+            window.scrollTo({ top: 0, behavior: "smooth" });
+            alert("Template '" + t.title + "' loaded — review the form, then click Create JD & Open.");
+        });
+    })();
+    </script>
 
     {% include "templates/includes/hr_portal_footer.html" %}
     {% include "templates/includes/hr_portal_js.html" %}

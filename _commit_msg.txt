@@ -1,0 +1,24 @@
+Add 5 medium-value portal features: JD templates, interview calendar, portal reports + export, source performance, CSV import
+
+1. JD templates: 9 built-in templates (utils/jd_templates.py) for common
+   roles; the JD creation form gets a template picker that pre-fills the
+   whole form in one click (embedded JSON has '<' escaped so it can never
+   break out of the inline script)
+2. Interview calendar (/hr_portal/calendar): month grid (Mon-first,
+   today highlighted) with per-day interview chips linking to candidates,
+   prev/next month navigation, plus a Next-7-days table; Hiring Manager
+   scope respected
+3. Portal reports (/hr_portal/reports): all 11 Desk script reports plus a
+   new Source Performance report, rendered with summary KPI chips, a pure
+   CSS grouped bar chart and a data table; CSV and PDF export via
+   api/portal_reports.export_report
+4. Source Performance: per-source candidates / shortlisted / interviewed /
+   offers / hired with hire rate (LEFT JOINs across Candidate, Ranking,
+   Interview Schedule, Offer Management); default report on the page
+5. Bulk CSV import (/hr_portal/import): upload a CSV (Frappe upload_file),
+   optionally link to a JD, choose the source; reports imported/duplicates/
+   per-row errors; downloadable sample CSV generated client-side
+
+Also: Calendar / Reports / Import nav links; calendar, report-chart and
+import CSS (theme-aware); hiring-manager JD scoping applied to calendar
+and import pages.

@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ page_title }} · HR Master</title>
+    {% include "templates/includes/hr_portal_meta.html" %}
+    {% include "templates/includes/hr_portal_css.html" %}
+</head>
+<body class="hrp-body">
+    {% include "templates/includes/hr_portal_header.html" %}
+
+    <main class="hrp-container">
+        <div class="hrp-page-head">
+            <div>
+                <h1 class="hrp-page-title">⬆️ Import Candidates</h1>
+                <p class="hrp-page-sub">{{ page_description }}</p>
+            </div>
+        </div>
+
+        {% if not can_write %}
+        <div class="hrp-card">
+            <div class="hrp-alert hrp-alert-error">You have read-only access. Ask an HR Master Admin or Recruiter to import candidates.</div>
+        </div>
+        {% else %}
+        <div class="hrp-grid hrp-grid-2">
+            <div class="hrp-card">
+                <h2 class="hrp-card-title">Upload CSV</h2>
+                <div class="hrp-form-row">
+                    <label class="hrp-label" for="csvFile">CSV file *</label>
+                    <input class="hrp-input" type="file" id="csvFile" accept=".csv,text/csv">
+                    <span class="hrp-hint">UTF-8 CSV with a header row. Duplicates (same email) are skipped automatically.</span>
+                </div>
+                <div class="hrp-form-row">
+                    <label class="hrp-label" for="csvJd">Link to Job Description (optional)</label>
+                    <select class="hrp-select" id="csvJd">
+                        <option value="">— None —</option>
+                        {% for j in jds %}
+                        <option value="{{ j.name }}">{{ j.job_title }} ({{ j.name }})</option>
+                        {% endfor %}
+                    </select>
+                    <span class="hrp-hint">Linking adds each candidate to the JD's ranking list (status Pending).</span>
+                </div>
+                <div class="hrp-form-row">
+                    <label class="hrp-label" for="csvSource">Source</label>
+                    <input class="hrp-input" type="text" id="csvSource" value="CSV Import">
+                </div>
+                <div class="hrp-actions">
+                    <button class="hrp-btn hrp-btn-primary" type="button" id="csvImportBtn">⬆️ Import CSV</button>
+                    <button class="hrp-btn hrp-btn-secondary" type="button" id="csvSampleBtn">📄 Download sample CSV</button>
+                </div>
+                <div id="csvResult" style="display:none"></div>
+            </div>
+
+            <div class="hrp-card">
+                <h2 class="hrp-card-title">Expected columns</h2>
+                <p class="hrp-hint">Only <strong>candidate_name</strong> is required. Column headers are matched exactly.</p>
+                <div class="hrp-chips">
+                    <span class="hrp-chip hrp-chip-required">candidate_name</span>
+                    <span class="hrp-chip">email</span>
+                    <span class="hrp-chip">phone</span>
+                    <span class="hrp-chip">current_title</span>
+                    <span class="hrp-chip">current_company</span>
+                    <span class="hrp-chip">total_experience_years</span>
+                    <span class="hrp-chip">highest_education</span>
+                    <span class="hrp-chip">skills</span>
+                    <span class="hrp-chip">location</span>
+                    <span class="hrp-chip">current_salary</span>
+                    <span class="hrp-chip">expected_salary</span>
+                    <span class="hrp-chip">notice_period_days</span>
+                    <span class="hrp-chip">source_url</span>
+                    <span class="hrp-chip">resume_text</span>
+                </div>
+                <div class="hrp-hint" style="margin-top:12px">
+                    <strong>skills</strong> is a comma-separated list (e.g. <code>Python, Django, SQL</code>).
+                    Candidates matching an existing email are counted as duplicates and skipped.
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </main>
+
+    <script>
+    (function () {
+        var csrf = "{{ csrf_token }}";
+        var importBtn = document.getElementById("csvImportBtn");
+        if (!importBtn) return;
+
+        function post(method, params) {
+            return fetch(method, {
+                method: "POST",
+                headers: { "Content-Type": "application/json", "X-Frappe-CSRF-Token": csrf },
+                body: JSON.stringify(params)
+            }).then(function (r) { return r.json(); });
+        }
+
+        function esc(s) {
+            return String(s == null ? "" : s)
+                .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        }
+
+        function renderResult(m) {
+            var panel = document.getElementById("csvResult");
+            if (!m) {
+                panel.innerHTML = "<div class='hrp-alert hrp-alert-error'>No response from the server.</div>";
+                panel.style.display = "";
+                return;
+            }
+            if (m.status === "error") {
+                panel.innerHTML = "<div class='hrp-alert hrp-alert-error'>" + esc(m.message) + "</div>";
+                panel.style.display = "";
+                return;
+            }
+            var html = "<div class='hrp-alert hrp-alert-success' style='margin-top:14px'><strong>Imported " + esc(m.imported) + "</strong> candidate(s)" +
+                (m.duplicates ? " · <strong>" + esc(m.duplicates) + "</strong> duplicate(s) skipped" : "") + "</div>";
+            if (m.candidates && m.candidates.length) {
+                html += "<p class='hrp-hint' style='margin-top:10px'>Created records:</p><ul class='hrp-list'>";
+                m.candidates.forEach(function (c) {
+                    html += "<li><a class='hrp-link' href='/hr_portal/candidate?name=" + esc(c) + "'>" + esc(c) + "</a></li>";
+                });
+                html += "</ul>";
+            }
+            if (m.errors && m.errors.length) {
+                html += "<div class='hrp-alert hrp-alert-warning' style='margin-top:12px'><strong>" + esc(m.errors.length) + " row(s) failed</strong>" +
+                    "<pre style='margin-top:8px;white-space:pre-wrap;word-break:break-word;font-size:12px;max-height:160px;overflow:auto;background:rgba(0,0,0,.05);border-radius:6px;padding:8px'>" + esc(m.errors.join("\n")) + "</pre></div>";
+            }
+            panel.innerHTML = html;
+            panel.style.display = "";
+        }
+
+        importBtn.addEventListener("click", function () {
+            var fileInput = document.getElementById("csvFile");
+            var file = fileInput.files[0];
+            if (!file) { alert("Choose a CSV file first"); return; }
+
+            importBtn.disabled = true;
+            importBtn.textContent = "⏳ Uploading…";
+            var fd = new FormData();
+            fd.append("file", file);
+
+            fetch("/api/method/upload_file", {
+                method: "POST",
+                headers: { "X-Frappe-CSRF-Token": csrf },
+                body: fd
+            }).then(function (r) { return r.json(); }).then(function (up) {
+                var um = up && up.message;
+                if (!um || !um.file_url) {
+                    throw new Error((um && um.message) || "File upload failed");
+                }
+                return post("/api/method/hr_master.utils.csv_import.import_candidates_from_csv", {
+                    file_url: um.file_url,
+                    job_description: document.getElementById("csvJd").value || "",
+                    source: document.getElementById("csvSource").value || "CSV Import"
+                });
+            }).then(function (data) {
+                renderResult(data && data.message);
+            }).catch(function (err) {
+                renderResult({ status: "error", message: err.message });
+            }).then(function () {
+                importBtn.disabled = false;
+                importBtn.textContent = "⬆️ Import CSV";
+            });
+        });
+
+        document.getElementById("csvSampleBtn").addEventListener("click", function () {
+            var cols = ["candidate_name", "email", "phone", "current_title", "current_company",
+                        "total_experience_years", "highest_education", "skills", "location",
+                        "current_salary", "expected_salary", "notice_period_days", "source_url", "resume_text"];
+            var row = ["Aarav Sharma", "aarav.sharma@example.com", "9876501234", "Senior Python Developer",
+                       "TechNova Solutions", "7", "Master's", "Python, Django, SQL, PostgreSQL",
+                       "Bengaluru", "3200000", "3800000", "60", "", "Experienced backend engineer with 7 years building scalable APIs."];
+            var csv = cols.join(",") + "\n" + row.map(function (v) {
+                return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v;
+            }).join(",") + "\n";
+            var blob = new Blob(["\ufeff" + csv], { type: "text/csv;charset=utf-8" });
+            var a = document.createElement("a");
+            a.href = URL.createObjectURL(blob);
+            a.download = "candidates_sample.csv";
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+        });
+    })();
+    </script>
+
+    {% include "templates/includes/hr_portal_footer.html" %}
+    {% include "templates/includes/hr_portal_js.html" %}
+</body>
+</html>

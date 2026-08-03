@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ page_title }} · HR Master</title>
+    {% include "templates/includes/hr_portal_meta.html" %}
+    {% include "templates/includes/hr_portal_css.html" %}
+</head>
+<body class="hrp-body">
+    {% include "templates/includes/hr_portal_header.html" %}
+
+    <main class="hrp-container">
+        <div class="hrp-page-head">
+            <div>
+                <h1 class="hrp-page-title">🗓️ Interview Calendar</h1>
+                <p class="hrp-page-sub">{{ page_description }}</p>
+            </div>
+        </div>
+
+        <div class="hrp-card">
+            <div class="hrp-cal-head">
+                <a class="hrp-btn hrp-btn-secondary hrp-btn-sm" href="{{ prev_link }}">‹ Prev</a>
+                <h2 class="hrp-cal-title">{{ month_name }} {{ year }}</h2>
+                <a class="hrp-btn hrp-btn-secondary hrp-btn-sm" href="{{ next_link }}">Next ›</a>
+                <a class="hrp-btn hrp-btn-secondary hrp-btn-sm" href="/hr_portal/calendar">Today</a>
+            </div>
+
+            <div class="hrp-cal-grid">
+                {% for w in weekdays %}
+                <div class="hrp-cal-dow">{{ w }}</div>
+                {% endfor %}
+                {% for c in cells %}
+                <div class="hrp-cal-day {{ 'hrp-cal-blank' if c.day == 0 else ('hrp-cal-today' if c.is_today else '') }}">
+                    {% if c.day %}
+                    <span class="hrp-cal-date">{{ c.day }}</span>
+                    {% for iv in c.interviews[:3] %}
+                    <a class="hrp-cal-chip" href="/hr_portal/candidate?name={{ iv.candidate }}" title="{{ iv.candidate_name }} · {{ iv.job_title or '—' }} ({{ iv.status }})">
+                        <span class="hrp-cal-chip-time">{{ iv.time_display }}</span>{{ iv.candidate_name }}
+                    </a>
+                    {% endfor %}
+                    {% if c.interviews|length > 3 %}
+                    <span class="hrp-cal-more">+{{ c.interviews|length - 3 }} more</span>
+                    {% endif %}
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="hrp-card hrp-mt">
+            <h2 class="hrp-card-title">📅 Next 7 days</h2>
+            {% if upcoming %}
+            <div class="hrp-table-wrap">
+                <table class="hrp-table">
+                    <thead>
+                        <tr><th>Date</th><th>Time</th><th>Candidate</th><th>Job</th><th>Type</th><th>Status</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for iv in upcoming %}
+                        <tr>
+                            <td>{{ iv.scheduled_date }}</td>
+                            <td>{{ iv.time_display or '—' }}</td>
+                            <td><a class="hrp-link" href="/hr_portal/candidate?name={{ iv.candidate }}">{{ iv.candidate_name }}</a></td>
+                            <td>{{ iv.job_title or '—' }}</td>
+                            <td>{{ iv.interview_type or '—' }}</td>
+                            <td>
+                                {% set st = iv.status|lower %}
+                                <span class="hrp-badge {{ 'hrp-badge-green' if st in ('completed', 'feedback submitted') else ('hrp-badge-orange' if st == 'rescheduled' else ('hrp-badge-red' if st in ('cancelled', 'no show') else 'hrp-badge-blue')) }}">{{ iv.status }}</span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="hrp-empty">
+                <div class="hrp-empty-icon">🗓️</div>
+                <p>No interviews scheduled in the next 7 days.</p>
+            </div>
+            {% endif %}
+        </div>
+    </main>
+
+    {% include "templates/includes/hr_portal_footer.html" %}
+    {% include "templates/includes/hr_portal_js.html" %}
+</body>
+</html>

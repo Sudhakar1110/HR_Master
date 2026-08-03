@@ -14,6 +14,7 @@ from hr_master.api.portal_actions import (
     jd_visibility,
     get_hr_roles,
 )
+from hr_master.utils.jd_templates import get_templates
 
 
 def get_context(context):
@@ -74,5 +75,36 @@ def get_context(context):
     context.departments = frappe.get_all(
         "Department", pluck="name", limit_page_length=0
     ) or []
+
+    # Built-in JD templates — pre-fill the creation form in one click.
+    templates = get_templates()
+    context.templates = templates
+    # JSON embedded inside an inline <script>: escape '<' so a template can
+    # never break out of the script tag (e.g. via a "</script>" in text).
+    context.templates_json = json.dumps(
+        [
+            {
+                k: t.get(k)
+                for k in (
+                    "key",
+                    "title",
+                    "job_title",
+                    "employment_type",
+                    "location",
+                    "remote_option",
+                    "min_experience_years",
+                    "max_experience_years",
+                    "salary_range_min",
+                    "salary_range_max",
+                    "vacancies",
+                    "required_skills",
+                    "preferred_skills",
+                    "qualifications",
+                    "job_description_raw",
+                )
+            }
+            for t in templates
+        ]
+    ).replace("<", "\\u003c")
 
     return context

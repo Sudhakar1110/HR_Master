@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ page_title }} · HR Master</title>
+    {% include "templates/includes/hr_portal_meta.html" %}
+    {% include "templates/includes/hr_portal_css.html" %}
+</head>
+<body class="hrp-body">
+    {% include "templates/includes/hr_portal_header.html" %}
+
+    <main class="hrp-container">
+        <div class="hrp-page-head">
+            <div>
+                <h1 class="hrp-page-title">📊 Reports</h1>
+                <p class="hrp-page-sub">{{ page_description }}</p>
+            </div>
+            <div class="hrp-actions">
+                <form method="get" class="hrp-form" style="display:inline">
+                    <select class="hrp-select" name="r" onchange="this.form.submit()">
+                        {% for r in reports_list %}
+                        <option value="{{ r.key }}" {{ 'selected' if r.key == report.report_key else '' }}>{{ r.title }}</option>
+                        {% endfor %}
+                    </select>
+                </form>
+                <button class="hrp-btn hrp-btn-secondary hrp-btn-sm" type="button" id="hrpExportCsv">⬇️ CSV</button>
+                <button class="hrp-btn hrp-btn-secondary hrp-btn-sm" type="button" id="hrpExportPdf">🖨 PDF</button>
+            </div>
+        </div>
+
+        {% if report.error %}
+        <div class="hrp-card">
+            <div class="hrp-alert hrp-alert-error">
+                <strong>This report could not be generated.</strong>
+                <div style="margin-top:6px">{{ report.error }}</div>
+            </div>
+        </div>
+        {% else %}
+        {% if report.summary %}
+        <div class="hrp-grid hrp-grid-3 hrp-mb">
+            {% for s in report.summary %}
+            <div class="hrp-card hrp-kpi">
+                <div class="hrp-kpi-top">
+                    <span class="hrp-kpi-label">{{ s.label }}</span>
+                </div>
+                <div class="hrp-kpi-value">{{ s.value }}</div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="hrp-card hrp-mb">
+            <h2 class="hrp-card-title">{{ report.title }}</h2>
+            {% if report.labels and report.datasets %}
+            <div class="hrp-rep-legend">
+                {% for ds in report.datasets %}
+                <span class="hrp-legend-row" style="font-size:12px">
+                    <span class="hrp-legend-dot" style="background: {{ ds.color }}"></span>
+                    {{ ds.name }}
+                </span>
+                {% endfor %}
+            </div>
+            <div class="hrp-rep-chart">
+                {% for i in range(report.labels|length) %}
+                <div class="hrp-rep-row">
+                    <span class="hrp-rep-label" title="{{ report.labels[i] }}">{{ report.labels[i] }}</span>
+                    <div class="hrp-rep-bars">
+                        {% for ds in report.datasets %}
+                        <div class="hrp-rep-bar" style="width: {{ ((ds.values[i] * 100 / report.max_value)|round|int) if report.max_value else 0 }}%; background: {{ ds.color }}">
+                            <span class="hrp-rep-bar-val">{{ ds.values[i] }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="hrp-hint">No chart data for this report.</p>
+            {% endif %}
+        </div>
+
+        <div class="hrp-card">
+            <h2 class="hrp-card-title">Data</h2>
+            {% if report.rows %}
+            <div class="hrp-table-wrap">
+                <table class="hrp-table">
+                    <thead>
+                        <tr>
+                            {% for c in report.columns %}
+                            <th>{{ c.label }}</th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in report.rows %}
+                        <tr>
+                            {% for c in report.columns %}
+                            <td>{{ row.get(c.fieldname) if row.get(c.fieldname) is not none else '—' }}</td>
+                            {% endfor %}
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="hrp-empty">
+                <div class="hrp-empty-icon">📭</div>
+                <p>No data for this report yet.</p>
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+    </main>
+
+    <script>
+    (function () {
+        var csrf = "{{ csrf_token }}";
+        var reportKey = "{{ report.report_key }}";
+        var csvBtn = document.getElementById("hrpExportCsv");
+        var pdfBtn = document.getElementById("hrpExportPdf");
+        if (!csvBtn || !pdfBtn) return;
+
+        function exportReport(fmt) {
+            fetch("/api/method/hr_master.api.portal_reports.export_report", {
+                method: "POST",
+                headers: { "Content-Type": "application/json", "X-Frappe-CSRF-Token": csrf },
+                body: JSON.stringify({ report_key: reportKey, file_format: fmt })
+            }).then(function (r) { return r.json(); }).then(function (data) {
+                var m = data && data.message;
+                if (m && m.status === "success" && m.file_url) {
+                    window.open(m.file_url, "_blank");
+                } else {
+                    alert((m && m.message) || "Export failed");
+                }
+            });
+        }
+        csvBtn.addEventListener("click", function () { exportReport("csv"); });
+        pdfBtn.addEventListener("click", function () { exportReport("pdf"); });
+    })();
+    </script>
+
+    {% include "templates/includes/hr_portal_footer.html" %}
+    {% include "templates/includes/hr_portal_js.html" %}
+</body>
+</html>
