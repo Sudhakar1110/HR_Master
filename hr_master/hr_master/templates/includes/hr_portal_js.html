@@ -314,78 +314,97 @@
 				});
 			}
 
-			/* Chat-style AI assistant: type a question → get an answer */
-			var aiChatBox = document.getElementById("hrpAiChat");
-			var aiChatInput = document.getElementById("hrpAiChatInput");
-			var aiChatSend = document.getElementById("hrpAiChatSend");
-			var aiChatArea = document.getElementById("hrpAiChatOutput");
-			if (aiChatBox && aiChatInput && aiChatSend && aiChatArea) {
-				var aiChatJd = aiChatBox.getAttribute("data-jd") || "";
+		}
 
-				function aiChatAdd(role, text) {
-					var row = document.createElement("div");
-					row.className = "hrp-chat-row hrp-chat-" + role;
-					var bubble = document.createElement("div");
-					bubble.className = "hrp-chat-bubble";
-					bubble.textContent = text;
-					row.appendChild(bubble);
-					aiChatArea.appendChild(row);
-					aiChatArea.scrollTop = aiChatArea.scrollHeight;
-					return row;
-				}
+		/* Chat-style AI assistant — works on any page containing a .hrp-chat box
+		   (JD page: ask about a job; Candidate page: ask about a candidate).
+		   Each box declares its endpoint + context key via data-chat-* attrs:
+		   data-chat-endpoint, data-chat-param, data-chat-value. */
+		document.querySelectorAll(".hrp-chat").forEach(function (chatBox) {
+			var input = chatBox.querySelector(".hrp-chat-input-row textarea");
+			var send = chatBox.querySelector(".hrp-chat-input-row button");
+			var area = chatBox.querySelector(".hrp-chat-output");
+			if (!input || !send || !area) { return; }
+			var endpoint = chatBox.getAttribute("data-chat-endpoint") || "";
+			var param = chatBox.getAttribute("data-chat-param") || "";
+			var value = chatBox.getAttribute("data-chat-value") || "";
+			var csrfMeta = document.querySelector('meta[name="csrf-token"]');
+			var csrfToken = csrfMeta ? csrfMeta.getAttribute("content") : "";
 
-				function aiChatSendMessage() {
-					var text = aiChatInput.value.trim();
-					if (!text || aiChatSend.disabled) { return; }
-					aiChatAdd("user", text);
-					aiChatInput.value = "";
-					aiChatSend.disabled = true;
-					aiChatSend.textContent = "…";
-					var pending = aiChatAdd("ai", "⏳ Thinking…");
-					aiCall(
-						"/api/method/hr_master.api.ai_api.ask_ai",
-						"job_description_name=" + encodeURIComponent(aiChatJd)
-							+ "&message=" + encodeURIComponent(text)
-					).then(function (data) {
-						pending.remove();
-						aiChatSend.disabled = false;
-						aiChatSend.textContent = "Send ➤";
-						if (data && data.exc_type) {
-							aiChatAdd("ai", (data._server_messages && data._server_messages[0]) || "AI request failed.");
-							return;
-						}
-						/* Frappe wraps whitelisted returns in {"message": <result>} */
-						var result = (data && data.message && typeof data.message === "object") ? data.message : data;
-						if (result && result.status === "success") {
-							aiChatAdd("ai", result.reply || "No response.");
-						} else {
-							aiChatAdd("ai", (result && result.message) || "Unexpected response.");
-						}
-					}).catch(function () {
-						pending.remove();
-						aiChatSend.disabled = false;
-						aiChatSend.textContent = "Send ➤";
-						aiChatAdd("ai", "Network error while calling the AI service.");
-					});
-				}
+			function aiChatCall(body) {
+				return fetch(endpoint, {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+						"X-Frappe-CSRF-Token": csrfToken
+					},
+					body: body,
+					credentials: "same-origin"
+				}).then(function (r) { return r.json(); });
+			}
 
-				aiChatSend.addEventListener("click", aiChatSendMessage);
-				aiChatInput.addEventListener("keydown", function (e) {
-					if (e.key === "Enter" && !e.shiftKey) {
-						e.preventDefault();
-						aiChatSendMessage();
+			function aiChatAdd(role, text) {
+				var row = document.createElement("div");
+				row.className = "hrp-chat-row hrp-chat-" + role;
+				var bubble = document.createElement("div");
+				bubble.className = "hrp-chat-bubble";
+				bubble.textContent = text;
+				row.appendChild(bubble);
+				area.appendChild(row);
+				area.scrollTop = area.scrollHeight;
+				return row;
+			}
+
+			function aiChatSendMessage() {
+				var text = input.value.trim();
+				if (!text || send.disabled) { return; }
+				aiChatAdd("user", text);
+				input.value = "";
+				send.disabled = true;
+				send.textContent = "…";
+				var pending = aiChatAdd("ai", "⏳ Thinking…");
+				aiChatCall(
+					param + "=" + encodeURIComponent(value)
+						+ "&message=" + encodeURIComponent(text)
+				).then(function (data) {
+					pending.remove();
+					send.disabled = false;
+					send.textContent = "Send ➤";
+					if (data && data.exc_type) {
+						aiChatAdd("ai", (data._server_messages && data._server_messages[0]) || "AI request failed.");
+						return;
 					}
-				});
-
-				/* Suggestion chips: clicking one fills the input box */
-				document.querySelectorAll(".hrp-chat-suggest .hrp-chip").forEach(function (chip) {
-					chip.addEventListener("click", function () {
-						aiChatInput.value = chip.getAttribute("data-hrp-chat-suggest") || chip.textContent;
-						aiChatInput.focus();
-					});
+					/* Frappe wraps whitelisted returns in {"message": <result>} */
+					var result = (data && data.message && typeof data.message === "object") ? data.message : data;
+					if (result && result.status === "success") {
+						aiChatAdd("ai", result.reply || "No response.");
+					} else {
+						aiChatAdd("ai", (result && result.message) || "Unexpected response.");
+					}
+				}).catch(function () {
+					pending.remove();
+					send.disabled = false;
+					send.textContent = "Send ➤";
+					aiChatAdd("ai", "Network error while calling the AI service.");
 				});
 			}
-		}
+
+			send.addEventListener("click", aiChatSendMessage);
+			input.addEventListener("keydown", function (e) {
+				if (e.key === "Enter" && !e.shiftKey) {
+					e.preventDefault();
+					aiChatSendMessage();
+				}
+			});
+
+			/* Suggestion chips scoped to this chat box: click to fill the input */
+			chatBox.querySelectorAll(".hrp-chat-suggest .hrp-chip").forEach(function (chip) {
+				chip.addEventListener("click", function () {
+					input.value = chip.getAttribute("data-hrp-chat-suggest") || chip.textContent;
+					input.focus();
+				});
+			});
+		});
 
 		/* Confirm dialog for destructive / state-changing actions */
 		document.querySelectorAll("form[data-confirm]").forEach(function (form) {

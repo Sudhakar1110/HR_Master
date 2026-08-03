@@ -557,3 +557,257 @@ def ask_ai(job_description_name=None, message=None):
             return {"status": "success", "reply": text}
 
     return {"status": "success", "reply": _chat_rule_based(jd, message)}
+
+
+# ------------------------------------------
+# Chat assistant for a specific candidate profile
+# ------------------------------------------
+
+
+def _candidate_digest(candidate):
+    """Plain-language summary of a candidate profile."""
+    lines = [
+        "{0} is a {1}{2} with {3} year(s) of experience{4}.".format(
+            candidate.candidate_name,
+            candidate.current_title or "professional",
+            (" at " + candidate.current_company) if candidate.current_company else "",
+            candidate.total_experience_years or 0,
+            (" from " + candidate.location) if candidate.location else "",
+        ),
+    ]
+    if candidate.highest_education:
+        lines.append("Education: {0}.".format(candidate.highest_education))
+    skills = candidate.get_skills_with_details()
+    if skills:
+        lines.append("Key skills: {0}.".format(", ".join(skills)[:300]))
+    if candidate.expected_salary:
+        lines.append("Salary expectations: {0}.".format(candidate.expected_salary))
+    if candidate.notice_period_days:
+        lines.append("Notice period: {0} days.".format(candidate.notice_period_days))
+    resume = frappe.utils.strip_html_tags(candidate.resume_text or "")
+    if resume:
+        sentences = [s.strip() for s in resume.replace("\n", " ").split(". ") if s.strip()]
+        if sentences:
+            lines.append(" ".join(sentences[:2]))
+    return "\n".join(lines)
+
+
+def _candidate_context_for_prompt(candidate):
+    """Compact candidate profile used as context for the chat assistant."""
+    lines = [
+        "Candidate name: {0}".format(candidate.candidate_name or candidate.name),
+        "Current title: {0}".format(candidate.current_title or "n/a"),
+        "Current company: {0}".format(candidate.current_company or "n/a"),
+        "Location: {0}".format(candidate.location or "n/a"),
+        "Experience: {0} years".format(candidate.total_experience_years or 0),
+        "Education: {0}".format(candidate.highest_education or "n/a"),
+        "Status: {0}".format(candidate.status or "n/a"),
+        "Source: {0}".format(candidate.source or "n/a"),
+        "Notice period: {0} days".format(candidate.notice_period_days or 0),
+    ]
+    if candidate.current_salary:
+        lines.append("Current salary: {0}".format(candidate.current_salary))
+    if candidate.expected_salary:
+        lines.append("Expected salary: {0}".format(candidate.expected_salary))
+    skills = candidate.get_skills_with_details()
+    if skills:
+        skill_lines = []
+        for skill_name, info in skills.items():
+            parts = [str(skill_name)]
+            if info.get("proficiency"):
+                parts.append(info["proficiency"])
+            if info.get("years_of_experience"):
+                parts.append("{0}y".format(info["years_of_experience"]))
+            if info.get("is_primary"):
+                parts.append("primary")
+            skill_lines.append(", ".join(parts))
+        lines.append("Skills: {0}".format("; ".join(skill_lines)[:1200]))
+    resume = frappe.utils.strip_html_tags(candidate.resume_text or "")
+    if resume:
+        lines.append("Resume summary: {0}".format(resume[:2500]))
+    return "\n".join(lines)
+
+
+def _candidate_chat_rule_based(candidate, message):
+    """Rule-based chat reply about a candidate when the LLM is unavailable.
+
+    Routes the question to the matching profile analysis (summary, strengths,
+    skills, experience, salary, interview questions, fit); anything else gets
+    a candidate digest plus guidance.
+    """
+    import re
+
+    msg = " ".join(message.lower().split())
+
+    def bullet(items):
+        return "\n".join("- {0}".format(i) for i in items)
+
+    def has_word(word):
+        return bool(re.search(r"\b{0}\b".format(re.escape(word)), msg))
+
+    skills = candidate.get_skills_with_details()
+
+    def fmt_skill(skill_name, info):
+        return "{0} ({1}, {2}y)".format(
+            skill_name,
+            info.get("proficiency") or "n/a",
+            info.get("years_of_experience") or 0,
+        )
+
+    # Strengths / weaknesses / development areas
+    if "strength" in msg or "weakness" in msg or "good at" in msg:
+        strong = []
+        gaps = []
+        for s, i in skills.items():
+            prof = (i.get("proficiency") or "").lower()
+            years = i.get("years_of_experience") or 0
+            if prof in ("expert", "advanced") or years >= 3:
+                strong.append(fmt_skill(s, i))
+            elif prof == "beginner" or years <= 1:
+                gaps.append(fmt_skill(s, i))
+        parts = []
+        parts.append(
+            "Likely strengths:\n{0}".format(bullet(strong))
+            if strong
+            else "No standout strengths found in the listed skills yet."
+        )
+        if gaps:
+            parts.append("Possible gaps / development areas:\n{0}".format(bullet(gaps)))
+        return "\n\n".join(parts)
+
+    # Experience analysis
+    if "experience" in msg or "years" in msg:
+        exp_lines = [
+            "{0} has {1} year(s) of total experience.".format(
+                candidate.candidate_name, candidate.total_experience_years or 0
+            )
+        ]
+        if skills:
+            by_year = sorted(
+                skills.items(),
+                key=lambda kv: kv[1].get("years_of_experience") or 0,
+                reverse=True,
+            )[:5]
+            exp_lines.append(
+                "Most experienced in:\n{0}".format(
+                    bullet(fmt_skill(s, i) for s, i in by_year)
+                )
+            )
+        return "\n".join(exp_lines)
+
+    # Skill list
+    if "skill" in msg:
+        if not skills:
+            return "This candidate has no skills listed yet."
+        return "Skills:\n{0}".format(bullet(fmt_skill(s, i) for s, i in skills.items()))
+
+    # Salary expectations
+    if "salary" in msg or "compensation" in msg or has_word("pay"):
+        parts = []
+        if candidate.current_salary:
+            parts.append("Current salary: {0}".format(candidate.current_salary))
+        if candidate.expected_salary:
+            parts.append("Expected salary: {0}".format(candidate.expected_salary))
+        if not parts:
+            parts.append(
+                "No salary expectations recorded for this candidate yet — check "
+                "with the recruiter or during the phone screen."
+            )
+        else:
+            parts.append(
+                "Use these as a starting point for the offer, benchmarked "
+                "against the role's market range."
+            )
+        return "\n".join(parts)
+
+    # Interview questions tailored to this candidate
+    if "interview" in msg or "question" in msg:
+        if not skills:
+            return (
+                "Tailor questions to this candidate's resume: ask them to walk "
+                "through their background, their most complex project, and why "
+                "they're interested in the role. No skills are listed yet, so "
+                "start with their experience."
+            )
+        qs = []
+        for s, i in list(skills.items())[:5]:
+            qs.append(
+                "Describe a project where you applied {0} — what was your role and the outcome?".format(s)
+            )
+            if i.get("years_of_experience"):
+                qs.append(
+                    "You have ~{0} years with {1} — what has been the hardest problem you solved with it?".format(
+                        i["years_of_experience"], s
+                    )
+                )
+        qs.append("What are your salary expectations and notice period?")
+        return "Interview questions for {0}:\n{1}".format(
+            candidate.candidate_name, bullet(qs[:6])
+        )
+
+    # Fit assessment (no JD context in this chat)
+    if has_word("fit") or "match" in msg:
+        if not skills:
+            return (
+                "No skills are listed for this candidate yet, so I can't assess "
+                "fit — add skills or ask the recruiter for their resume."
+            )
+        strong_count = sum(
+            1
+            for i in skills.values()
+            if (i.get("proficiency") or "").lower() in ("expert", "advanced")
+            or (i.get("years_of_experience") or 0) >= 3
+        )
+        return (
+            "Quick fit read on {0}:\n- {1} skills listed\n- {2} of them are "
+            "strong (Expert/Advanced or 3+ years)\n- {3} years total experience\n\n"
+            "For a proper fit %, rank this candidate against a specific JD — "
+            "this chat has no JD context."
+        ).format(candidate.candidate_name, len(skills), strong_count, candidate.total_experience_years or 0)
+
+    # Profile summary / digest
+    if any(k in msg for k in ("summar", "overview", "describe", "profile", "about this candidate")):
+        return _candidate_digest(candidate)
+
+    # Generic fallback: digest + guidance
+    return (
+        "Here's a quick overview of this candidate:\n\n{0}\n\n"
+        "Ask me about their skills, strengths, experience, interview "
+        "questions, salary expectations or fit — or any custom question. For "
+        "fully AI-generated answers, enable an AI provider in Desk → "
+        "Recruitment Settings → AI Configuration."
+    ).format(_candidate_digest(candidate))
+
+
+@frappe.whitelist()
+def ask_ai_about_candidate(candidate_name=None, message=None):
+    """Chat-style AI assistant for a specific candidate profile.
+
+    Uses the configured LLM when available; falls back to a rule-based reply
+    built from the candidate's profile so the chat always answers.
+    """
+    _guard()
+    if not candidate_name or not frappe.db.exists("Candidate", candidate_name):
+        frappe.throw(_("Candidate not found"))
+    candidate = frappe.get_doc("Candidate", candidate_name)
+    message = (message or "").strip()
+    if not message:
+        frappe.throw(_("Message is required"))
+
+    if is_llm_configured():
+        system = (
+            "You are an expert recruiting assistant embedded in HR Master, a "
+            "Frappe/ERPNext app. The user is evaluating the candidate shown in "
+            "the context. Answer concisely, practically and directly. Base "
+            "your answer on the candidate profile; if the question is "
+            "unrelated, steer it back helpfully."
+        )
+        prompt = (
+            "CANDIDATE PROFILE:\n{0}\n\nUSER QUESTION:\n{1}\n\nReply with a "
+            "helpful, concise answer."
+        ).format(_candidate_context_for_prompt(candidate), message[:2000])
+        text = call_llm(prompt, system=system, max_tokens=600, temperature=0.4).strip()
+        if text:
+            return {"status": "success", "reply": text}
+
+    return {"status": "success", "reply": _candidate_chat_rule_based(candidate, message)}
