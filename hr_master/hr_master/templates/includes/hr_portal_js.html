@@ -328,6 +328,7 @@
 			var endpoint = chatBox.getAttribute("data-chat-endpoint") || "";
 			var param = chatBox.getAttribute("data-chat-param") || "";
 			var value = chatBox.getAttribute("data-chat-value") || "";
+			var initialAreaHTML = area.innerHTML; /* welcome bubble — used by the Reload button */
 			var csrfMeta = document.querySelector('meta[name="csrf-token"]');
 			var csrfToken = csrfMeta ? csrfMeta.getAttribute("content") : "";
 
@@ -404,6 +405,19 @@
 					input.focus();
 				});
 			});
+
+			/* Reload / reset: restore the welcome bubble and clear the input,
+			   and (on the JD page) clear the quick-action output too. */
+			var resetBtn = chatBox.querySelector(".hrp-chat-reset");
+			if (resetBtn) {
+				resetBtn.addEventListener("click", function () {
+					area.innerHTML = initialAreaHTML;
+					input.value = "";
+					var quickOut = document.getElementById("hrpAiOutput");
+					if (quickOut) { quickOut.innerHTML = ""; }
+					input.focus();
+				});
+			}
 		});
 
 		/* Confirm dialog for destructive / state-changing actions */

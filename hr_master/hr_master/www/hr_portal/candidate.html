@@ -327,6 +327,9 @@
             <h2 class="hrp-card-title">🤖 Ask AI about {{ candidate.candidate_name }}</h2>
             <p class="hrp-hint">Ask anything about this candidate — profile summary, skills, strengths, interview questions, salary expectations or fit — or any custom question. Uses your configured AI provider (Recruitment Settings → AI Configuration); falls back to profile-based answers when AI is off.</p>
             <div class="hrp-chat" data-chat-endpoint="/api/method/hr_master.api.ai_api.ask_ai_about_candidate" data-chat-param="candidate_name" data-chat-value="{{ candidate.name }}">
+                <div class="hrp-chat-toolbar">
+                    <button class="hrp-btn hrp-btn-secondary hrp-btn-sm hrp-chat-reset" type="button" title="Reload / reset the AI assistant">↻ Reload</button>
+                </div>
                 <div class="hrp-chat-output">
                     <div class="hrp-chat-row hrp-chat-ai">
                         <div class="hrp-chat-bubble">👋 Ask me about this candidate — e.g. "summarize their profile", "what are their strengths?", "what salary should we offer?" or any custom question.</div>
