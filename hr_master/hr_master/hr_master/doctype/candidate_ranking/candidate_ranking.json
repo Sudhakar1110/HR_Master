@@ -90,7 +90,7 @@
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Status",
-   "options": "Pending\nEvaluated\nShortlisted\nInterview Scheduled\nRejected\nOn Hold"
+   "options": "Pending\nEvaluated\nShortlisted\nInterview Scheduled\nRejected\nOn Hold\nSelected"
   },
   {
    "fieldname": "evaluation_date",
@@ -260,6 +260,10 @@
   {
    "color": "Orange",
    "title": "On Hold"
+  },
+  {
+   "color": "Green",
+   "title": "Selected"
   }
  ],
  "track_changes": 1

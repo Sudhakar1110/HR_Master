@@ -271,6 +271,7 @@ def create_workflow_masters():
         ("Interview Scheduled", "Info"),
         ("Rejected", "Danger"),
         ("On Hold", "Warning"),
+        ("Selected", "Success"),
     ]
 
     for state_name, style in workflow_states:
@@ -289,6 +290,7 @@ def create_workflow_masters():
         "Schedule Interview",
         "Put on Hold",
         "Re-evaluate",
+        "Hire",
     ]
 
     for action_name in workflow_actions:

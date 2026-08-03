@@ -101,7 +101,7 @@
                                 </td>
                                 <td>
                                     {% set st = r.status|lower %}
-                                    <span class="hrp-badge {{ 'hrp-badge-green' if st in ('shortlisted', 'interview scheduled') else ('hrp-badge-orange' if st in ('pending', 'evaluated', 'on hold') else 'hrp-badge-red') }}">{{ r.status }}</span>
+                                    <span class="hrp-badge {{ 'hrp-badge-green' if st in ('shortlisted', 'interview scheduled', 'selected') else ('hrp-badge-orange' if st in ('pending', 'evaluated', 'on hold') else 'hrp-badge-red') }}">{{ r.status }}</span>
                                 </td>
                                 <td>
                                     {% if can_write %}
@@ -116,6 +116,14 @@
                                                 <button class="hrp-btn hrp-btn-sm {{ 'hrp-btn-success' if act == 'Shortlist' else ('hrp-btn-danger' if act == 'Reject' else 'hrp-btn-secondary') }}" type="submit">{{ label }}</button>
                                             </form>
                                             {% endfor %}
+                                            {% if r.status in ('Shortlisted', 'Interview Scheduled') %}
+                                            <form method="post" style="display:inline">
+                                                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                                                <input type="hidden" name="action" value="Hire">
+                                                <input type="hidden" name="ranking" value="{{ r.name }}">
+                                                <button class="hrp-btn hrp-btn-sm hrp-btn-primary" type="submit">Hire</button>
+                                            </form>
+                                            {% endif %}
                                         </div>
                                     </details>
                                     {% endif %}

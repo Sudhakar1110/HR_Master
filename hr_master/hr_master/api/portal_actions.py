@@ -28,6 +28,7 @@ WORKFLOW_ACTIONS = {
     "Schedule Interview": "Interview Scheduled",
     "Put on Hold": "On Hold",
     "Re-evaluate": "Evaluated",
+    "Hire": "Selected",
 }
 
 
@@ -253,6 +254,20 @@ def set_ranking_status(ranking_name, action):
         # Last-resort fallback - never let the workflow block a portal action.
         doc.db_set("workflow_state", target)
         doc.db_set("status", target)
+
+    # Keep the linked Candidate in sync when the ranking is hired, so the
+    # Hired Candidates card / reports / Candidate Hired notification reflect it.
+    if target == "Selected" and doc.candidate:
+        try:
+            candidate = frappe.get_doc("Candidate", doc.candidate)
+            if candidate.status != "Selected":
+                candidate.status = "Selected"
+                candidate.save(ignore_permissions=True)
+        except Exception:
+            frappe.log_error(
+                title="HR Master: failed to update candidate status on hire",
+                message=frappe.get_traceback(),
+            )
 
     frappe.db.commit()
     return {"status": target}

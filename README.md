@@ -12,7 +12,7 @@ Built and verified against **Frappe 15.100.0 / ERPNext 15.118.1 / HRMS 15.63.2**
 - 🌐 **Job Portal Search** — queue searches for a JD (LinkedIn, Naukri, Indeed, Monster) via background jobs; import results into Candidates
 - 📊 **AI-Powered Ranking** — weighted skill match (60%) + experience (25%) + education (15%) scoring with per-skill breakdowns and recommendations
 - 📋 **Candidate Lifecycle** — Candidate, Resume (with parsed sections), Ranking, Interview Schedule, Interview Feedback, and Offer Management
-- 🔄 **Workflow Driven** — the *Candidate Evaluation* workflow moves records through Pending → Evaluated → Shortlisted → Interview Scheduled → Rejected / On Hold
+- 🔄 **Workflow Driven** — the *Candidate Evaluation* workflow moves records through Pending → Evaluated → Shortlisted → Interview Scheduled → Selected / Rejected / On Hold
 - 📈 **11 Built-in Reports** — candidate match, hiring funnel, skill gap, time-to-hire, recruiter/offer/interview performance, and more
 - 🏠 **HR Master Workspace** — 8 shortcuts, 4 cards with 26 links, and 11 live "Key Metrics" number cards
 - 🔔 **Notifications & Email Templates** — shortlisted, interview scheduled, offer generated/accepted, hired, and more
@@ -56,7 +56,7 @@ Open the **HR Master** workspace from the module list (or `/app/hr-master`).
 | Phase | Creates |
 |---|---|
 | `ensure_module_def` | `Module Def: HR Master` (refreshes module maps) |
-| `create_workflow_masters` | 6 **Workflow States** + 6 **Workflow Action Masters** used by the Candidate Evaluation workflow |
+| `create_workflow_masters` | 7 **Workflow States** + 7 **Workflow Action Masters** used by the Candidate Evaluation workflow |
 | `sync_all_resources` | Imports all **70 JSON fixtures** from disk (doctypes, reports, workspace, number cards, notifications, print formats, letter heads, workflow, email templates) |
 | `create_seed_data` | 4 roles, 10 common departments, 44 common skills |
 | `set_default_config` | Defaults for **Job Portal Config** & **Recruitment Settings**, plus default email templates |
@@ -146,12 +146,13 @@ Applies to **Candidate Ranking**:
 ```
 Pending ──Evaluate──▶ Evaluated ──Shortlist──▶ Shortlisted ──Schedule Interview──▶ Interview Scheduled
    │                      │                        │                                  │
-   │                      ├──Reject──▶ Rejected    ├──Reject──▶ Rejected              └──▶ Rejected / On Hold
-   └──Reject──▶ Rejected  └──On Hold──▶ On Hold    └──On Hold──▶ On Hold
+   │                      ├──Reject──▶ Rejected    ├──Reject──▶ Rejected              ├──Reject──▶ Rejected
+   └──Reject──▶ Rejected  └──On Hold──▶ On Hold    ├──On Hold──▶ On Hold              ├──On Hold──▶ On Hold
+                                                     ├──Hire──▶ Selected               └──Hire──▶ Selected
                                                      └──Re-evaluate──▶ Evaluated
 ```
 
-The 6 **Workflow States** (Pending, Evaluated, Shortlisted, Interview Scheduled, Rejected, On Hold) and 6 **Workflow Action Masters** (Evaluate, Shortlist, Reject, Schedule Interview, Put on Hold, Re-evaluate) are seeded automatically on install/migrate.
+The 7 **Workflow States** (Pending, Evaluated, Shortlisted, Interview Scheduled, Rejected, On Hold, Selected) and 7 **Workflow Action Masters** (Evaluate, Shortlist, Reject, Schedule Interview, Put on Hold, Re-evaluate, Hire) are seeded automatically on install/migrate.
 
 ---
 

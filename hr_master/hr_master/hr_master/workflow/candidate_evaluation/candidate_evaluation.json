@@ -70,6 +70,16 @@
    "state": "On Hold",
    "update_field": "status",
    "update_value": "On Hold"
+  },
+  {
+   "allow_edit": "HR Master Hiring Manager",
+   "doc_status": "0",
+   "is_optional_state": 0,
+   "message": "",
+   "next_action_email_template": "",
+   "state": "Selected",
+   "update_field": "status",
+   "update_value": "Selected"
   }
  ],
  "transitions": [
@@ -200,6 +210,22 @@
    "condition": "",
    "next_state": "Rejected",
    "state": "On Hold"
+  },
+  {
+   "action": "Hire",
+   "allow_self_approval": 1,
+   "allowed": "HR Master Recruiter",
+   "condition": "",
+   "next_state": "Selected",
+   "state": "Shortlisted"
+  },
+  {
+   "action": "Hire",
+   "allow_self_approval": 1,
+   "allowed": "HR Master Hiring Manager",
+   "condition": "",
+   "next_state": "Selected",
+   "state": "Interview Scheduled"
   }
  ],
  "workflow_name": "Candidate Evaluation",

@@ -92,7 +92,7 @@
                             </td>
                             <td>
                                 {% set st = r.status|lower %}
-                                <span class="hrp-badge {{ 'hrp-badge-green' if st in ('shortlisted', 'interview scheduled') else ('hrp-badge-orange' if st in ('pending', 'on hold', 'evaluated') else 'hrp-badge-red') }}">{{ r.status }}</span>
+                                <span class="hrp-badge {{ 'hrp-badge-green' if st in ('shortlisted', 'interview scheduled', 'selected') else ('hrp-badge-orange' if st in ('pending', 'on hold', 'evaluated') else 'hrp-badge-red') }}">{{ r.status }}</span>
                             </td>
                             <td>
                                 <span class="hrp-hint">{{ r.experience_match_score or 0 }}% exp</span> ·
@@ -119,6 +119,14 @@
                                         <input type="hidden" name="ranking" value="{{ r.name }}">
                                         <button class="hrp-btn hrp-btn-warning hrp-btn-sm" type="submit">Hold</button>
                                     </form>
+                                    {% if r.status in ('Shortlisted', 'Interview Scheduled') %}
+                                    <form method="post" style="display:inline">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                                        <input type="hidden" name="action" value="Hire">
+                                        <input type="hidden" name="ranking" value="{{ r.name }}">
+                                        <button class="hrp-btn hrp-btn-primary hrp-btn-sm" type="submit" data-confirm="Hire {{ r.candidate_name }}?">Hire</button>
+                                    </form>
+                                    {% endif %}
                                 </div>
                                 {% else %}
                                 <span class="hrp-hint">View only</span>

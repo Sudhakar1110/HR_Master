@@ -48,6 +48,7 @@ def get_context(context):
                 "Schedule Interview",
                 "Put on Hold",
                 "Re-evaluate",
+                "Hire",
             ):
                 ranking_name = frappe.form_dict.get("ranking")
                 if ranking_name and frappe.db.exists("Candidate Ranking", ranking_name):
