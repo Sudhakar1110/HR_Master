@@ -24,20 +24,34 @@ frappe.ui.form.on("Search History", {
         // Re-run this search
         if (frm.doc.search_query && frm.doc.search_type === "Candidate") {
             frm.add_custom_button(__("Re-run Search"), function () {
+                // filters_used is stored as JSON text - tolerate any corruption
+                var filters = {};
+                try {
+                    filters = frm.doc.filters_used ? JSON.parse(frm.doc.filters_used) : {};
+                } catch (e) {
+                    filters = {};
+                }
                 frappe.call({
-                    method: "hr_master.api.search_api.advanced_candidate_search",
+                    method: "hr_master.utils.advanced_search.advanced_candidate_search",
                     args: {
                         search_text: frm.doc.search_query,
-                        filters: frm.doc.filters_used ? JSON.parse(frm.doc.filters_used) : {}
+                        filters: filters
                     },
                     freeze: true,
                     freeze_message: __("Searching..."),
                     callback: function (r) {
-                        if (r.message) {
+                        var result = r && r.message;
+                        if (result && result.status === "success") {
                             frappe.msgprint({
                                 title: __("Search Complete"),
                                 indicator: "green",
-                                message: __("Found {0} results", [r.message.length])
+                                message: __("Found {0} results", [result.total || 0])
+                            });
+                        } else {
+                            frappe.msgprint({
+                                title: __("Search Failed"),
+                                indicator: "red",
+                                message: (result && result.message) || __("Unexpected error")
                             });
                         }
                     }
