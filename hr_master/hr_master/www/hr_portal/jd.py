@@ -85,6 +85,7 @@ def get_context(context):
             "remotive_results",
             "arbeitnow_results",
             "demo_results",
+            "error_log",
         ],
         filters={"job_description": jd_name},
         order_by="search_date desc",
@@ -102,18 +103,33 @@ def get_context(context):
         or any(s.get("status") in ("Queued", "In Progress") for s in context.searches)
     )
 
-    # Explain a search that finished with 0 results or failed (config-aware hint)
+    # Explain a search that finished with 0 results, partially failed or
+    # failed entirely (config-aware hint with the real error where available).
     context.search_zero_hint = None
     latest = context.searches[0] if context.searches else None
     if latest and latest.get("status") in ("Completed", "Partial", "Failed"):
         if latest.get("status") == "Failed":
+            details = (latest.get("error_log") or "").strip()
+            if not details:
+                details = _latest_search_errors()
             context.search_zero_hint = {
                 "title": "Search failed",
                 "body": (
-                    "The search job hit an error (check the Error Log in the Desk for details). "
-                    "Common causes: an invalid/expired SerpAPI key, no network access to the API, "
+                    "The search job hit an error — details are shown below "
+                    "(full traceback in Desk → Error Log). Common causes: an "
+                    "invalid/expired SerpAPI key, no network access to the API, "
                     "or a portal that is enabled but not actually available."
                 ),
+                "details": details,
+            }
+        elif latest.get("status") == "Partial":
+            context.search_zero_hint = {
+                "title": "Search partially completed",
+                "body": (
+                    "Some portals returned results, but others failed. "
+                    "Error details from the search job are shown below."
+                ),
+                "details": (latest.get("error_log") or "").strip(),
             }
         elif not (latest.get("total_candidates_found") or 0):
             config = frappe.get_single("Job Portal Config")
@@ -163,3 +179,31 @@ def get_context(context):
                 }
 
     return context
+
+
+def _latest_search_errors(limit=3):
+    """Return the most recent search-related Error Log messages.
+
+    Used when a search record has no error_log of its own (e.g. it failed
+    before the background job could persist one), so the portal can show the
+    real reason instead of generic boilerplate.
+    """
+    try:
+        logs = frappe.get_all(
+            "Error Log",
+            filters={"title": ["like", "%Search Error%"]},
+            fields=["message", "creation"],
+            order_by="creation desc",
+            limit_page_length=limit,
+        )
+        lines = []
+        for log in logs:
+            msg = (log.get("message") or "").strip()
+            if not msg:
+                continue
+            if len(msg) > 600:
+                msg = msg[:600] + "…"
+            lines.append("- [{0}] {1}".format((log.get("creation") or "")[:19], msg))
+        return "\n".join(lines)
+    except Exception:
+        return ""

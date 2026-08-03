@@ -80,6 +80,9 @@
                     <div class="hrp-alert hrp-alert-warning">
                         <strong>{{ search_zero_hint.title }}</strong>
                         <div style="margin-top:4px">{{ search_zero_hint.body }}</div>
+                        {% if search_zero_hint.details %}
+                        <pre style="margin-top:8px; white-space:pre-wrap; word-break:break-word; font-size:12px; line-height:1.5; background:rgba(0,0,0,.05); border-radius:6px; padding:8px; max-height:160px; overflow:auto">{{ search_zero_hint.details }}</pre>
+                        {% endif %}
                     </div>
                     {% endif %}
                     <div class="hrp-actions hrp-mb">

@@ -89,13 +89,19 @@ def on_update(doc, method):
 
 
 def auto_trigger_search(doc):
-    """Automatically trigger portal search when JD is opened."""
-    from hr_master.tasks.celery import process_candidate_search
+    """Automatically trigger portal search when JD is opened.
 
+    Delegates to search_candidates_for_jd(), which creates a proper Job Portal
+    Search record (with keyword/portal defaults and the zero-key Demo
+    fallback) and enqueues the background job with a valid search_name.
+    """
     if frappe.db.get_single_value("Job Portal Config", "auto_search_enabled"):
-        frappe.enqueue(
-            method=process_candidate_search,
-            queue="long",
-            timeout=300,
-            job_description_name=doc.name,
-        )
+        from hr_master.api.search_api import search_candidates_for_jd
+
+        try:
+            search_candidates_for_jd(doc.name)
+        except Exception as e:
+            frappe.log_error(
+                message=f"Auto search failed for {doc.name}: {str(e)}",
+                title="Auto Search Error",
+            )
