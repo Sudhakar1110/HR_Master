@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ page_title }} · HR Master</title>
+    {% include "templates/includes/hr_portal_meta.html" %}
+    {% include "templates/includes/hr_portal_css.html" %}
+</head>
+<body class="hrp-body" data-can-write="{{ '1' if can_write else '0' }}">
+    {% include "templates/includes/hr_portal_header.html" %}
+
+    <main class="hrp-container">
+        {% if flash %}
+        <div class="hrp-alert {{ 'hrp-alert-success' if flash.type == 'success' else 'hrp-alert-error' }}" data-dismiss>
+            {{ flash.message }}
+        </div>
+        {% endif %}
+
+        <div class="hrp-page-head">
+            <div>
+                <h1 class="hrp-page-title">Candidate Pipeline</h1>
+                <p class="hrp-page-sub">Drag a card to move the candidate to the next stage (or use the dropdown under each card).</p>
+            </div>
+            <div class="hrp-actions">
+                <form method="get" class="hrp-form" style="display:inline">
+                    <select class="hrp-select" name="jd" onchange="this.form.submit()">
+                        <option value="">All Job Descriptions</option>
+                        {% for j in jds %}
+                        <option value="{{ j.name }}" {{ 'selected' if jd == j.name else '' }}>{{ j.job_title }} ({{ j.name }})</option>
+                        {% endfor %}
+                    </select>
+                </form>
+                {% if jd %}
+                <a class="hrp-btn hrp-btn-secondary" href="/hr_portal/results?jd={{ jd }}">Ranked List →</a>
+                {% endif %}
+            </div>
+        </div>
+
+        {% if rankings %}
+        <div class="hrp-kanban" id="hrpKanban">
+            {% for col in columns %}
+            <div class="hrp-kanban-col" data-column="{{ col.name }}">
+                <h3 class="hrp-kanban-col-title">{{ col.icon }} {{ col.label }}
+                    <span class="hrp-kanban-count">{{ rankings|selectattr('column', 'equalto', col.name)|list|length }}</span>
+                </h3>
+                <div class="hrp-kanban-col-body">
+                    {% for r in rankings if r.column == col.name %}
+                    <div class="hrp-kanban-card" draggable="true" data-ranking="{{ r.name }}" data-status="{{ r.status }}">
+                        <div class="hrp-kanban-card-head">
+                            <a class="hrp-link" href="/hr_portal/candidate?name={{ r.candidate }}">{{ r.candidate_name }}</a>
+                            <span class="hrp-score">{{ (r.total_match_score or 0)|int }}%</span>
+                        </div>
+                        <div class="hrp-kanban-card-sub">{{ r.job_title or '—' }}</div>
+                        <div class="hrp-kanban-card-meta">
+                            {% if r.source %}<span class="hrp-badge hrp-badge-gray">{{ r.source }}</span>{% endif %}
+                            {% if r.candidate_location %}<span class="hrp-hint">{{ r.candidate_location }}</span>{% endif %}
+                        </div>
+                        {% if can_write %}
+                        <select class="hrp-select hrp-btn-sm hrp-kanban-move" data-ranking="{{ r.name }}">
+                            {% for c in columns %}
+                            <option value="{{ c.name }}" {{ 'selected' if c.name == col.name else '' }}>{{ c.label }}</option>
+                            {% endfor %}
+                        </select>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="hrp-card">
+            <div class="hrp-empty">
+                <div class="hrp-empty-icon">🗂️</div>
+                <p>No rankings yet{{ ' for this JD' if jd else '' }}.</p>
+                <p class="hrp-hint">Import candidates from a portal search and click <strong>Rank Candidates</strong> on the JD page to fill this board.</p>
+                <a class="hrp-btn hrp-btn-primary hrp-btn-sm" href="/hr_portal/jds">Go to Job Descriptions →</a>
+            </div>
+        </div>
+        {% endif %}
+    </main>
+
+    <script>
+    (function () {
+        var csrf = "{{ csrf_token }}";
+        var canWrite = document.body.getAttribute("data-can-write") === "1";
+        if (!canWrite) return;
+
+        function postMove(ranking, column) {
+            return fetch("/api/method/hr_master.api.portal_actions.move_candidate_pipeline", {
+                method: "POST",
+                headers: { "Content-Type": "application/json", "X-Frappe-CSRF-Token": csrf },
+                body: JSON.stringify({ ranking: ranking, column: column })
+            }).then(function (r) { return r.json(); });
+        }
+
+        function moveCard(card, columnName) {
+            var ranking = card.getAttribute("data-ranking");
+            postMove(ranking, columnName).then(function (data) {
+                var m = data && data.message;
+                if (m && m.status === "success") {
+                    var target = document.querySelector('.hrp-kanban-col[data-column="' + columnName + '"] .hrp-kanban-col-body');
+                    if (target) {
+                        card.querySelector(".hrp-kanban-move").value = columnName;
+                        target.appendChild(card);
+                        refreshCounts();
+                    }
+                } else {
+                    alert((m && m.message) || "Could not move the candidate");
+                }
+            });
+        }
+
+        function refreshCounts() {
+            document.querySelectorAll(".hrp-kanban-col").forEach(function (col) {
+                var count = col.querySelectorAll(".hrp-kanban-card").length;
+                var badge = col.querySelector(".hrp-kanban-count");
+                if (badge) badge.textContent = count;
+            });
+        }
+
+        // Drag & drop
+        var dragged = null;
+        document.querySelectorAll(".hrp-kanban-card").forEach(function (card) {
+            card.addEventListener("dragstart", function (e) {
+                dragged = card;
+                card.classList.add("dragging");
+                e.dataTransfer.effectAllowed = "move";
+                try { e.dataTransfer.setData("text/plain", card.getAttribute("data-ranking")); } catch (err) {}
+            });
+            card.addEventListener("dragend", function () {
+                card.classList.remove("dragging");
+                dragged = null;
+            });
+        });
+
+        document.querySelectorAll(".hrp-kanban-col").forEach(function (col) {
+            col.addEventListener("dragover", function (e) {
+                if (!dragged) return;
+                e.preventDefault();
+                col.classList.add("drag-over");
+            });
+            col.addEventListener("dragleave", function () {
+                col.classList.remove("drag-over");
+            });
+            col.addEventListener("drop", function (e) {
+                e.preventDefault();
+                col.classList.remove("drag-over");
+                if (dragged) moveCard(dragged, col.getAttribute("data-column"));
+            });
+        });
+
+        // Dropdown fallback (mobile / no drag support)
+        document.querySelectorAll(".hrp-kanban-move").forEach(function (sel) {
+            sel.addEventListener("change", function () {
+                var card = sel.closest(".hrp-kanban-card");
+                if (card) moveCard(card, sel.value);
+            });
+        });
+    })();
+    </script>
+
+    {% include "templates/includes/hr_portal_footer.html" %}
+    {% include "templates/includes/hr_portal_js.html" %}
+</body>
+</html>

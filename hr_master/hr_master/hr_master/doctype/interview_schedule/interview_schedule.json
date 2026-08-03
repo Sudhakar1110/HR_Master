@@ -27,7 +27,9 @@
   "feedback_required",
   "send_calendar_invite",
   "invite_email_sent",
+  "invite_email_sent_at",
   "reminder_sent",
+  "reminder_sent_at",
   "sb_feedback",
   "feedback",
   "rating",
@@ -172,11 +174,25 @@
    "description": "Marked automatically once the interview invitation email has been sent to the candidate."
   },
   {
+   "fieldname": "invite_email_sent_at",
+   "fieldtype": "Datetime",
+   "label": "Invite Email Sent At",
+   "read_only": 1,
+   "description": "When the interview invitation email was sent."
+  },
+  {
    "default": "0",
    "fieldname": "reminder_sent",
    "fieldtype": "Check",
    "label": "Reminder Email Sent",
    "description": "Marked automatically once the 24h-before reminder email has been sent."
+  },
+  {
+   "fieldname": "reminder_sent_at",
+   "fieldtype": "Datetime",
+   "label": "Reminder Email Sent At",
+   "read_only": 1,
+   "description": "When the reminder email was sent."
   },
   {
    "fieldname": "sb_feedback",

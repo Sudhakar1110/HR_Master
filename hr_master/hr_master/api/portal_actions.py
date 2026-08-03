@@ -12,6 +12,7 @@ from urllib.parse import quote
 
 import frappe
 from frappe import _
+from frappe.utils import now_datetime
 
 HR_ROLES = [
     "HR Master Admin",
@@ -433,8 +434,10 @@ def send_offer_email(offer_name=None):
         now=True,
     )
 
+    update = {"offer_email_sent_at": now_datetime()}
     if offer.status in ("Draft", "Approval Pending", "Approved"):
-        frappe.db.set_value("Offer Management", offer.name, "status", "Offer Sent")
+        update["status"] = "Offer Sent"
+    frappe.db.set_value("Offer Management", offer.name, update)
 
     frappe.db.commit()
     return {
@@ -494,12 +497,161 @@ def send_interview_invite_email(interview_name=None):
         now=True,
     )
 
-    frappe.db.set_value("Interview Schedule", iv.name, "invite_email_sent", 1)
+    frappe.db.set_value(
+        "Interview Schedule",
+        iv.name,
+        {"invite_email_sent": 1, "invite_email_sent_at": now_datetime()},
+    )
     frappe.db.commit()
     return {
         "status": "success",
         "message": _("Invite emailed to {0}").format(candidate.email),
     }
+
+
+@frappe.whitelist()
+def send_rejection_email(ranking_name=None):
+    """Reject a candidate AND email them using the Candidate Rejection template.
+
+    Applies the Reject workflow action to the ranking, then emails the
+    candidate (CC the recruiter).
+    """
+    if not can_write():
+        frappe.throw(_("You are not allowed to reject candidates"))
+    if not ranking_name or not frappe.db.exists("Candidate Ranking", ranking_name):
+        frappe.throw(_("Ranking not found"))
+
+    ranking = frappe.get_doc("Candidate Ranking", ranking_name)
+    candidate = frappe.get_doc("Candidate", ranking.candidate)
+    if not (candidate.email or "").strip():
+        frappe.throw(
+            _("Candidate {0} has no email address — add one to the profile first").format(
+                candidate.candidate_name
+            )
+        )
+
+    # Reject via the workflow (status + candidate sync)
+    set_ranking_status(ranking_name, "Reject")
+
+    context = {
+        "candidate_name": candidate.candidate_name,
+        "job_title": ranking.job_title or "",
+        "company_name": _get_company_name(),
+        "recruiter_name": _get_recruiter_name(),
+    }
+    subject, message = _render_email_template(
+        "Candidate Rejection",
+        context,
+        "Update on your application for {0}".format(ranking.job_title or "this position"),
+    )
+
+    frappe.sendmail(
+        recipients=[candidate.email],
+        cc=_get_cc_emails(ranking.owner),
+        subject=subject,
+        message=message,
+        reference_doctype="Candidate Ranking",
+        reference_name=ranking.name,
+        now=True,
+    )
+    frappe.db.commit()
+    return {
+        "status": "success",
+        "message": _("Candidate rejected and emailed {0}").format(candidate.email),
+    }
+
+
+@frappe.whitelist()
+def move_candidate_pipeline(ranking=None, column=None):
+    """Move a ranking card between Kanban columns (drag & drop).
+
+    Maps the target column to the matching Candidate Evaluation workflow
+    action so the status, workflow state and candidate stay in sync.
+    """
+    column_actions = {
+        "Screened": "Evaluate",
+        "Shortlisted": "Shortlist",
+        "Interview": "Schedule Interview",
+        "Selected": "Hire",
+        "On Hold": "Put on Hold",
+        "Rejected": "Reject",
+    }
+    action = column_actions.get(column or "")
+    if not action:
+        frappe.throw(_("Unknown pipeline column: {0}").format(column))
+    result = set_ranking_status(ranking, action)
+    return {"status": "success", "target": result.get("status")}
+
+
+# ------------------------------------------
+# Saved candidate searches (per-user, DB-backed)
+# ------------------------------------------
+
+
+def _saved_searches_store():
+    """User Defaults key holding saved portal searches (JSON dict)."""
+    return "hr_portal_saved_searches"
+
+
+@frappe.whitelist()
+def save_candidate_search(job_description=None, title=None, filters=None):
+    """Save the current results-page filters as a named search for this user."""
+    if frappe.session.user == "Guest":
+        frappe.throw(_("Login required"))
+    if not title or not title.strip():
+        frappe.throw(_("A name for the saved search is required"))
+
+    store = _saved_searches_store()
+    saved = json.loads(frappe.defaults.get_user_default(store) or "{}")
+    jd_key = job_description or ""
+    saved.setdefault(jd_key, [])
+
+    # Replace an existing saved search with the same name
+    saved[jd_key] = [
+        s
+        for s in saved[jd_key]
+        if (s.get("title") or "").lower() != title.strip().lower()
+    ]
+    saved[jd_key].append({
+        "title": title.strip(),
+        "filters": filters or "",
+        "saved_on": str(now_datetime()),
+    })
+
+    frappe.defaults.set_user_default(store, json.dumps(saved))
+    frappe.db.commit()
+    return {"status": "success", "message": _("Saved search '{0}'").format(title.strip())}
+
+
+@frappe.whitelist()
+def get_saved_searches(job_description=None):
+    """Return the current user's saved searches for a JD (or all)."""
+    if frappe.session.user == "Guest":
+        return []
+    store = _saved_searches_store()
+    saved = json.loads(frappe.defaults.get_user_default(store) or "{}")
+    if job_description:
+        return saved.get(job_description, [])
+    return [s for entries in saved.values() for s in entries]
+
+
+@frappe.whitelist()
+def delete_saved_search(job_description=None, title=None):
+    """Delete one of the current user's saved searches."""
+    if frappe.session.user == "Guest":
+        frappe.throw(_("Login required"))
+    store = _saved_searches_store()
+    saved = json.loads(frappe.defaults.get_user_default(store) or "{}")
+    jd_key = job_description or ""
+    if jd_key in saved:
+        saved[jd_key] = [
+            s
+            for s in saved[jd_key]
+            if (s.get("title") or "").lower() != (title or "").lower()
+        ]
+        frappe.defaults.set_user_default(store, json.dumps(saved))
+        frappe.db.commit()
+    return {"status": "success", "message": _("Saved search deleted")}
 
 
 # ------------------------------------------

@@ -116,6 +116,12 @@
                                                 <button class="hrp-btn hrp-btn-sm {{ 'hrp-btn-success' if act == 'Shortlist' else ('hrp-btn-danger' if act == 'Reject' else 'hrp-btn-secondary') }}" type="submit">{{ label }}</button>
                                             </form>
                                             {% endfor %}
+                                            <form method="post" style="display:inline">
+                                                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                                                <input type="hidden" name="action" value="RejectEmail">
+                                                <input type="hidden" name="ranking" value="{{ r.name }}">
+                                                <button class="hrp-btn hrp-btn-sm hrp-btn-danger" type="submit" data-confirm="Reject and email {{ candidate.candidate_name }}?">✉️ Reject + Email</button>
+                                            </form>
                                             {% if r.status in ('Shortlisted', 'Interview Scheduled') %}
                                             <form method="post" style="display:inline">
                                                 <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
@@ -206,7 +212,7 @@
                                     <td>
                                         <span class="hrp-badge {{ 'hrp-badge-green' if o.status == 'Accepted' else ('hrp-badge-blue' if o.status in ('Approved', 'Offer Sent') else 'hrp-badge-gray') }}">{{ o.status }}</span>
                                         {% if o.status in ('Offer Sent', 'Negotiation', 'Accepted') %}
-                                        <span class="hrp-badge hrp-badge-green" style="margin-left:4px">✓ Emailed</span>
+                                        <span class="hrp-badge hrp-badge-green" style="margin-left:4px">✓ Emailed{% if o.offer_email_sent_at %} · {{ o.offer_email_sent_at.strftime('%d %b %Y %H:%M') }}{% endif %}</span>
                                         {% endif %}
                                     </td>
                                     <td>{{ o.total_ctc or '—' }}</td>
@@ -280,10 +286,10 @@
                                     <td>
                                         <span class="hrp-badge hrp-badge-blue">{{ i.status }}</span>
                                         {% if i.invite_email_sent %}
-                                        <span class="hrp-badge hrp-badge-green" style="margin-left:4px">✓ Emailed</span>
+                                        <span class="hrp-badge hrp-badge-green" style="margin-left:4px">✓ Emailed{% if i.invite_email_sent_at %} · {{ i.invite_email_sent_at.strftime('%d %b %Y %H:%M') }}{% endif %}</span>
                                         {% endif %}
                                         {% if i.reminder_sent %}
-                                        <span class="hrp-badge hrp-badge-orange" style="margin-left:4px">⏰ Reminder ✓</span>
+                                        <span class="hrp-badge hrp-badge-orange" style="margin-left:4px">⏰ Reminder ✓{% if i.reminder_sent_at %} · {{ i.reminder_sent_at.strftime('%d %b %Y %H:%M') }}{% endif %}</span>
                                         {% endif %}
                                     </td>
                                     <td>

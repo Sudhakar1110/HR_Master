@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ page_title }} · HR Master</title>
+    {% include "templates/includes/hr_portal_meta.html" %}
+    {% include "templates/includes/hr_portal_css.html" %}
+</head>
+<body class="hrp-body">
+    {% include "templates/includes/hr_portal_header.html" %}
+
+    <main class="hrp-container">
+        {% if flash %}
+        <div class="hrp-alert {{ 'hrp-alert-success' if flash.type == 'success' else 'hrp-alert-error' }}" data-dismiss>
+            {{ flash.message }}
+        </div>
+        {% endif %}
+
+        <div class="hrp-page-head">
+            <div>
+                <h1 class="hrp-page-title">Duplicate Candidates</h1>
+                <p class="hrp-page-sub">{{ total_candidates }} candidates scanned · {{ duplicate_count }} potential duplicate group(s)</p>
+            </div>
+            <div class="hrp-actions">
+                <a class="hrp-btn hrp-btn-secondary" href="/hr_portal/duplicates">↻ Re-scan</a>
+            </div>
+        </div>
+
+        {% if groups %}
+            {% for g in groups %}
+            <div class="hrp-card hrp-mb">
+                <div class="hrp-flex" style="justify-content:space-between;align-items:center;margin-bottom:10px">
+                    <h2 class="hrp-card-title" style="margin:0">Group {{ loop.index }}</h2>
+                    <span class="hrp-badge hrp-badge-orange">{{ g.match_score|int }}% match · {{ g.matched_by }}</span>
+                </div>
+                <div class="hrp-grid hrp-grid-2">
+                    {% for c in [g.candidate_1, g.candidate_2] %}
+                    <div class="hrp-card" style="padding:14px">
+                        <label class="hrp-flex" style="align-items:flex-start;gap:10px;cursor:pointer">
+                            <input type="radio" name="primary_{{ outer_loop.index }}" value="{{ c.name }}" {{ 'checked' if loop.index == 1 else '' }} data-group="group{{ outer_loop.index }}">
+                            <span>
+                                <strong>{{ c.candidate_name }}</strong>
+                                <div class="hrp-hint">
+                                    {% if c.email %}{{ c.email }}{% endif %}{% if c.phone %} · {{ c.phone }}{% endif %}
+                                </div>
+                                <div class="hrp-hint">
+                                    {% if c.source %}<span class="hrp-badge hrp-badge-gray">{{ c.source }}</span>{% endif %}
+                                    {% if c.status %}<span class="hrp-badge hrp-badge-blue">{{ c.status }}</span>{% endif %}
+                                    created {{ (c.creation or '')|string|truncate(10, True, '') }}
+                                </div>
+                            </span>
+                        </label>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% if can_write %}
+                <div class="hrp-actions hrp-mt">
+                    <form method="post" style="display:inline" data-merge-group="group{{ loop.index }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                        <input type="hidden" name="action" value="merge">
+                        <input type="hidden" name="primary" value="{{ g.candidate_1.name }}">
+                        <input type="hidden" name="duplicate" value="{{ g.candidate_2.name }}">
+                        <button class="hrp-btn hrp-btn-primary hrp-btn-sm" type="submit" data-confirm="Merge {{ g.candidate_2.candidate_name }} into {{ g.candidate_1.candidate_name }}? The duplicate is kept as the primary record.">🔀 Merge into primary</button>
+                    </form>
+                    <form method="post" style="display:inline">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                        <input type="hidden" name="action" value="ignore">
+                        <input type="hidden" name="candidate" value="{{ g.candidate_2.name }}">
+                        <button class="hrp-btn hrp-btn-secondary hrp-btn-sm" type="submit">Not a duplicate</button>
+                    </form>
+                </div>
+                {% else %}
+                <p class="hrp-hint hrp-mt">View only — ask an Admin or Recruiter to merge.</p>
+                {% endif %}
+            </div>
+            {% endfor %}
+        {% else %}
+        <div class="hrp-card">
+            <div class="hrp-empty">
+                <div class="hrp-empty-icon">✅</div>
+                <p>No duplicate candidates found.</p>
+                <p class="hrp-hint">Detection runs on the weekly schedule and every time you open this page (matched by name, email and phone).</p>
+            </div>
+        </div>
+        {% endif %}
+    </main>
+
+    <script>
+    // Keep the hidden primary/duplicate fields in sync with the selected radio
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll("input[data-group]").forEach(function (radio) {
+            radio.addEventListener("change", function () {
+                var group = radio.getAttribute("data-group");
+                var checked = document.querySelector('input[data-group="' + group + '"]:checked');
+                if (!checked) return;
+                var form = document.querySelector('form[data-merge-group="' + group + '"]');
+                if (!form) return;
+                // primary = checked candidate, duplicate = the other one
+                var others = document.querySelectorAll('input[data-group="' + group + '"]');
+                var otherName = null;
+                others.forEach(function (o) { if (o !== checked && !otherName) otherName = o.value; });
+                form.querySelector("input[name='primary']").value = checked.value;
+                form.querySelector("input[name='duplicate']").value = otherName || checked.value;
+            });
+        });
+    });
+    </script>
+
+    {% include "templates/includes/hr_portal_footer.html" %}
+    {% include "templates/includes/hr_portal_js.html" %}
+</body>
+</html>

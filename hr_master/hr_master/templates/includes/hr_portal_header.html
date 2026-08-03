@@ -12,6 +12,8 @@
     <div class="hrp-nav-links" id="hrpNavLinks">
       <a href="/hr_portal" class="{{ 'hrp-active' if active == 'dashboard' else '' }}">Dashboard</a>
       <a href="/hr_portal/jds" class="{{ 'hrp-active' if active == 'jds' else '' }}">Job Descriptions</a>
+      <a href="/hr_portal/kanban" class="{{ 'hrp-active' if active == 'kanban' else '' }}">Pipeline</a>
+      <a href="/hr_portal/duplicates" class="{{ 'hrp-active' if active == 'duplicates' else '' }}">Duplicates</a>
       <a href="/app/hr-master" target="_blank" class="hrp-desk-link">Open Desk <span aria-hidden="true">↗</span></a>
     </div>
     {% if frappe.session.user != "Guest" %}

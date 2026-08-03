@@ -1088,6 +1088,25 @@ html { scroll-behavior: smooth; }
   .hrp-theme-toggle.hrp-theme-flip { animation: none; }
 }
 </style>
+<style>
+/* Kanban pipeline board */
+.hrp-kanban { display: flex; gap: 14px; overflow-x: auto; padding-bottom: 12px; align-items: flex-start; }
+.hrp-kanban-col { flex: 1 1 230px; min-width: 230px; max-width: 320px; background: var(--hrp-bg); border: 1px solid var(--hrp-border); border-radius: 14px; padding: 12px; transition: outline .15s ease, box-shadow .15s ease; }
+.hrp-kanban-col.drag-over { outline: 2px dashed var(--hrp-primary); outline-offset: 2px; box-shadow: 0 6px 18px rgba(79,70,229,.18); }
+.hrp-kanban-col-title { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 700; color: var(--hrp-text); margin: 0 0 12px; }
+.hrp-kanban-count { margin-left: auto; background: var(--hrp-primary); color: #fff; border-radius: 999px; font-size: 11px; padding: 2px 8px; }
+.hrp-kanban-card { background: var(--hrp-card); border: 1px solid var(--hrp-border); border-radius: 12px; padding: 12px; margin-bottom: 10px; cursor: grab; box-shadow: var(--hrp-shadow); transition: transform .15s ease, box-shadow .15s ease, opacity .15s ease; }
+.hrp-kanban-card:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(16,24,40,.12); }
+.hrp-kanban-card.dragging { opacity: .45; }
+.hrp-kanban-card-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.hrp-kanban-card-sub { font-size: 12px; color: var(--hrp-muted); margin: 4px 0 6px; }
+.hrp-kanban-card-meta { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-bottom: 8px; }
+.hrp-kanban-move { width: 100%; }
+
+/* Results filter bar */
+.hrp-filter-bar { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; margin-bottom: 16px; padding: 14px; background: var(--hrp-bg); border: 1px solid var(--hrp-border); border-radius: 12px; }
+.hrp-filter-bar .hrp-form-row { margin: 0; }
+</style>
 <script>
 /* Theme init — set before first paint to avoid a light flash.
    The theme is persisted per-user in the database and injected into the

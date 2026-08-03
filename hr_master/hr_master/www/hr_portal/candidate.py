@@ -16,6 +16,7 @@ from hr_master.api.portal_actions import (
     create_offer,
     send_offer_email,
     send_interview_invite_email,
+    send_rejection_email,
     submit_feedback,
     redirect_with_flash,
     render_flash,
@@ -88,6 +89,12 @@ def get_context(context):
                 redirect_with_flash(
                     base_path, result.get("message") or "Invite emailed", flash_type
                 )
+            elif action == "RejectEmail":
+                result = send_rejection_email(frappe.form_dict.get("ranking"))
+                flash_type = "success" if result.get("status") == "success" else "error"
+                redirect_with_flash(
+                    base_path, result.get("message") or "Candidate rejected", flash_type
+                )
             else:
                 frappe.throw(_("Unknown action"))
         except frappe.Redirect:
@@ -132,7 +139,9 @@ def get_context(context):
             "status",
             "result",
             "invite_email_sent",
+            "invite_email_sent_at",
             "reminder_sent",
+            "reminder_sent_at",
         ],
         filters={"candidate": candidate_name},
         order_by="scheduled_date desc",
@@ -141,7 +150,7 @@ def get_context(context):
 
     context.offers = frappe.get_all(
         "Offer Management",
-        fields=["name", "job_title", "status", "total_ctc", "offer_date", "expected_joining_date"],
+        fields=["name", "job_title", "status", "total_ctc", "offer_date", "expected_joining_date", "offer_email_sent_at"],
         filters={"candidate": candidate_name},
         order_by="offer_date desc",
         limit_page_length=20,

@@ -55,20 +55,48 @@
 
         {% if rankings %}
         <div class="hrp-card">
+            <div class="hrp-filter-bar">
+                <div class="hrp-form-row">
+                    <label class="hrp-label">Source</label>
+                    <select class="hrp-select" id="fSource"><option value="">All sources</option></select>
+                </div>
+                <div class="hrp-form-row">
+                    <label class="hrp-label">Min match %</label>
+                    <input class="hrp-input" type="number" id="fMatch" min="0" max="100" placeholder="0" style="width:90px">
+                </div>
+                <div class="hrp-form-row">
+                    <label class="hrp-label">Min exp (yrs)</label>
+                    <input class="hrp-input" type="number" id="fExp" min="0" placeholder="0" style="width:90px">
+                </div>
+                <div class="hrp-form-row">
+                    <label class="hrp-label">Location</label>
+                    <input class="hrp-input" type="text" id="fLoc" placeholder="e.g. Bengaluru" style="width:150px">
+                </div>
+                <div class="hrp-actions" style="margin-left:auto">
+                    <button class="hrp-btn hrp-btn-secondary hrp-btn-sm" type="button" id="fReset">Reset</button>
+                    <button class="hrp-btn hrp-btn-primary hrp-btn-sm" type="button" id="fSave">💾 Save</button>
+                    <select class="hrp-select" id="fSaved" style="max-width:170px"><option value="">Saved…</option></select>
+                    <button class="hrp-btn hrp-btn-danger hrp-btn-sm" type="button" id="fDelete" title="Delete selected saved search">🗑</button>
+                </div>
+            </div>
             <div class="hrp-table-wrap">
-                <table class="hrp-table">
+                <table class="hrp-table" id="resultsTable">
                     <thead>
                         <tr>
-                            <th>#</th><th>Candidate</th><th>Match %</th><th>Recommendation</th>
+                            <th>#</th><th>Candidate</th><th>Source</th><th>Match %</th><th>Recommendation</th>
                             <th>Status</th><th>Exp / Edu</th><th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for r in rankings %}
-                        <tr>
+                        <tr data-source="{{ r.source or '' }}" data-match="{{ (r.total_match_score or 0)|int }}" data-exp="{{ r.candidate_experience or 0 }}" data-location="{{ r.candidate_location or '' }}">
                             <td><strong>{{ loop.index }}</strong></td>
                             <td>
                                 <a class="hrp-link" href="/hr_portal/candidate?name={{ r.candidate }}">{{ r.candidate_name }}</a>
+                            </td>
+                            <td>
+                                {% set src = (r.source or '')|lower %}
+                                <span class="hrp-badge {{ 'hrp-badge-green' if src == 'remotive' else ('hrp-badge-blue' if src in ('arbeitnow','linkedin') else ('hrp-badge-purple' if src == 'serpapi' else ('hrp-badge-orange' if src in ('adzuna','naukri') else ('hrp-badge-red' if src == 'monster' else 'hrp-badge-gray'))) }}">{{ r.source or '—' }}</span>
                             </td>
                             <td>
                                 {% set score = r.total_match_score or 0 %}
@@ -115,6 +143,12 @@
                                     </form>
                                     <form method="post" style="display:inline">
                                         <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                                        <input type="hidden" name="action" value="RejectEmail">
+                                        <input type="hidden" name="ranking" value="{{ r.name }}">
+                                        <button class="hrp-btn hrp-btn-danger hrp-btn-sm" type="submit" data-confirm="Reject and email {{ r.candidate_name }}?">✉️ Reject + Email</button>
+                                    </form>
+                                    <form method="post" style="display:inline">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
                                         <input type="hidden" name="action" value="Put on Hold">
                                         <input type="hidden" name="ranking" value="{{ r.name }}">
                                         <button class="hrp-btn hrp-btn-warning hrp-btn-sm" type="submit">Hold</button>
@@ -149,6 +183,118 @@
         </div>
         {% endif %}
     </main>
+
+    <script>
+    (function () {
+        var csrf = "{{ csrf_token }}";
+        var jd = "{{ jd.name }}";
+        var table = document.getElementById("resultsTable");
+        if (!table) return;
+        var rows = Array.prototype.slice.call(table.querySelectorAll("tbody tr"));
+        var sourceSel = document.getElementById("fSource");
+
+        // Build the source dropdown from the data actually present
+        var sources = {};
+        rows.forEach(function (row) {
+            var s = (row.getAttribute("data-source") || "").trim();
+            if (s) sources[s] = 1;
+        });
+        Object.keys(sources).sort().forEach(function (s) {
+            var opt = document.createElement("option");
+            opt.value = s;
+            opt.textContent = s;
+            sourceSel.appendChild(opt);
+        });
+
+        function currentFilters() {
+            return {
+                source: document.getElementById("fSource").value || "",
+                min_match: document.getElementById("fMatch").value || "",
+                min_exp: document.getElementById("fExp").value || "",
+                location: (document.getElementById("fLoc").value || "").toLowerCase()
+            };
+        }
+
+        function apply(filters) {
+            if (filters) {
+                document.getElementById("fSource").value = filters.source || "";
+                document.getElementById("fMatch").value = filters.min_match || "";
+                document.getElementById("fExp").value = filters.min_exp || "";
+                document.getElementById("fLoc").value = filters.location || "";
+            }
+            var f = currentFilters();
+            rows.forEach(function (row) {
+                var ok = true;
+                if (ok && f.source && row.getAttribute("data-source") !== f.source) ok = false;
+                if (ok && f.min_match && parseInt(row.getAttribute("data-match") || "0", 10) < parseInt(f.min_match, 10)) ok = false;
+                if (ok && f.min_exp && parseFloat(row.getAttribute("data-exp") || "0") < parseFloat(f.min_exp)) ok = false;
+                if (ok && f.location && ((row.getAttribute("data-location") || "").toLowerCase().indexOf(f.location) === -1)) ok = false;
+                row.style.display = ok ? "" : "none";
+            });
+        }
+
+        ["fSource", "fMatch", "fExp", "fLoc"].forEach(function (id) {
+            document.getElementById(id).addEventListener("input", function () { apply(); });
+        });
+        document.getElementById("fReset").addEventListener("click", function () {
+            apply({ source: "", min_match: "", min_exp: "", location: "" });
+        });
+
+        function post(method, params) {
+            return fetch(method, {
+                method: "POST",
+                headers: { "Content-Type": "application/json", "X-Frappe-CSRF-Token": csrf },
+                body: JSON.stringify(params)
+            }).then(function (r) { return r.json(); });
+        }
+
+        document.getElementById("fSave").addEventListener("click", function () {
+            var title = prompt("Name this saved search:");
+            if (!title || !title.trim()) return;
+            post("/api/method/hr_master.api.portal_actions.save_candidate_search", {
+                job_description: jd, title: title, filters: JSON.stringify(currentFilters())
+            }).then(function (data) {
+                var m = data && data.message;
+                if (m && m.status === "success") { loadSaved(); alert(m.message); }
+                else alert((m && m.message) || "Could not save the search");
+            });
+        });
+
+        var savedSel = document.getElementById("fSaved");
+        function loadSaved() {
+            post("/api/method/hr_master.api.portal_actions.get_saved_searches", { job_description: jd })
+                .then(function (data) {
+                    var list = (data && data.message) || [];
+                    savedSel.innerHTML = "<option value=''>Saved…</option>";
+                    list.forEach(function (s) {
+                        var opt = document.createElement("option");
+                        opt.value = s.title;
+                        opt.textContent = s.title;
+                        savedSel.appendChild(opt);
+                    });
+                });
+        }
+        savedSel.addEventListener("change", function () {
+            if (!savedSel.value) return;
+            post("/api/method/hr_master.api.portal_actions.get_saved_searches", { job_description: jd })
+                .then(function (data) {
+                    var list = (data && data.message) || [];
+                    var found = list.filter(function (s) { return s.title === savedSel.value; })[0];
+                    if (found) {
+                        try { apply(JSON.parse(found.filters || "{}")); } catch (e) { /* ignore */ }
+                    }
+                });
+        });
+        document.getElementById("fDelete").addEventListener("click", function () {
+            if (!savedSel.value) return;
+            if (!confirm("Delete saved search '" + savedSel.value + "'?")) return;
+            post("/api/method/hr_master.api.portal_actions.delete_saved_search", {
+                job_description: jd, title: savedSel.value
+            }).then(function () { loadSaved(); });
+        });
+        loadSaved();
+    })();
+    </script>
 
     {% include "templates/includes/hr_portal_footer.html" %}
     {% include "templates/includes/hr_portal_js.html" %}

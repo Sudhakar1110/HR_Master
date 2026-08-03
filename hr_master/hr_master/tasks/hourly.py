@@ -79,7 +79,13 @@ def send_interview_reminders():
                     continue
                 if now <= dt <= window_end:
                     _send_reminder_for(iv)
-                    frappe.db.set_value("Interview Schedule", iv.name, "reminder_sent", 1)
+                    from frappe.utils import now_datetime
+
+                    frappe.db.set_value(
+                        "Interview Schedule",
+                        iv.name,
+                        {"reminder_sent": 1, "reminder_sent_at": now_datetime()},
+                    )
                     sent += 1
                     frappe.db.commit()
             except Exception as e:
@@ -146,10 +152,18 @@ def _send_reminder_for(iv):
     if not (candidate.email or "").strip():
         return
 
+    iv_doc = frappe.get_doc("Interview Schedule", iv["name"])
+    interviewer_name = ""
+    for row in iv_doc.interviewers or []:
+        if (row.interviewer_name or "").strip():
+            interviewer_name = row.interviewer_name
+            break
+
     context = {
         "candidate_name": candidate.candidate_name,
         "job_title": iv.get("job_title") or "",
         "company_name": _get_company_name(),
+        "interviewer_name": interviewer_name,
         "scheduled_date": str(iv.get("scheduled_date") or ""),
         "scheduled_time": str(iv.get("scheduled_time") or ""),
         "interview_link": iv.get("location_or_link") or "",
@@ -164,7 +178,6 @@ def _send_reminder_for(iv):
         subject = "Reminder: " + subject
 
     recipients = [candidate.email]
-    iv_doc = frappe.get_doc("Interview Schedule", iv["name"])
     for row in iv_doc.interviewers or []:
         if (row.email or "").strip() and row.email not in recipients:
             recipients.append(row.email)

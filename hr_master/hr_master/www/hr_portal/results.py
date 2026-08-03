@@ -15,6 +15,7 @@ from hr_master.api.portal_actions import (
     set_portal_context,
 )
 from hr_master.api.ranking_api import rank_all_candidates_for_jd
+from hr_master.api.portal_actions import send_rejection_email
 
 
 def get_context(context):
@@ -39,6 +40,11 @@ def get_context(context):
 
             if action == "rank_all":
                 result = rank_all_candidates_for_jd(jd_name)
+                message = result.get("message") or str(result)
+                flash_type = "success" if result.get("status") == "success" else "error"
+                redirect_with_flash("/hr_portal/results?jd={0}".format(jd_name), message, flash_type)
+            elif action == "RejectEmail" and ranking_name and frappe.db.exists("Candidate Ranking", ranking_name):
+                result = send_rejection_email(ranking_name)
                 message = result.get("message") or str(result)
                 flash_type = "success" if result.get("status") == "success" else "error"
                 redirect_with_flash("/hr_portal/results?jd={0}".format(jd_name), message, flash_type)
@@ -81,6 +87,26 @@ def get_context(context):
         order_by="total_match_score desc",
         limit_page_length=200,
     )
+
+    # Attach candidate source / location / experience so the table can show a
+    # source badge and support client-side filters.
+    candidate_names = [
+        r.get("candidate") for r in context.rankings if r.get("candidate")
+    ]
+    cand_map = {}
+    if candidate_names:
+        cand_rows = frappe.get_all(
+            "Candidate",
+            fields=["name", "source", "location", "total_experience_years"],
+            filters={"name": ["in", candidate_names]},
+            limit_page_length=0,
+        )
+        cand_map = {row["name"]: row for row in cand_rows}
+    for r in context.rankings:
+        info = cand_map.get(r.get("candidate")) or {}
+        r["source"] = info.get("source") or ""
+        r["candidate_location"] = info.get("location") or ""
+        r["candidate_experience"] = info.get("total_experience_years") or 0
 
     # frappe.get_all returns dicts — use dict access
     scores = [r.get("total_match_score") or 0 for r in context.rankings]
