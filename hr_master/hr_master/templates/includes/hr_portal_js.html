@@ -313,6 +313,70 @@
 					);
 				});
 			}
+
+			/* Chat-style AI assistant: type a question → get an answer */
+			var aiChatBox = document.getElementById("hrpAiChat");
+			var aiChatInput = document.getElementById("hrpAiChatInput");
+			var aiChatSend = document.getElementById("hrpAiChatSend");
+			var aiChatArea = document.getElementById("hrpAiChatOutput");
+			if (aiChatBox && aiChatInput && aiChatSend && aiChatArea) {
+				var aiChatJd = aiChatBox.getAttribute("data-jd") || "";
+
+				function aiChatAdd(role, text) {
+					var row = document.createElement("div");
+					row.className = "hrp-chat-row hrp-chat-" + role;
+					var bubble = document.createElement("div");
+					bubble.className = "hrp-chat-bubble";
+					bubble.textContent = text;
+					row.appendChild(bubble);
+					aiChatArea.appendChild(row);
+					aiChatArea.scrollTop = aiChatArea.scrollHeight;
+					return row;
+				}
+
+				function aiChatSendMessage() {
+					var text = aiChatInput.value.trim();
+					if (!text || aiChatSend.disabled) { return; }
+					aiChatAdd("user", text);
+					aiChatInput.value = "";
+					aiChatSend.disabled = true;
+					aiChatSend.textContent = "…";
+					var pending = aiChatAdd("ai", "⏳ Thinking…");
+					aiCall(
+						"/api/method/hr_master.api.ai_api.ask_ai",
+						"job_description_name=" + encodeURIComponent(aiChatJd)
+							+ "&message=" + encodeURIComponent(text)
+					).then(function (data) {
+						pending.remove();
+						aiChatSend.disabled = false;
+						aiChatSend.textContent = "Send ➤";
+						if (data && data.exc_type) {
+							aiChatAdd("ai", (data._server_messages && data._server_messages[0]) || "AI request failed.");
+							return;
+						}
+						/* Frappe wraps whitelisted returns in {"message": <result>} */
+						var result = (data && data.message && typeof data.message === "object") ? data.message : data;
+						if (result && result.status === "success") {
+							aiChatAdd("ai", result.reply || "No response.");
+						} else {
+							aiChatAdd("ai", (result && result.message) || "Unexpected response.");
+						}
+					}).catch(function () {
+						pending.remove();
+						aiChatSend.disabled = false;
+						aiChatSend.textContent = "Send ➤";
+						aiChatAdd("ai", "Network error while calling the AI service.");
+					});
+				}
+
+				aiChatSend.addEventListener("click", aiChatSendMessage);
+				aiChatInput.addEventListener("keydown", function (e) {
+					if (e.key === "Enter" && !e.shiftKey) {
+						e.preventDefault();
+						aiChatSendMessage();
+					}
+				});
+			}
 		}
 
 		/* Confirm dialog for destructive / state-changing actions */

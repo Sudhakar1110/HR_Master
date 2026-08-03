@@ -425,3 +425,135 @@ def suggest_salary_range(job_description_name=None):
             return {"status": "success", "text": text}
 
     return {"status": "success", "text": _salary_rule_based(jd)}
+
+
+# ------------------------------------------
+# Chat-style AI assistant (type a question → get an answer)
+# ------------------------------------------
+
+
+def _jd_context_for_prompt(jd):
+    """Compact JD summary used as context for the chat assistant."""
+    lines = [
+        "Job title: {0}".format(jd.job_title or jd.name),
+        "Location: {0}".format(jd.location or "Remote"),
+        "Employment type: {0}".format(jd.employment_type or "Full-Time"),
+        "Experience required: {0}-{1} years".format(
+            jd.min_experience_years or 0, jd.max_experience_years or "more"
+        ),
+    ]
+    if jd.salary_range_min or jd.salary_range_max:
+        lines.append(
+            "Salary range: {0} - {1}".format(
+                jd.salary_range_min or "?", jd.salary_range_max or "?"
+            )
+        )
+    required = jd.get_required_skills_list()
+    preferred = jd.get_preferred_skills_list()
+    if required:
+        lines.append("Required skills: {0}".format(", ".join(required[:12])))
+    if preferred:
+        lines.append("Preferred skills: {0}".format(", ".join(preferred[:12])))
+    raw = frappe.utils.strip_html_tags(jd.job_description_raw or "")
+    if raw:
+        lines.append("Description: {0}".format(raw[:2500]))
+    return "\n".join(lines)
+
+
+def _chat_rule_based(jd, message):
+    """Rule-based chat reply used when the LLM is unavailable.
+
+    Routes the user's question to the matching JD tool (screening, questions,
+    skills, keywords, salary, summary); anything else gets a JD digest plus
+    guidance.
+    """
+    import re
+
+    msg = " ".join(message.lower().split())
+
+    def bullet(items):
+        return "\n".join("- {0}".format(i) for i in items)
+
+    def has_word(word):
+        # Word-boundary match so "pay" doesn't match "payment" and "search"
+        # doesn't match "research".
+        return bool(re.search(r"\b{0}\b".format(re.escape(word)), msg))
+
+    if "screen" in msg:
+        q = _screening_questions_rule_based(jd, 5)
+        parts = []
+        for label, items in q.items():
+            if items:
+                parts.append("{0}:\n{1}".format(label, bullet(items)))
+        return "\n\n".join(parts) or "No screening questions yet — add skills to this JD first."
+
+    if "interview" in msg or "question" in msg:
+        q = _questions_rule_based(jd, 6)
+        parts = []
+        for label, items in (
+            ("Technical", q["technical"]),
+            ("Behavioral", q["behavioral"]),
+            ("Role-specific", q["role_specific"]),
+        ):
+            if items:
+                parts.append("{0}:\n{1}".format(label, bullet(items)))
+        return "\n\n".join(parts) or "No interview questions yet — add skills to this JD first."
+
+    if "skill" in msg:
+        required, preferred = _suggest_skills_rule_based(jd)
+        parts = []
+        if required:
+            parts.append("Required skills:\n{0}".format(bullet(required)))
+        if preferred:
+            parts.append("Preferred skills:\n{0}".format(bullet(preferred)))
+        return "\n\n".join(parts) or "No skills found — add skills to this JD first."
+
+    if "keyword" in msg or has_word("search"):
+        return "Search keywords:\n{0}".format(bullet(_search_keywords_rule_based(jd)))
+
+    if "salary" in msg or "compensation" in msg or has_word("pay"):
+        return _salary_rule_based(jd)
+
+    if any(k in msg for k in ("summar", "overview", "describe", "about this job")):
+        return _summary_rule_based(jd)
+
+    # Generic fallback: JD digest + guidance
+    return (
+        "Here's a quick overview of this job:\n\n{0}\n\n"
+        "I can also draft interview questions, screening questions, skill "
+        "suggestions, search keywords or a salary benchmark — just ask. For "
+        "fully AI-generated answers to any question, enable an AI provider in "
+        "Desk → Recruitment Settings → AI Configuration."
+    ).format(_summary_rule_based(jd))
+
+
+@frappe.whitelist()
+def ask_ai(job_description_name=None, message=None):
+    """Chat-style AI assistant for a JD (free-form questions).
+
+    Uses the configured LLM when available; falls back to a rule-based reply
+    so the chat box always answers and never 417s/errors.
+    """
+    _guard()
+    jd = _get_jd(job_description_name)
+    message = (message or "").strip()
+    if not message:
+        frappe.throw(_("Message is required"))
+
+    if is_llm_configured():
+        system = (
+            "You are an expert recruiting assistant embedded in HR Master, a "
+            "Frappe/ERPNext app. The user manages the job description shown in "
+            "the context. Answer concisely, practically and directly. Use the "
+            "job context; if the question is unrelated to recruiting, steer it "
+            "back helpfully."
+        )
+        prompt = (
+            "JOB CONTEXT:\n{0}\n\nUSER QUESTION:\n{1}\n\nReply with a helpful, "
+            "concise answer."
+        ).format(_jd_context_for_prompt(jd), message[:2000])
+        text = call_llm(prompt, system=system, max_tokens=600, temperature=0.4).strip()
+        if text:
+            return {"status": "success", "reply": text}
+
+    return {"status": "success", "reply": _chat_rule_based(jd, message)}

@@ -295,6 +295,78 @@ body.hrp-body {
 .hrp-ai-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 14px; }
 @media (max-width: 480px) { .hrp-ai-grid { grid-template-columns: 1fr; } }
 
+/* AI chat (type a question → get an answer) */
+.hrp-chat {
+  border: 1px solid var(--hrp-border);
+  border-radius: 14px;
+  background: #f6f8fd;
+  padding: 12px;
+  margin-top: 12px;
+}
+.hrp-chat-output {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 320px;
+  overflow-y: auto;
+  padding: 4px 2px;
+  margin-bottom: 10px;
+}
+.hrp-chat-row { display: flex; }
+.hrp-chat-user { justify-content: flex-end; }
+.hrp-chat-ai { justify-content: flex-start; }
+.hrp-chat-bubble {
+  max-width: 85%;
+  padding: 9px 13px;
+  border-radius: 14px;
+  font-size: 13.5px;
+  line-height: 1.55;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.hrp-chat-ai .hrp-chat-bubble {
+  background: #fff;
+  border: 1px solid var(--hrp-border);
+  border-bottom-left-radius: 4px;
+  color: var(--hrp-text);
+  box-shadow: var(--hrp-shadow);
+}
+.hrp-chat-user .hrp-chat-bubble {
+  background: var(--hrp-grad);
+  color: #fff;
+  border-bottom-right-radius: 4px;
+  box-shadow: 0 4px 12px rgba(99, 91, 255, 0.3);
+}
+.hrp-chat-input-row {
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+}
+.hrp-chat-input-row textarea {
+  flex: 1;
+  resize: vertical;
+  min-height: 42px;
+  max-height: 130px;
+  padding: 9px 12px;
+  border: 1px solid var(--hrp-border-strong);
+  border-radius: 10px;
+  font-size: 13.5px;
+  font-family: inherit;
+  background: #fff;
+  color: var(--hrp-text);
+  transition: border-color 0.16s ease, box-shadow 0.16s ease;
+}
+.hrp-chat-input-row textarea:focus {
+  outline: none;
+  border-color: var(--hrp-primary);
+  box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.14);
+}
+.hrp-chat-input-row textarea::placeholder { color: var(--hrp-subtle); }
+html[data-theme="dark"] .hrp-chat { background: #0f1730; border-color: var(--hrp-border-strong); }
+html[data-theme="dark"] .hrp-chat-ai .hrp-chat-bubble { background: #1a2240; border-color: var(--hrp-border-strong); }
+html[data-theme="dark"] .hrp-chat-input-row textarea { background: #0f1730; color: var(--hrp-text); }
+html[data-theme="dark"] .hrp-chat-input-row textarea::placeholder { color: var(--hrp-subtle); }
+
 /* ============================================================
    Buttons
    ============================================================ */

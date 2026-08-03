@@ -108,11 +108,15 @@ def get_candidates_for_jd(jd):
         pluck="candidate",
     )
 
+    # NOTE: candidate_skills is a child-table field — it cannot be selected
+    # via frappe.get_all (would generate SELECT candidate_skills FROM
+    # tabCandidate → MySQL error 1054). The ranking step re-loads each full
+    # Candidate doc anyway, so only scalar fields are fetched here.
     if ranking_candidates:
         return frappe.get_all(
             "Candidate",
             filters={"name": ["in", ranking_candidates]},
-            fields=["name", "candidate_name", "candidate_skills"],
+            fields=["name", "candidate_name"],
         )
 
     # If no existing rankings, get all candidates from searches

@@ -109,6 +109,18 @@
                         <button class="hrp-btn hrp-btn-secondary hrp-btn-sm" type="button" id="hrpAiSalary" data-jd="{{ jd.name }}">💰 Salary Range</button>
                     </div>
                     <div id="hrpAiOutput"></div>
+
+                    <div class="hrp-chat" id="hrpAiChat" data-jd="{{ jd.name }}">
+                        <div class="hrp-chat-output" id="hrpAiChatOutput">
+                            <div class="hrp-chat-row hrp-chat-ai">
+                                <div class="hrp-chat-bubble">👋 Hi! Ask me anything about this JD — for example "write a job summary", "suggest screening questions", "what salary is fair?" — or any custom question.</div>
+                            </div>
+                        </div>
+                        <div class="hrp-chat-input-row">
+                            <textarea id="hrpAiChatInput" rows="2" placeholder="Ask the AI assistant about this job… (Enter to send, Shift+Enter for a new line)"></textarea>
+                            <button class="hrp-btn hrp-btn-primary hrp-btn-sm" type="button" id="hrpAiChatSend">Send ➤</button>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="hrp-card hrp-mt">
