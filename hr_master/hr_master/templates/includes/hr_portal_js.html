@@ -218,7 +218,7 @@
 					if (data && data.status === "success") {
 						aiRenderSections(sections || data.questions || { "Required Skills": data.required, "Preferred Skills": data.preferred });
 					} else {
-						aiShowError("Unexpected response.");
+						aiShowError((data && data.message) || "Unexpected response.");
 					}
 				}).catch(function () { aiShowError("Network error while calling the AI service."); });
 			}
