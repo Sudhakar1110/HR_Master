@@ -35,23 +35,27 @@
    "fieldname": "profile_url",
    "fieldtype": "Data",
    "in_list_view": 1,
-   "label": "Profile URL"
+   "label": "Profile URL",
+   "length": 500
   },
   {
    "fieldname": "current_title",
    "fieldtype": "Data",
    "in_list_view": 1,
-   "label": "Current Title"
+   "label": "Current Title",
+   "length": 300
   },
   {
    "fieldname": "current_company",
    "fieldtype": "Data",
-   "label": "Current Company"
+   "label": "Current Company",
+   "length": 300
   },
   {
    "fieldname": "location",
    "fieldtype": "Data",
-   "label": "Location"
+   "label": "Location",
+   "length": 300
   },
   {
    "fieldname": "skills_summary",

@@ -82,12 +82,14 @@
   {
    "fieldname": "current_company",
    "fieldtype": "Data",
-   "label": "Current Company"
+   "label": "Current Company",
+   "length": 300
   },
   {
    "fieldname": "current_title",
    "fieldtype": "Data",
-   "label": "Current Title"
+   "label": "Current Title",
+   "length": 300
   },
   {
    "fieldname": "total_experience_years",
@@ -98,7 +100,8 @@
    "fieldname": "location",
    "fieldtype": "Data",
    "in_list_view": 1,
-   "label": "Location"
+   "label": "Location",
+   "length": 300
   },
   {
    "fieldname": "current_salary",

@@ -166,18 +166,29 @@ def process_candidate_search(search_name, job_description_name):
 
 
 def _append_search_results(search, portal_name, results):
-    """Append raw portal results as child rows on a Job Portal Search."""
+    """Append raw portal results as child rows on a Job Portal Search.
+
+    Values are truncated to their field max-lengths so an oversized value
+    from a portal (e.g. a very long Arbeitnow job URL) can never make the
+    save fail with a 'will get truncated' validation error.
+    """
     for result in results or []:
         search.append("search_results", {
-            "candidate_name": result.get("name", ""),
+            "candidate_name": _truncate(result.get("name", ""), 140),
             "source": portal_name,
-            "profile_url": result.get("url", ""),
-            "current_title": result.get("title", ""),
-            "current_company": result.get("company", ""),
-            "location": result.get("location", ""),
-            "skills_summary": result.get("skills", ""),
+            "profile_url": _truncate(result.get("url", ""), 500),
+            "current_title": _truncate(result.get("title", ""), 300),
+            "current_company": _truncate(result.get("company", ""), 300),
+            "location": _truncate(result.get("location", ""), 300),
+            "skills_summary": _truncate(result.get("skills", ""), 1000),
             "experience_years": result.get("experience", 0),
         })
+
+
+def _truncate(value, length):
+    """Cap a value at a field's max length, coercing to str first."""
+    value = "" if value is None else str(value)
+    return value if len(value) <= length else value[:length]
 
 
 def import_results_and_rank(search, jd):
