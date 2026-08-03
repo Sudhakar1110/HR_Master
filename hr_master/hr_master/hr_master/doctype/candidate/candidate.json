@@ -188,7 +188,7 @@
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Source",
-   "options": "\nLinkedIn\nNaukri\nIndeed\nMonster\nSerpAPI\nAdzuna\nRemotive\nArbeitnow\nDemo\nInternal Referral\nDirect Apply\nOther"
+   "options": "\nLinkedIn\nNaukri\nIndeed\nMonster\nSerpAPI\nAdzuna\nRemotive\nArbeitnow\nDemo\nInternal Referral\nDirect Apply\nCSV Import\nOther"
   },
   {
    "fieldname": "source_url",

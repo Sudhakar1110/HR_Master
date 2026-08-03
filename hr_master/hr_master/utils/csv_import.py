@@ -9,6 +9,29 @@ import json
 import io
 
 
+def _valid_source(value):
+    """Return a Candidate.source value that passes Select validation.
+
+    The Candidate doctype's ``source`` field is a Select; assigning a value
+    that is not one of its options (e.g. a custom "CSV Import" label on a
+    site where the option has not been synced yet) fails validation and
+    rejects the whole row. Unknown values fall back to "Other" so imports
+    never break.
+    """
+    value = (value or "").strip()
+    if not value:
+        return ""
+    try:
+        meta = frappe.get_meta("Candidate")
+        field = meta.get_field("source")
+        options = [o.strip() for o in (field.options or "").split("\n") if o.strip()]
+    except Exception:
+        options = []
+    if options and value in options:
+        return value
+    return "Other"
+
+
 @frappe.whitelist()
 def import_candidates_from_csv(file_url, job_description=None, source="CSV Import"):
     """Import candidates from a CSV file.
@@ -25,6 +48,7 @@ def import_candidates_from_csv(file_url, job_description=None, source="CSV Impor
 
         results = {"imported": 0, "duplicates": 0, "errors": [], "candidates": []}
         required_fields = ["candidate_name"]
+        source = _valid_source(source)
 
         for row in reader:
             try:
