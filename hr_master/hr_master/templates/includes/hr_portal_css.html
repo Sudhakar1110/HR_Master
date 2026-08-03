@@ -337,6 +337,25 @@ body.hrp-body {
   border-bottom-right-radius: 4px;
   box-shadow: 0 4px 12px rgba(99, 91, 255, 0.3);
 }
+.hrp-chat-suggest {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+.hrp-chat-suggest .hrp-chip {
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 600;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+}
+.hrp-chat-suggest .hrp-chip:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(99, 91, 255, 0.28);
+  filter: brightness(1.05);
+}
+.hrp-chat-suggest .hrp-chip:active { transform: translateY(0); }
+.hrp-chat-suggest .hrp-chip:focus-visible { outline: 2px solid var(--hrp-primary); outline-offset: 2px; }
 .hrp-chat-input-row {
   display: flex;
   gap: 8px;

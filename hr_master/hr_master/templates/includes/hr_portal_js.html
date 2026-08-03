@@ -376,6 +376,14 @@
 						aiChatSendMessage();
 					}
 				});
+
+				/* Suggestion chips: clicking one fills the input box */
+				document.querySelectorAll(".hrp-chat-suggest .hrp-chip").forEach(function (chip) {
+					chip.addEventListener("click", function () {
+						aiChatInput.value = chip.getAttribute("data-hrp-chat-suggest") || chip.textContent;
+						aiChatInput.focus();
+					});
+				});
 			}
 		}
 
