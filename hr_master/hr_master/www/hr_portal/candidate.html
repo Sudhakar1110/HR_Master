@@ -203,7 +203,12 @@
                                 {% for o in offers %}
                                 <tr>
                                     <td>{{ o.job_title }}</td>
-                                    <td><span class="hrp-badge {{ 'hrp-badge-green' if o.status == 'Accepted' else ('hrp-badge-blue' if o.status in ('Approved', 'Offer Sent') else 'hrp-badge-gray') }}">{{ o.status }}</span></td>
+                                    <td>
+                                        <span class="hrp-badge {{ 'hrp-badge-green' if o.status == 'Accepted' else ('hrp-badge-blue' if o.status in ('Approved', 'Offer Sent') else 'hrp-badge-gray') }}">{{ o.status }}</span>
+                                        {% if o.status in ('Offer Sent', 'Negotiation', 'Accepted') %}
+                                        <span class="hrp-badge hrp-badge-green" style="margin-left:4px">✓ Emailed</span>
+                                        {% endif %}
+                                    </td>
                                     <td>{{ o.total_ctc or '—' }}</td>
                                     <td>
                                         {% if can_write and o.status not in ('Accepted', 'Declined', 'Withdrawn') %}
@@ -272,7 +277,15 @@
                                     <td>{{ i.scheduled_date }}</td>
                                     <td>{{ i.scheduled_time }}</td>
                                     <td>{{ i.interview_round or '—' }}</td>
-                                    <td><span class="hrp-badge hrp-badge-blue">{{ i.status }}</span></td>
+                                    <td>
+                                        <span class="hrp-badge hrp-badge-blue">{{ i.status }}</span>
+                                        {% if i.invite_email_sent %}
+                                        <span class="hrp-badge hrp-badge-green" style="margin-left:4px">✓ Emailed</span>
+                                        {% endif %}
+                                        {% if i.reminder_sent %}
+                                        <span class="hrp-badge hrp-badge-orange" style="margin-left:4px">⏰ Reminder ✓</span>
+                                        {% endif %}
+                                    </td>
                                     <td>
                                         {% if can_write and i.status in ('Scheduled', 'Rescheduled') %}
                                         <form method="post" style="display:inline">

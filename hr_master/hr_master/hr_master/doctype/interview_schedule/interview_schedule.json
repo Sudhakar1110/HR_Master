@@ -26,6 +26,7 @@
   "column_break_15",
   "feedback_required",
   "send_calendar_invite",
+  "invite_email_sent",
   "reminder_sent",
   "sb_feedback",
   "feedback",
@@ -162,6 +163,13 @@
    "fieldname": "send_calendar_invite",
    "fieldtype": "Check",
    "label": "Send Calendar Invite"
+  },
+  {
+   "default": "0",
+   "fieldname": "invite_email_sent",
+   "fieldtype": "Check",
+   "label": "Invite Email Sent",
+   "description": "Marked automatically once the interview invitation email has been sent to the candidate."
   },
   {
    "default": "0",

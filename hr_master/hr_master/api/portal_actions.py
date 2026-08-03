@@ -493,6 +493,8 @@ def send_interview_invite_email(interview_name=None):
         reference_name=iv.name,
         now=True,
     )
+
+    frappe.db.set_value("Interview Schedule", iv.name, "invite_email_sent", 1)
     frappe.db.commit()
     return {
         "status": "success",

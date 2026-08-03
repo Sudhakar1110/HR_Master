@@ -131,6 +131,8 @@ def get_context(context):
             "interview_type",
             "status",
             "result",
+            "invite_email_sent",
+            "reminder_sent",
         ],
         filters={"candidate": candidate_name},
         order_by="scheduled_date desc",
