@@ -96,7 +96,7 @@
                             </td>
                             <td>
                                 {% set src = (r.source or '')|lower %}
-                                <span class="hrp-badge {{ 'hrp-badge-green' if src == 'remotive' else ('hrp-badge-blue' if src in ('arbeitnow','linkedin') else ('hrp-badge-purple' if src == 'serpapi' else ('hrp-badge-orange' if src in ('adzuna','naukri') else ('hrp-badge-red' if src == 'monster' else 'hrp-badge-gray'))) }}">{{ r.source or '—' }}</span>
+                                <span class="hrp-badge {{ 'hrp-badge-green' if src == 'remotive' else ('hrp-badge-blue' if src in ('arbeitnow','linkedin') else ('hrp-badge-purple' if src == 'serpapi' else ('hrp-badge-orange' if src in ('adzuna','naukri') else ('hrp-badge-red' if src == 'monster' else 'hrp-badge-gray')))) }}">{{ r.source or '—' }}</span>
                             </td>
                             <td>
                                 {% set score = r.total_match_score or 0 %}
