@@ -329,6 +329,7 @@
 			var param = chatBox.getAttribute("data-chat-param") || "";
 			var value = chatBox.getAttribute("data-chat-value") || "";
 			var initialAreaHTML = area.innerHTML; /* welcome bubble — used by the Reload button */
+			var lastQuestion = ""; /* last question asked, so Reload can re-run it */
 			var csrfMeta = document.querySelector('meta[name="csrf-token"]');
 			var csrfToken = csrfMeta ? csrfMeta.getAttribute("content") : "";
 
@@ -356,9 +357,10 @@
 				return row;
 			}
 
-			function aiChatSendMessage() {
-				var text = input.value.trim();
+			function aiChatSendMessage(overrideText) {
+				var text = (overrideText != null) ? String(overrideText).trim() : input.value.trim();
 				if (!text || send.disabled) { return; }
+				lastQuestion = text;
 				aiChatAdd("user", text);
 				input.value = "";
 				send.disabled = true;
@@ -406,16 +408,22 @@
 				});
 			});
 
-			/* Reload / reset: restore the welcome bubble and clear the input,
-			   and (on the JD page) clear the quick-action output too. */
+			/* Reload: wipe the conversation, then generate a FRESH output for the
+			   current input — or for the last question when the box is empty. */
 			var resetBtn = chatBox.querySelector(".hrp-chat-reset");
 			if (resetBtn) {
 				resetBtn.addEventListener("click", function () {
+					if (send.disabled) { return; } /* a request is still running */
 					area.innerHTML = initialAreaHTML;
-					input.value = "";
 					var quickOut = document.getElementById("hrpAiOutput");
 					if (quickOut) { quickOut.innerHTML = ""; }
-					input.focus();
+					var question = input.value.trim() || lastQuestion;
+					input.value = "";
+					if (question) {
+						aiChatSendMessage(question); /* re-run → new output */
+					} else {
+						input.focus();
+					}
 				});
 			}
 		});
