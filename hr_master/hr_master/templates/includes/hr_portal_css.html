@@ -292,6 +292,8 @@ body.hrp-body {
   font-size: 14.5px;
 }
 .hrp-actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.hrp-ai-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 14px; }
+@media (max-width: 480px) { .hrp-ai-grid { grid-template-columns: 1fr; } }
 
 /* ============================================================
    Buttons

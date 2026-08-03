@@ -152,7 +152,11 @@
 		var aiOutput = document.getElementById("hrpAiOutput");
 		var aiQuestionsBtn = document.getElementById("hrpAiQuestions");
 		var aiSkillsBtn = document.getElementById("hrpAiSkills");
-		if (aiOutput && (aiQuestionsBtn || aiSkillsBtn)) {
+		var aiSummaryBtn = document.getElementById("hrpAiSummary");
+		var aiScreenBtn = document.getElementById("hrpAiScreen");
+		var aiKeywordsBtn = document.getElementById("hrpAiKeywords");
+		var aiSalaryBtn = document.getElementById("hrpAiSalary");
+		if (aiOutput && (aiQuestionsBtn || aiSkillsBtn || aiSummaryBtn || aiScreenBtn || aiKeywordsBtn || aiSalaryBtn)) {
 			var aiCsrf = document.querySelector('meta[name="csrf-token"]');
 			var aiCsrfToken = aiCsrf ? aiCsrf.getAttribute("content") : "";
 
@@ -181,7 +185,9 @@
 				behavioral: "Behavioral",
 				"role_specific": "Role Specific",
 				"Required Skills": "Required Skills",
-				"Preferred Skills": "Preferred Skills"
+				"Preferred Skills": "Preferred Skills",
+				"Phone Screen": "Phone Screen",
+				"Skill Deep-Dive": "Skill Deep-Dive"
 			};
 
 			function aiEscape(text) {
@@ -204,6 +210,22 @@
 				aiOutput.innerHTML = html || '<span class="hrp-hint">No results returned.</span>';
 			}
 
+			function aiRenderText(text) {
+				aiOutput.innerHTML = '<div style="white-space:pre-wrap;font-size:14px;color:#334155;line-height:1.65">'
+					+ aiEscape(text) + "</div>";
+			}
+
+			function aiRenderKeywords(keywords) {
+				var html = '<div class="hrp-chips">';
+				(keywords || []).forEach(function (kw) {
+					html += '<span class="hrp-chip hrp-chip-required">' + aiEscape(kw) + "</span>";
+				});
+				html += "</div>";
+				aiOutput.innerHTML = (keywords && keywords.length)
+					? html
+					: '<span class="hrp-hint">No keywords returned.</span>';
+			}
+
 			function aiRun(endpoint, jdName, params, loadingText, sections) {
 				aiShowLoading(loadingText);
 				var body = "job_description_name=" + encodeURIComponent(jdName);
@@ -218,7 +240,13 @@
 					/* Frappe wraps whitelisted returns in {"message": <result>} */
 					var result = (data && data.message && typeof data.message === "object") ? data.message : data;
 					if (result && result.status === "success") {
-						aiRenderSections(sections || result.questions || { "Required Skills": result.required, "Preferred Skills": result.preferred });
+						if (result.text) {
+							aiRenderText(result.text);
+						} else if (result.keywords) {
+							aiRenderKeywords(result.keywords);
+						} else {
+							aiRenderSections(sections || result.questions || { "Required Skills": result.required, "Preferred Skills": result.preferred });
+						}
 					} else {
 						aiShowError((result && result.message) || "Unexpected response.");
 					}
@@ -242,6 +270,46 @@
 						aiSkillsBtn.getAttribute("data-jd") || "",
 						{},
 						"Suggesting skills"
+					);
+				});
+			}
+			if (aiSummaryBtn) {
+				aiSummaryBtn.addEventListener("click", function () {
+					aiRun(
+						"/api/method/hr_master.api.ai_api.suggest_jd_summary",
+						aiSummaryBtn.getAttribute("data-jd") || "",
+						{},
+						"Writing job summary"
+					);
+				});
+			}
+			if (aiScreenBtn) {
+				aiScreenBtn.addEventListener("click", function () {
+					aiRun(
+						"/api/method/hr_master.api.ai_api.suggest_screening_questions",
+						aiScreenBtn.getAttribute("data-jd") || "",
+						{ count: 5 },
+						"Writing screening questions"
+					);
+				});
+			}
+			if (aiKeywordsBtn) {
+				aiKeywordsBtn.addEventListener("click", function () {
+					aiRun(
+						"/api/method/hr_master.api.ai_api.suggest_search_keywords",
+						aiKeywordsBtn.getAttribute("data-jd") || "",
+						{},
+						"Suggesting search keywords"
+					);
+				});
+			}
+			if (aiSalaryBtn) {
+				aiSalaryBtn.addEventListener("click", function () {
+					aiRun(
+						"/api/method/hr_master.api.ai_api.suggest_salary_range",
+						aiSalaryBtn.getAttribute("data-jd") || "",
+						{},
+						"Benchmarking salary range"
 					);
 				});
 			}

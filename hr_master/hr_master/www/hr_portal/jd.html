@@ -99,10 +99,14 @@
 
                 <div class="hrp-card hrp-mt">
                     <h2 class="hrp-card-title">✨ AI Assist</h2>
-                    <p class="hrp-hint">Generate tailored interview questions or skill suggestions for this JD using your configured AI provider (Recruitment Settings → AI Configuration).</p>
-                    <div class="hrp-actions hrp-mb">
-                        <button class="hrp-btn hrp-btn-primary hrp-btn-sm" type="button" id="hrpAiQuestions" data-jd="{{ jd.name }}">✨ Generate Interview Questions</button>
+                    <p class="hrp-hint">Six AI-powered tools for this JD — interview questions, skills, summary, screening questions, search keywords and salary benchmark. Uses your configured AI provider (Recruitment Settings → AI Configuration); falls back to rule-based suggestions when AI is off.</p>
+                    <div class="hrp-ai-grid">
+                        <button class="hrp-btn hrp-btn-primary hrp-btn-sm" type="button" id="hrpAiQuestions" data-jd="{{ jd.name }}">✨ Interview Questions</button>
                         <button class="hrp-btn hrp-btn-secondary hrp-btn-sm" type="button" id="hrpAiSkills" data-jd="{{ jd.name }}">✨ Suggest Skills</button>
+                        <button class="hrp-btn hrp-btn-secondary hrp-btn-sm" type="button" id="hrpAiSummary" data-jd="{{ jd.name }}">📝 JD Summary</button>
+                        <button class="hrp-btn hrp-btn-secondary hrp-btn-sm" type="button" id="hrpAiScreen" data-jd="{{ jd.name }}">📞 Screening Questions</button>
+                        <button class="hrp-btn hrp-btn-secondary hrp-btn-sm" type="button" id="hrpAiKeywords" data-jd="{{ jd.name }}">🔎 Search Keywords</button>
+                        <button class="hrp-btn hrp-btn-secondary hrp-btn-sm" type="button" id="hrpAiSalary" data-jd="{{ jd.name }}">💰 Salary Range</button>
                     </div>
                     <div id="hrpAiOutput"></div>
                 </div>
