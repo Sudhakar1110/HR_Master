@@ -92,6 +92,7 @@ def auto_merge_exact_duplicates():
 
     merged = 0
     skipped = 0
+    merged_pairs = []
     for g in groups:
         c1 = g.get("candidate_1") or {}
         c2 = g.get("candidate_2") or {}
@@ -118,6 +119,12 @@ def auto_merge_exact_duplicates():
         outcome = merge_duplicates(primary.name, duplicate.name)
         if outcome.get("status") == "success":
             merged += 1
+            merged_pairs.append({
+                "primary": primary.name,
+                "primary_name": primary.candidate_name,
+                "duplicate": duplicate.name,
+                "duplicate_name": duplicate.candidate_name,
+            })
         else:
             skipped += 1
 
@@ -127,7 +134,78 @@ def auto_merge_exact_duplicates():
         frappe.logger().info(
             "HR Master: Auto-merged {0} duplicate pair(s), skipped {1} (weekly scan)".format(merged, skipped)
         )
-    return {"status": "success", "auto_merged": merged, "skipped": skipped}
+
+    if merged_pairs:
+        _send_auto_merge_digest(merged_pairs, skipped)
+
+    return {
+        "status": "success",
+        "auto_merged": merged,
+        "skipped": skipped,
+        "merged_pairs": merged_pairs,
+    }
+
+
+def _send_auto_merge_digest(pairs, skipped):
+    """Email HR Master Admins a summary of the auto-merged duplicates."""
+    try:
+        admin_emails = frappe.get_all(
+            "User", filters={"role": "HR Master Admin"}, pluck="email"
+        )
+        admin_emails = [e for e in admin_emails if e]
+        if not admin_emails:
+            return
+
+        try:
+            from frappe.utils import escape_html
+        except Exception:
+            escape_html = lambda v: str(v or "")
+        rows = "".join(
+            "<tr>"
+            "<td>{0}</td><td>{1}</td><td>{2}</td>"
+            "</tr>".format(
+                i + 1,
+                escape_html(pair["duplicate_name"] or ""),
+                escape_html(pair["primary_name"] or ""),
+            )
+            for i, pair in enumerate(pairs)
+        )
+
+        message = """
+        <h3>HR Master — Duplicate Auto-Merge Summary</h3>
+        <p>The weekly duplicate scan merged <strong>{merged}</strong> exact-match
+        duplicate pair(s) automatically (same email or phone + 100% match).
+        In each pair, the record with the most complete data was kept and the
+        other was merged into it (skills, activities and rankings moved across)
+        and marked <strong>Blacklisted</strong>.</p>
+        <table style="border-collapse:collapse;width:100%;">
+            <tr style="background:#f1f5f9;">
+                <th style="padding:8px;border:1px solid #ddd;text-align:left;">#</th>
+                <th style="padding:8px;border:1px solid #ddd;text-align:left;">Merged (removed)</th>
+                <th style="padding:8px;border:1px solid #ddd;text-align:left;">Kept (primary)</th>
+            </tr>
+            {rows}
+        </table>
+        <p style="color:#64748b;font-size:13px;">{skipped} candidate pair(s) were skipped
+        because they only matched by name, were already merged/reviewed, or failed to merge.</p>
+        <p>Review the Duplicates page in the portal for anything left to merge manually.</p>
+        """.format(
+            merged=len(pairs),
+            rows=rows,
+            skipped=skipped,
+        )
+
+        frappe.sendmail(
+            recipients=admin_emails,
+            subject="HR Master: {0} duplicate candidate pair(s) auto-merged".format(len(pairs)),
+            message=message,
+        )
+        frappe.logger().info("HR Master: auto-merge digest email sent to {0} admin(s)".format(len(admin_emails)))
+    except Exception:
+        frappe.log_error(
+            title="HR Master: auto-merge digest email failed",
+            message=frappe.get_traceback(),
+        )
 
 
 def _is_unmergeable(candidate, notes_map):

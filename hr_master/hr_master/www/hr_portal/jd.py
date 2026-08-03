@@ -12,6 +12,9 @@ from hr_master.api.portal_actions import (
     redirect_with_flash,
     render_flash,
     set_portal_context,
+    can_view_jd,
+    can_approve_offers,
+    review_offer,
 )
 from hr_master.api.search_api import search_candidates_for_jd, import_search_results
 from hr_master.api.ranking_api import rank_all_candidates_for_jd
@@ -26,14 +29,30 @@ def get_context(context):
     context.can_write = can_write()
 
     jd_name = frappe.form_dict.get("name")
-    if not jd_name or not frappe.db.exists("Job Description", jd_name):
+    if not can_view_jd(jd_name):
         frappe.local.flags.redirect_location = "/hr_portal/jds"
         raise frappe.Redirect
 
-    # Handle POST actions (search / import / rank) - PRG pattern
+    # Handle POST actions (search / import / rank / offer review) - PRG pattern
     if frappe.request.method == "POST":
         action = frappe.form_dict.get("action")
         try:
+            # Offer approval is done by Admins / Hiring Managers — it must NOT
+            # require the write role, so it runs before require_write_access().
+            if action in ("approve_offer", "reject_offer"):
+                offer_name = frappe.form_dict.get("offer")
+                result = review_offer(
+                    offer_name,
+                    approve=(action == "approve_offer"),
+                )
+                message = result.get("message") or (
+                    "Offer approved" if action == "approve_offer" else "Offer rejected"
+                )
+                flash_type = "success" if result.get("status") == "success" else "error"
+                redirect_with_flash(
+                    "/hr_portal/jd?name={0}".format(jd_name), message, flash_type
+                )
+
             require_write_access()
 
             if action == "search":
@@ -95,6 +114,38 @@ def get_context(context):
     context.ranking_count = frappe.db.count(
         "Candidate Ranking", filters={"job_description": jd_name}
     )
+
+    # Offers for this JD (with approval state) — powers the portal approval UI.
+    context.can_approve_offers = can_approve_offers()
+    context.offers = frappe.get_all(
+        "Offer Management",
+        fields=[
+            "name",
+            "candidate",
+            "candidate_name",
+            "status",
+            "approval_status",
+            "approved_by",
+            "total_ctc",
+            "offer_date",
+            "offer_email_sent_at",
+        ],
+        filters={"job_description": jd_name},
+        order_by="creation desc",
+        limit_page_length=20,
+    )
+    try:
+        settings = frappe.get_single("Recruitment Settings")
+        _require_approval = bool(settings.get("require_approval_for_offers"))
+    except Exception:
+        _require_approval = False
+    for o in context.offers:
+        o["needs_approval"] = (
+            _require_approval
+            and o.get("status") in ("Draft", "Approval Pending")
+            and o.get("approval_status") != "Approved"
+        )
+        o["sendable"] = o.get("status") in ("Draft", "Approval Pending", "Approved") and not o["needs_approval"]
 
     # Whether a background portal search is still running (drives auto-refresh polling)
     # context.searches comes from frappe.get_all (list of dicts) — use dict access.

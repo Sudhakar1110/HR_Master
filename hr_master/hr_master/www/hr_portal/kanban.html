@@ -20,7 +20,7 @@
         <div class="hrp-page-head">
             <div>
                 <h1 class="hrp-page-title">Candidate Pipeline</h1>
-                <p class="hrp-page-sub">Drag a card to move the candidate to the next stage (or use the dropdown under each card).</p>
+                <p class="hrp-page-sub">Drag a card to move the candidate to the next stage (or use the dropdown under each card). Dropping a card on <strong>Offer</strong> creates a draft offer for that candidate.</p>
             </div>
             <div class="hrp-actions">
                 <form method="get" class="hrp-form" style="display:inline">
@@ -55,6 +55,7 @@
                         <div class="hrp-kanban-card-meta">
                             {% if r.source %}<span class="hrp-badge hrp-badge-gray">{{ r.source }}</span>{% endif %}
                             {% if r.candidate_location %}<span class="hrp-hint">{{ r.candidate_location }}</span>{% endif %}
+                            {% if r.offer_status %}<span class="hrp-badge hrp-badge-blue">📄 {{ r.offer_status }}</span>{% endif %}
                         </div>
                         {% if can_write %}
                         <select class="hrp-select hrp-btn-sm hrp-kanban-move" data-ranking="{{ r.name }}">

@@ -44,6 +44,7 @@
                     <div class="hrp-detail"><dt>Vacancies</dt><dd>{{ jd.vacancies or 1 }}</dd></div>
                     <div class="hrp-detail"><dt>Posting Date</dt><dd>{{ jd.posting_date }}</dd></div>
                     <div class="hrp-detail"><dt>Target Close</dt><dd>{{ jd.target_close_date or '—' }}</dd></div>
+                    <div class="hrp-detail"><dt>Hiring Manager</dt><dd>{{ jd.hiring_manager or 'Unassigned' }}</dd></div>
                 </dl>
 
                 {% if jd.required_skills %}
@@ -98,6 +99,60 @@
                         </form>
                     </div>
                     <p class="hrp-hint">Search queues a background job across enabled portals (LinkedIn, Naukri, Indeed, Monster, SerpAPI/Google Jobs, Adzuna, Remotive, Arbeitnow). Import converts results into Candidate records; Rank scores them against this JD.</p>
+                </div>
+
+                <div class="hrp-card hrp-mt">
+                    <h2 class="hrp-card-title">📄 Offers &amp; Approvals</h2>
+                    {% if offers %}
+                    <div class="hrp-table-wrap">
+                        <table class="hrp-table">
+                            <thead><tr><th>Candidate</th><th>Status</th><th>Approval</th><th>CTC</th><th></th></tr></thead>
+                            <tbody>
+                                {% for o in offers %}
+                                <tr>
+                                    <td><a class="hrp-link" href="/hr_portal/candidate?name={{ o.candidate }}">{{ o.candidate_name }}</a></td>
+                                    <td>
+                                        <span class="hrp-badge {{ 'hrp-badge-green' if o.status == 'Accepted' else ('hrp-badge-blue' if o.status in ('Approved', 'Offer Sent') else ('hrp-badge-orange' if o.status == 'Approval Pending' else 'hrp-badge-gray')) }}">{{ o.status }}</span>
+                                        {% if o.status in ('Offer Sent', 'Negotiation', 'Accepted') %}
+                                        <span class="hrp-badge hrp-badge-green" style="margin-left:4px">✓ Emailed{% if o.offer_email_sent_at %} · {{ o.offer_email_sent_at.strftime('%d %b %Y %H:%M') }}{% endif %}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if o.approval_status %}
+                                        <span class="hrp-badge {{ 'hrp-badge-green' if o.approval_status == 'Approved' else ('hrp-badge-red' if o.approval_status == 'Rejected' else 'hrp-badge-orange') }}">{{ o.approval_status }}</span>
+                                        {% else %}<span class="hrp-hint">—</span>{% endif %}
+                                    </td>
+                                    <td>{{ o.total_ctc or '—' }}</td>
+                                    <td>
+                                        {% if can_approve_offers and o.status in ('Draft', 'Approval Pending') %}
+                                        <form method="post" style="display:inline">
+                                            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                                            <input type="hidden" name="action" value="approve_offer">
+                                            <input type="hidden" name="offer" value="{{ o.name }}">
+                                            <button class="hrp-btn hrp-btn-sm hrp-btn-success" type="submit" data-confirm="Approve offer {{ o.name }}? It can then be emailed to the candidate.">✓ Approve</button>
+                                        </form>
+                                        <form method="post" style="display:inline">
+                                            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                                            <input type="hidden" name="action" value="reject_offer">
+                                            <input type="hidden" name="offer" value="{{ o.name }}">
+                                            <button class="hrp-btn hrp-btn-sm hrp-btn-danger" type="submit" data-confirm="Reject offer {{ o.name }}? It returns to Draft for revision.">✗ Reject</button>
+                                        </form>
+                                        {% elif o.needs_approval %}
+                                        <span class="hrp-hint">⏳ Awaiting approval</span>
+                                        {% else %}<span class="hrp-hint">—</span>{% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="hrp-empty">
+                        <div class="hrp-empty-icon">📄</div>
+                        <p>No offers yet for this JD.</p>
+                        <p class="hrp-hint">Create offers from a candidate's profile, or drag a candidate onto the <strong>Offer</strong> column in the Pipeline board.</p>
+                    </div>
+                    {% endif %}
                 </div>
 
                 <div class="hrp-card hrp-mt">

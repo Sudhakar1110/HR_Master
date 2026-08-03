@@ -79,10 +79,22 @@
                     <button class="hrp-btn hrp-btn-danger hrp-btn-sm" type="button" id="fDelete" title="Delete selected saved search">🗑</button>
                 </div>
             </div>
+            {% if can_write %}
+            <div class="hrp-bulk-bar" id="hrpBulkBar" style="display:none">
+                <span class="hrp-hint" id="hrpBulkCount">0 selected</span>
+                <button type="button" class="hrp-btn hrp-btn-success hrp-btn-sm" data-bulk="Shortlist">⭐ Shortlist</button>
+                <button type="button" class="hrp-btn hrp-btn-primary hrp-btn-sm" data-bulk="Hire">🎉 Hire</button>
+                <button type="button" class="hrp-btn hrp-btn-warning hrp-btn-sm" data-bulk="Put on Hold">⏸️ Hold</button>
+                <button type="button" class="hrp-btn hrp-btn-danger hrp-btn-sm" data-bulk="Reject">🚫 Reject</button>
+                <button type="button" class="hrp-btn hrp-btn-secondary hrp-btn-sm" id="hrpBulkExport">⬇️ Export CSV</button>
+                <button type="button" class="hrp-btn hrp-btn-secondary hrp-btn-sm" id="hrpBulkClear">Clear</button>
+            </div>
+            {% endif %}
             <div class="hrp-table-wrap">
                 <table class="hrp-table" id="resultsTable">
                     <thead>
                         <tr>
+                            {% if can_write %}<th><input type="checkbox" id="hrpSelectAll" title="Select all visible candidates"></th>{% endif %}
                             <th>#</th><th>Candidate</th><th>Source</th><th>Match %</th><th>Recommendation</th>
                             <th>Status</th><th>Exp / Edu</th><th>Actions</th>
                         </tr>
@@ -90,6 +102,7 @@
                     <tbody>
                         {% for r in rankings %}
                         <tr data-source="{{ r.source or '' }}" data-match="{{ (r.total_match_score or 0)|int }}" data-exp="{{ r.candidate_experience or 0 }}" data-location="{{ r.candidate_location or '' }}">
+                            {% if can_write %}<td><input type="checkbox" class="hrp-row-check" data-ranking="{{ r.name }}" data-candidate="{{ r.candidate }}"></td>{% endif %}
                             <td><strong>{{ loop.index }}</strong></td>
                             <td>
                                 <a class="hrp-link" href="/hr_portal/candidate?name={{ r.candidate }}">{{ r.candidate_name }}</a>
@@ -293,6 +306,111 @@
             }).then(function () { loadSaved(); });
         });
         loadSaved();
+
+        // ---- Bulk actions (Shortlist / Hire / Hold / Reject / Export CSV) ----
+        var bulkBar = document.getElementById("hrpBulkBar");
+        if (bulkBar) {
+            var bulkSel = {};   // ranking name -> 1
+            var bulkCand = {};  // ranking name -> candidate name (for export)
+            var selectAll = document.getElementById("hrpSelectAll");
+            var bulkCount = document.getElementById("hrpBulkCount");
+
+            function visibleRows() {
+                return rows.filter(function (r) { return r.style.display !== "none"; });
+            }
+            function refreshBulk() {
+                var count = Object.keys(bulkSel).length;
+                bulkCount.textContent = count + " selected";
+                bulkBar.style.display = count ? "" : "none";
+                if (selectAll) selectAll.checked = count > 0 && count === visibleRows().length;
+            }
+            function selectedRankings() { return Object.keys(bulkSel); }
+            function selectedCandidates() {
+                var out = [];
+                Object.keys(bulkCand).forEach(function (k) {
+                    var c = bulkCand[k];
+                    if (c && out.indexOf(c) === -1) out.push(c);
+                });
+                return out;
+            }
+
+            rows.forEach(function (row) {
+                var cb = row.querySelector(".hrp-row-check");
+                if (!cb) return;
+                cb.addEventListener("change", function () {
+                    var rk = cb.getAttribute("data-ranking");
+                    if (cb.checked) { bulkSel[rk] = 1; bulkCand[rk] = cb.getAttribute("data-candidate"); }
+                    else { delete bulkSel[rk]; delete bulkCand[rk]; }
+                    refreshBulk();
+                });
+            });
+
+            if (selectAll) {
+                selectAll.addEventListener("change", function () {
+                    var on = selectAll.checked;
+                    visibleRows().forEach(function (row) {
+                        var cb = row.querySelector(".hrp-row-check");
+                        if (!cb) return;
+                        cb.checked = on;
+                        var rk = cb.getAttribute("data-ranking");
+                        if (on) { bulkSel[rk] = 1; bulkCand[rk] = cb.getAttribute("data-candidate"); }
+                        else { delete bulkSel[rk]; delete bulkCand[rk]; }
+                    });
+                    refreshBulk();
+                });
+            }
+
+            bulkBar.querySelectorAll("[data-bulk]").forEach(function (btn) {
+                btn.addEventListener("click", function () {
+                    var names = selectedRankings();
+                    if (!names.length) return;
+                    var action = btn.getAttribute("data-bulk");
+                    if (!confirm("Apply '" + action + "' to " + names.length + " selected candidate(s)?")) return;
+                    post("/api/method/hr_master.api.portal_actions.bulk_ranking_action", {
+                        rankings: names, action: action
+                    }).then(function (data) {
+                        var m = data && data.message;
+                        if (m && (m.status === "success" || m.status === "partial")) {
+                            location.reload();
+                        } else {
+                            alert((m && (m.message || (m.errors || []).join("\n"))) || "Bulk action failed");
+                        }
+                    });
+                });
+            });
+
+            document.getElementById("hrpBulkExport").addEventListener("click", function () {
+                var cands = selectedCandidates();
+                if (!cands.length) return;
+                post("/api/method/hr_master.utils.candidate_export.export_candidates", {
+                    filters: JSON.stringify({ name: ["in", cands] })
+                }).then(function (data) {
+                    var m = data && data.message;
+                    if (m && m.status === "success" && m.file_url) {
+                        window.open(m.file_url, "_blank");
+                        bulkSel = {}; bulkCand = {};
+                        rows.forEach(function (row) {
+                            var cb = row.querySelector(".hrp-row-check");
+                            if (cb) cb.checked = false;
+                        });
+                        if (selectAll) selectAll.checked = false;
+                        refreshBulk();
+                    } else {
+                        alert((m && m.message) || "Export failed");
+                    }
+                });
+            });
+
+            document.getElementById("hrpBulkClear").addEventListener("click", function () {
+                bulkSel = {}; bulkCand = {};
+                rows.forEach(function (row) {
+                    var cb = row.querySelector(".hrp-row-check");
+                    if (cb) cb.checked = false;
+                });
+                if (selectAll) selectAll.checked = false;
+                refreshBulk();
+            });
+        }
     })();
     </script>
 

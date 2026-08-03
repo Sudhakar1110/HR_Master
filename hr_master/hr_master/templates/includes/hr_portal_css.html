@@ -1139,6 +1139,18 @@ html { scroll-behavior: smooth; }
 .hrp-legend-value { font-weight: 700; color: var(--hrp-heading); }
 .hrp-legend-value em { font-style: normal; font-weight: 400; font-size: 11px; color: var(--hrp-muted); margin-left: 4px; }
 html[data-theme="dark"] .hrp-funnel-track { background: #141b31; border-color: var(--hrp-border-strong); }
+/* Bulk actions bar + row checkboxes (ranked results page) */
+.hrp-bulk-bar {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 10px;
+    padding: 10px 14px; margin-bottom: 14px;
+    background: linear-gradient(135deg, rgba(99, 91, 255, 0.08), rgba(16, 185, 129, 0.08));
+    border: 1px solid var(--hrp-border);
+    border-radius: var(--hrp-radius);
+    animation: hrpFadeUp 0.35s ease both;
+}
+.hrp-bulk-bar .hrp-hint { font-weight: 700; color: var(--hrp-primary); margin-right: 4px; }
+.hrp-row-check, #hrpSelectAll { accent-color: var(--hrp-primary); width: 16px; height: 16px; cursor: pointer; }
+html[data-theme="dark"] .hrp-bulk-bar { background: rgba(99, 91, 255, 0.12); }
 </style>
 <script>
 /* Theme init — set before first paint to avoid a light flash.

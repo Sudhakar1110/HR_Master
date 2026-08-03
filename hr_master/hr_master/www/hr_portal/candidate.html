@@ -210,21 +210,42 @@
                                 <tr>
                                     <td>{{ o.job_title }}</td>
                                     <td>
-                                        <span class="hrp-badge {{ 'hrp-badge-green' if o.status == 'Accepted' else ('hrp-badge-blue' if o.status in ('Approved', 'Offer Sent') else 'hrp-badge-gray') }}">{{ o.status }}</span>
+                                        <span class="hrp-badge {{ 'hrp-badge-green' if o.status == 'Accepted' else ('hrp-badge-blue' if o.status in ('Approved', 'Offer Sent') else ('hrp-badge-orange' if o.status == 'Approval Pending' else 'hrp-badge-gray')) }}">{{ o.status }}</span>
+                                        {% if o.approval_status %}
+                                        <span class="hrp-badge {{ 'hrp-badge-green' if o.approval_status == 'Approved' else ('hrp-badge-red' if o.approval_status == 'Rejected' else 'hrp-badge-orange') }}" style="margin-left:4px">Approval: {{ o.approval_status }}</span>
+                                        {% endif %}
                                         {% if o.status in ('Offer Sent', 'Negotiation', 'Accepted') %}
                                         <span class="hrp-badge hrp-badge-green" style="margin-left:4px">✓ Emailed{% if o.offer_email_sent_at %} · {{ o.offer_email_sent_at.strftime('%d %b %Y %H:%M') }}{% endif %}</span>
                                         {% endif %}
                                     </td>
                                     <td>{{ o.total_ctc or '—' }}</td>
                                     <td>
-                                        {% if can_write and o.status not in ('Accepted', 'Declined', 'Withdrawn') %}
+                                        {% if can_approve_offers and o.status in ('Draft', 'Approval Pending') %}
+                                        <form method="post" style="display:inline">
+                                            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                                            <input type="hidden" name="action" value="approve_offer">
+                                            <input type="hidden" name="offer" value="{{ o.name }}">
+                                            <button class="hrp-btn hrp-btn-sm hrp-btn-success" type="submit" data-confirm="Approve offer {{ o.name }}?">✓ Approve</button>
+                                        </form>
+                                        <form method="post" style="display:inline">
+                                            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                                            <input type="hidden" name="action" value="reject_offer">
+                                            <input type="hidden" name="offer" value="{{ o.name }}">
+                                            <button class="hrp-btn hrp-btn-sm hrp-btn-danger" type="submit" data-confirm="Reject offer {{ o.name }}?">✗ Reject</button>
+                                        </form>
+                                        {% endif %}
+                                        {% if can_write and o.sendable %}
                                         <form method="post" style="display:inline">
                                             <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
                                             <input type="hidden" name="action" value="send_offer">
                                             <input type="hidden" name="offer" value="{{ o.name }}">
                                             <button class="hrp-btn hrp-btn-sm hrp-btn-primary" type="submit" data-confirm="Email the offer letter (PDF) to {{ candidate.candidate_name }}?">✉️ Email</button>
                                         </form>
-                                        {% else %}<span class="hrp-hint">—</span>{% endif %}
+                                        {% elif o.needs_approval %}
+                                        <span class="hrp-hint">⏳ Awaiting approval</span>
+                                        {% elif not can_write %}
+                                        <span class="hrp-hint">—</span>
+                                        {% endif %}
                                     </td>
                                 </tr>
                                 {% endfor %}

@@ -73,6 +73,17 @@
                         </div>
                     </div>
 
+                    <div class="hrp-form-row">
+                        <label class="hrp-label" for="hiring_manager">Hiring Manager</label>
+                        <select class="hrp-select" id="hiring_manager" name="hiring_manager">
+                            <option value="">— Unassigned (visible to all HR roles) —</option>
+                            {% for u in users %}
+                            <option value="{{ u.name }}" {{ 'selected' if (form_values or {}).get('hiring_manager') == u.name else '' }}>{{ u.full_name or u.name }} ({{ u.name }})</option>
+                            {% endfor %}
+                        </select>
+                        <span class="hrp-hint">Assigning a hiring manager limits who sees this JD in the portal — Admins and Recruiters always see everything.</span>
+                    </div>
+
                     <div class="hrp-form-grid">
                         <div class="hrp-form-row">
                             <label class="hrp-label" for="min_experience_years">Min Experience (yrs)</label>
@@ -130,11 +141,14 @@
             <!-- JD list -->
             <div class="hrp-card">
                 <h2 class="hrp-card-title">All Job Descriptions</h2>
+                {% if is_hiring_manager %}
+                <p class="hrp-hint" style="margin-bottom:10px">👁 You are a <strong>Hiring Manager</strong> — this list shows only JDs assigned to you (plus unassigned ones). Ask an Admin or Recruiter to assign you to a JD if it's missing.</p>
+                {% endif %}
                 {% if jds %}
                 <div class="hrp-table-wrap">
                     <table class="hrp-table">
                         <thead>
-                            <tr><th>Job Title</th><th>Status</th><th>Search</th><th>Location</th><th>Vac.</th><th></th></tr>
+                            <tr><th>Job Title</th><th>Status</th><th>Search</th><th>Location</th><th>Vac.</th><th>Hiring Mgr</th><th></th></tr>
                         </thead>
                         <tbody>
                             {% for jd in jds %}
@@ -150,6 +164,7 @@
                                 </td>
                                 <td>{{ jd.location or '—' }}</td>
                                 <td>{{ jd.vacancies or 1 }}</td>
+                                <td>{{ jd.hiring_manager or '—' }}</td>
                                 <td class="hrp-right"><a class="hrp-link" href="/hr_portal/jd?name={{ jd.name }}">Open →</a></td>
                             </tr>
                             {% endfor %}

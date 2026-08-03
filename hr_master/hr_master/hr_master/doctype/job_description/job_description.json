@@ -15,6 +15,7 @@
   "posting_date",
   "target_close_date",
   "vacancies",
+  "hiring_manager",
   "sb_description",
   "job_description_raw",
   "column_break_10",
@@ -92,6 +93,13 @@
    "fieldname": "vacancies",
    "fieldtype": "Int",
    "label": "Number of Vacancies"
+  },
+  {
+   "fieldname": "hiring_manager",
+   "fieldtype": "Link",
+   "label": "Hiring Manager",
+   "options": "User",
+   "description": "Assigned hiring manager — this user (plus Admins and Recruiters) can see this JD in the portal."
   },
   {
    "fieldname": "sb_description",

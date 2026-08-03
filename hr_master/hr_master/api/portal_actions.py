@@ -51,6 +51,73 @@ def can_write(user=None):
     return any(r in ("HR Master Admin", "HR Master Recruiter") for r in user_roles)
 
 
+def can_approve_offers(user=None):
+    """Return True if the user may approve / reject offers in the portal.
+
+    Approvers are Admins and Hiring Managers (recruiters create offers but
+    cannot approve their own, so self-approval is not possible).
+    """
+    user_roles = frappe.get_roles(user)
+    return any(r in ("HR Master Admin", "HR Master Hiring Manager") for r in user_roles)
+
+
+def jd_visibility():
+    """Return (filters, or_filters) scoping Job Descriptions for the current user.
+
+    Admins / Recruiters / Viewers see everything. Hiring Managers see only
+    JDs assigned to them (hiring_manager == user) or unassigned ones.
+    """
+    roles = frappe.get_roles()
+    if any(
+        r in ("HR Master Admin", "HR Master Recruiter", "HR Master Viewer")
+        for r in roles
+    ):
+        return {}, None
+    if "HR Master Hiring Manager" in roles:
+        return {}, [
+            ["hiring_manager", "in", [frappe.session.user]],
+            ["hiring_manager", "is", "not set"],
+        ]
+    return {}, None
+
+
+def visible_jd_names(limit=500):
+    """Names of the JDs the current user may view; None if unrestricted.
+
+    Used to scope candidate-ranking queries (e.g. dashboard top matches,
+    Kanban board) to the JDs a Hiring Manager is allowed to see.
+    """
+    filters, or_filters = jd_visibility()
+    if not or_filters:
+        return None
+    rows = frappe.get_all(
+        "Job Description",
+        fields=["name"],
+        filters=filters,
+        or_filters=or_filters,
+        limit_page_length=limit,
+    )
+    return [r["name"] for r in rows]
+
+
+def can_view_jd(jd_name):
+    """True if the current user may view this JD (role + assignment check)."""
+    if not jd_name or not frappe.db.exists("Job Description", jd_name):
+        return False
+    roles = frappe.get_roles()
+    if any(
+        r in ("HR Master Admin", "HR Master Recruiter", "HR Master Viewer")
+        for r in roles
+    ):
+        return True
+    if "HR Master Hiring Manager" in roles:
+        hiring_manager = frappe.db.get_value(
+            "Job Description", jd_name, "hiring_manager"
+        )
+        return not hiring_manager or hiring_manager == frappe.session.user
+    return False
+
+
 def set_portal_context(context):
     """Populate shared portal page context (CSRF token + per-user theme).
 
@@ -190,6 +257,7 @@ def create_jd(data=None):
         "location",
         "remote_option",
         "vacancies",
+        "hiring_manager",
         "min_experience_years",
         "max_experience_years",
         "salary_range_min",
@@ -360,7 +428,19 @@ def create_offer(data=None):
         if jd:
             offer.job_description = jd
 
-    offer.status = "Draft"
+    # When offer approval is enabled, new offers enter the approval queue
+    # instead of going straight to Draft, and cannot be emailed until approved.
+    try:
+        settings = frappe.get_single("Recruitment Settings")
+        require_approval = bool(settings.get("require_approval_for_offers"))
+    except Exception:
+        require_approval = False
+    if require_approval:
+        offer.status = "Approval Pending"
+        offer.approval_status = "Pending"
+    else:
+        offer.status = "Draft"
+
     offer.save(ignore_permissions=True)
     frappe.db.commit()
     return {"name": offer.name}
@@ -386,6 +466,25 @@ def send_offer_email(offer_name=None):
         frappe.throw(
             _("Candidate {0} has no email address — add one to the profile first").format(
                 candidate.candidate_name
+            )
+        )
+
+    # Approval gate: when enabled in Recruitment Settings, Draft / Approval
+    # Pending offers must be approved in the portal before they can be emailed.
+    try:
+        settings = frappe.get_single("Recruitment Settings")
+        require_approval = bool(settings.get("require_approval_for_offers"))
+    except Exception:
+        require_approval = False
+    if (
+        require_approval
+        and offer.status in ("Draft", "Approval Pending")
+        and offer.approval_status != "Approved"
+    ):
+        frappe.throw(
+            _(
+                "This offer needs approval before it can be emailed — approve it "
+                "from the Offers section on the JD / candidate page first."
             )
         )
 
@@ -566,8 +665,20 @@ def move_candidate_pipeline(ranking=None, column=None):
     """Move a ranking card between Kanban columns (drag & drop).
 
     Maps the target column to the matching Candidate Evaluation workflow
-    action so the status, workflow state and candidate stay in sync.
+    action so the status, workflow state and candidate stay in sync. The
+    special "Offer" column creates a Draft Offer for the candidate instead
+    of changing the workflow state (offers are a separate step).
     """
+    if not can_write():
+        frappe.throw(_("You are not allowed to move candidates"))
+    if not ranking or not frappe.db.exists("Candidate Ranking", ranking):
+        frappe.throw(_("Ranking not found"))
+
+    if (column or "") == "Offer":
+        ranking_doc = frappe.get_doc("Candidate Ranking", ranking)
+        ensure_offer_for_ranking(ranking_doc)
+        return {"status": "success", "target": "Offer"}
+
     column_actions = {
         "Screened": "Evaluate",
         "Shortlisted": "Shortlist",
@@ -581,6 +692,150 @@ def move_candidate_pipeline(ranking=None, column=None):
         frappe.throw(_("Unknown pipeline column: {0}").format(column))
     result = set_ranking_status(ranking, action)
     return {"status": "success", "target": result.get("status")}
+
+
+def ensure_offer_for_ranking(ranking_doc):
+    """Create a Draft Offer Management for the ranking if none is active.
+
+    Active = any offer that is not Declined / Withdrawn, so dragging a card
+    into the Offer column never duplicates an existing open offer.
+    """
+    if not ranking_doc.candidate:
+        frappe.throw(_("Ranking has no candidate"))
+    existing = frappe.get_all(
+        "Offer Management",
+        filters={
+            "candidate": ranking_doc.candidate,
+            "status": ["not in", ["Declined", "Withdrawn"]],
+        },
+        pluck="name",
+        limit_page_length=1,
+    )
+    if existing:
+        return existing[0]
+
+    offer = frappe.new_doc("Offer Management")
+    offer.candidate = ranking_doc.candidate
+    offer.job_description = ranking_doc.job_description
+    try:
+        settings = frappe.get_single("Recruitment Settings")
+        require_approval = bool(settings.get("require_approval_for_offers"))
+    except Exception:
+        require_approval = False
+    if require_approval:
+        offer.status = "Approval Pending"
+        offer.approval_status = "Pending"
+    else:
+        offer.status = "Draft"
+    offer.save(ignore_permissions=True)
+    frappe.db.commit()
+    return offer.name
+
+
+@frappe.whitelist()
+def review_offer(offer_name=None, approve=True, notes=None):
+    """Approve or reject an Offer in the portal before it is emailed.
+
+    Allowed for Admins and Hiring Managers. Approved offers can be emailed;
+    rejected offers return to Draft (approval_status = Rejected) for revision.
+    """
+    if not can_approve_offers():
+        frappe.throw(_("You are not allowed to approve offers"))
+    if not offer_name or not frappe.db.exists("Offer Management", offer_name):
+        frappe.throw(_("Offer not found"))
+
+    offer = frappe.get_doc("Offer Management", offer_name)
+    if offer.status not in ("Draft", "Approval Pending"):
+        frappe.throw(_("Only Draft / Approval Pending offers can be reviewed"))
+
+    approve = str(approve).lower() in ("1", "true", "yes")
+    if approve:
+        offer.approval_status = "Approved"
+        offer.status = "Approved"
+        action_label = "approved"
+    else:
+        offer.approval_status = "Rejected"
+        offer.status = "Draft"
+        action_label = "rejected"
+    offer.approved_by = frappe.session.user
+    offer.approval_date = frappe.utils.today()
+    if notes:
+        offer.approval_notes = notes
+    offer.save(ignore_permissions=True)
+    frappe.db.commit()
+
+    # Audit trail on the candidate
+    try:
+        from hr_master.hr_master.doctype.candidate_activity_log.candidate_activity_log import (
+            log_activity,
+        )
+
+        log_activity(
+            candidate=offer.candidate,
+            activity_type="Status Changed",
+            description=_("Offer {0} {1} by {2}").format(
+                offer_name, action_label, frappe.session.user
+            ),
+        )
+        frappe.db.commit()
+    except Exception:
+        pass
+
+    return {
+        "status": "success",
+        "approval_status": offer.approval_status,
+        "message": _("Offer {0} {1}").format(offer_name, action_label),
+    }
+
+
+@frappe.whitelist()
+def bulk_ranking_action(rankings=None, action=None):
+    """Apply one workflow action to many Candidate Rankings at once.
+
+    Used by the bulk actions bar on the ranked results page (Shortlist /
+    Reject / Hold / Hire / Evaluate / Schedule Interview).
+    """
+    if not can_write():
+        frappe.throw(_("You are not allowed to update rankings"))
+    if isinstance(rankings, str):
+        try:
+            rankings = json.loads(rankings)
+        except Exception:
+            rankings = [rankings]
+    if not rankings:
+        frappe.throw(_("No rankings selected"))
+
+    action = (action or "").strip()
+    valid_actions = {
+        "Evaluate",
+        "Shortlist",
+        "Reject",
+        "Put on Hold",
+        "Hire",
+        "Schedule Interview",
+    }
+    if action not in valid_actions:
+        frappe.throw(_("Unknown bulk action: {0}").format(action))
+
+    updated = 0
+    errors = []
+    for name in rankings:
+        try:
+            if not frappe.db.exists("Candidate Ranking", name):
+                errors.append(_("{0}: ranking not found").format(name))
+                continue
+            set_ranking_status(name, action)
+            updated += 1
+        except Exception as e:
+            errors.append(_("{0}: {1}").format(name, e))
+
+    frappe.db.commit()
+    return {
+        "status": "success" if not errors else "partial",
+        "action": action,
+        "updated": updated,
+        "errors": errors,
+    }
 
 
 # ------------------------------------------

@@ -13,6 +13,7 @@ from hr_master.api.portal_actions import (
     redirect_with_flash,
     render_flash,
     set_portal_context,
+    can_view_jd,
 )
 from hr_master.api.ranking_api import rank_all_candidates_for_jd
 from hr_master.api.portal_actions import send_rejection_email
@@ -27,7 +28,7 @@ def get_context(context):
     context.can_write = can_write()
 
     jd_name = frappe.form_dict.get("jd")
-    if not jd_name or not frappe.db.exists("Job Description", jd_name):
+    if not jd_name or not can_view_jd(jd_name):
         frappe.local.flags.redirect_location = "/hr_portal/jds"
         raise frappe.Redirect
 

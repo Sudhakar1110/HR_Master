@@ -21,6 +21,8 @@ from hr_master.api.portal_actions import (
     redirect_with_flash,
     render_flash,
     set_portal_context,
+    can_approve_offers,
+    review_offer,
 )
 
 
@@ -42,6 +44,20 @@ def get_context(context):
         action = frappe.form_dict.get("action")
         base_path = "/hr_portal/candidate?name={0}".format(candidate_name)
         try:
+            # Offer approval is done by Admins / Hiring Managers — it must NOT
+            # require the write role, so it runs before require_write_access().
+            if action in ("approve_offer", "reject_offer"):
+                offer_name = frappe.form_dict.get("offer")
+                result = review_offer(
+                    offer_name,
+                    approve=(action == "approve_offer"),
+                )
+                message = result.get("message") or (
+                    "Offer approved" if action == "approve_offer" else "Offer rejected"
+                )
+                flash_type = "success" if result.get("status") == "success" else "error"
+                redirect_with_flash(base_path, message, flash_type)
+
             require_write_access()
 
             if action in (
@@ -148,13 +164,37 @@ def get_context(context):
         limit_page_length=50,
     )
 
+    context.can_approve_offers = can_approve_offers()
     context.offers = frappe.get_all(
         "Offer Management",
-        fields=["name", "job_title", "status", "total_ctc", "offer_date", "expected_joining_date", "offer_email_sent_at"],
+        fields=[
+            "name",
+            "job_title",
+            "status",
+            "approval_status",
+            "approved_by",
+            "approval_date",
+            "total_ctc",
+            "offer_date",
+            "expected_joining_date",
+            "offer_email_sent_at",
+        ],
         filters={"candidate": candidate_name},
         order_by="offer_date desc",
         limit_page_length=20,
     )
+    try:
+        settings = frappe.get_single("Recruitment Settings")
+        _require_approval = bool(settings.get("require_approval_for_offers"))
+    except Exception:
+        _require_approval = False
+    for o in context.offers:
+        o["needs_approval"] = (
+            _require_approval
+            and o.get("status") in ("Draft", "Approval Pending")
+            and o.get("approval_status") != "Approved"
+        )
+        o["sendable"] = o.get("status") in ("Draft", "Approval Pending", "Approved") and not o["needs_approval"]
 
     context.feedback_list = frappe.get_all(
         "Interview Feedback",

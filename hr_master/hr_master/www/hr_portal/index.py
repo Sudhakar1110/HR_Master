@@ -4,7 +4,12 @@ from __future__ import unicode_literals
 
 import frappe
 
-from hr_master.api.portal_actions import require_hr_access, set_portal_context
+from hr_master.api.portal_actions import (
+    require_hr_access,
+    set_portal_context,
+    jd_visibility,
+    visible_jd_names,
+)
 
 
 def get_context(context):
@@ -37,16 +42,30 @@ def get_context(context):
         "avg_match": _avg_match_score(),
     }
 
+    jd_filters, jd_or_filters = jd_visibility()
     context.recent_jds = frappe.get_all(
         "Job Description",
         fields=["name", "job_title", "status", "location", "posting_date", "portal_search_status"],
+        filters=jd_filters,
+        or_filters=jd_or_filters,
         order_by="posting_date desc",
         limit=6,
     )
 
+    # Hiring Managers should not see top matches from JDs outside their scope.
+    visible = visible_jd_names()
+    if visible is None:
+        ranking_filters = {}
+    else:
+        ranking_filters = (
+            {"job_description": ["in", visible]}
+            if visible
+            else {"job_description": "__no_visible_jd__"}
+        )
     context.top_rankings = frappe.get_all(
         "Candidate Ranking",
         fields=["name", "candidate", "candidate_name", "job_title", "total_match_score", "status"],
+        filters=ranking_filters,
         order_by="total_match_score desc",
         limit=6,
     )

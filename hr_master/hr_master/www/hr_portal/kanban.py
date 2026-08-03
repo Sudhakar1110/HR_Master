@@ -8,13 +8,19 @@ from hr_master.api.portal_actions import (
     can_write,
     require_hr_access,
     set_portal_context,
+    jd_visibility,
+    visible_jd_names,
+    can_view_jd,
 )
 
-# Kanban columns -> workflow action applied when a card is dropped there
+# Kanban columns -> workflow action applied when a card is dropped there.
+# "Offer" has no workflow status: it is driven by the presence of an active
+# Offer Management record, and dropping a card there creates a draft offer.
 COLUMNS = [
     {"name": "Screened", "label": "Screened", "icon": "📋", "statuses": ["Pending", "Evaluated"], "color": "blue"},
     {"name": "Shortlisted", "label": "Shortlisted", "icon": "⭐", "statuses": ["Shortlisted"], "color": "green"},
     {"name": "Interview", "label": "Interview", "icon": "🗓️", "statuses": ["Interview Scheduled"], "color": "purple"},
+    {"name": "Offer", "label": "Offer", "icon": "📄", "statuses": [], "color": "blue"},
     {"name": "Selected", "label": "Selected / Hired", "icon": "🎉", "statuses": ["Selected"], "color": "green"},
     {"name": "On Hold", "label": "On Hold", "icon": "⏸️", "statuses": ["On Hold"], "color": "orange"},
     {"name": "Rejected", "label": "Rejected", "icon": "🚫", "statuses": ["Rejected"], "color": "red"},
@@ -36,14 +42,22 @@ def get_context(context):
 
     jd_name = frappe.form_dict.get("jd")
     filters = {}
-    if jd_name and frappe.db.exists("Job Description", jd_name):
+    if jd_name and frappe.db.exists("Job Description", jd_name) and can_view_jd(jd_name):
         filters["job_description"] = jd_name
         context.jd = jd_name
     else:
         context.jd = ""
+        # Hiring Managers only see rankings for JDs they can view.
+        visible = visible_jd_names()
+        if visible is not None:
+            filters = (
+                {"job_description": ["in", visible]}
+                if visible
+                else {"job_description": "__no_visible_jd__"}
+            )
 
     context.page_title = "Candidate Pipeline"
-    context.page_description = "Drag candidates between stages — Screened → Shortlisted → Interview → Selected/Hired."
+    context.page_description = "Drag candidates between stages — Screened → Shortlisted → Interview → Offer → Selected/Hired."
 
     rankings = frappe.get_all(
         "Candidate Ranking",
@@ -73,17 +87,42 @@ def get_context(context):
         )
         cand_map = {row["name"]: row for row in cand_rows}
 
+    # Candidates with an active offer sit in the Offer column. "Active" means
+    # any offer that is not Declined / Withdrawn; the latest one wins.
+    offers_map = {}
+    if names:
+        offer_rows = frappe.get_all(
+            "Offer Management",
+            fields=["candidate", "name", "status"],
+            filters={"status": ["not in", ["Declined", "Withdrawn"]]},
+            order_by="creation desc",
+            limit_page_length=500,
+        )
+        for row in offer_rows:
+            offers_map.setdefault(row["candidate"], row)
+
     for r in rankings:
         info = cand_map.get(r.get("candidate")) or {}
         r["source"] = info.get("source") or ""
         r["candidate_location"] = info.get("location") or ""
-        r["column"] = STATUS_TO_COLUMN.get(r.get("status"), "Screened")
+        offer = offers_map.get(r.get("candidate"))
+        if offer:
+            r["column"] = "Offer"
+            r["offer_status"] = offer.get("status")
+            r["offer_name"] = offer.get("name")
+        else:
+            r["column"] = STATUS_TO_COLUMN.get(r.get("status"), "Screened")
+            r["offer_status"] = ""
+            r["offer_name"] = ""
 
     context.rankings = rankings
     context.columns = COLUMNS
+    jd_filters, jd_or_filters = jd_visibility()
     context.jds = frappe.get_all(
         "Job Description",
         fields=["name", "job_title"],
+        filters=jd_filters,
+        or_filters=jd_or_filters,
         order_by="modified desc",
         limit_page_length=100,
     ) or []
