@@ -155,6 +155,21 @@ def _split_skills(value):
     return []
 
 
+def _to_float(value):
+    """Coerce a form/API value (string, number or empty) to a float.
+
+    Portal form values arrive as strings (e.g. "5000000"), so arithmetic on
+    them must coerce first — otherwise "5000000" + 0 raises
+    TypeError: can only concatenate str (not "int") to str.
+    """
+    if value in (None, ""):
+        return 0.0
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return 0.0
+
+
 @frappe.whitelist()
 def create_jd(data=None):
     """Create (and submit) a Job Description from portal form data."""
@@ -327,8 +342,8 @@ def create_offer(data=None):
         if data.get(field) not in (None, ""):
             offer.set(field, data.get(field))
 
-    base = data.get("base_salary") or 0
-    variable = data.get("variable_pay") or 0
+    base = _to_float(data.get("base_salary"))
+    variable = _to_float(data.get("variable_pay"))
     if base or variable:
         offer.total_ctc = base + variable
 

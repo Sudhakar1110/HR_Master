@@ -7,6 +7,21 @@ from frappe.model.document import Document
 from frappe.utils import today
 
 
+def _as_float(value):
+    """Coerce a value (string/number/None) to a float; 0.0 when empty/invalid.
+
+    Values can arrive as strings (e.g. via the portal or the REST API), so
+    arithmetic must coerce first to avoid TypeError: can only concatenate
+    str (not "int") to str.
+    """
+    if value in (None, ""):
+        return 0.0
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return 0.0
+
+
 class OfferManagement(Document):
     """Manages job offers for selected candidates."""
 
@@ -21,8 +36,8 @@ class OfferManagement(Document):
             self.offer_date = today()
 
     def calculate_total_ctc(self):
-        base = self.base_salary or 0
-        variable = self.variable_pay or 0
+        base = _as_float(self.base_salary)
+        variable = _as_float(self.variable_pay)
         self.total_ctc = base + variable
 
     def before_submit(self):
