@@ -347,10 +347,277 @@ def create_offer(data=None):
     if base or variable:
         offer.total_ctc = base + variable
 
+    # The portal form does not pass a Job Description; link the candidate's
+    # latest ranking so job_title is fetched and the offer letter prints it.
+    if not offer.job_description:
+        jd = frappe.db.get_value(
+            "Candidate Ranking",
+            {"candidate": data.get("candidate")},
+            "job_description",
+            order_by="evaluation_date desc",
+        )
+        if jd:
+            offer.job_description = jd
+
     offer.status = "Draft"
     offer.save(ignore_permissions=True)
     frappe.db.commit()
     return {"name": offer.name}
+
+
+@frappe.whitelist()
+def send_offer_email(offer_name=None):
+    """Email the offer letter (with the offer-letter PDF attached) to the candidate.
+
+    Uses the 'Offer Letter' Email Template Config when available and advances
+    the offer status to 'Offer Sent' (Draft / Approval Pending / Approved
+    only). If PDF rendering is unavailable the email is still sent without
+    the attachment and the failure is logged.
+    """
+    if not can_write():
+        frappe.throw(_("You are not allowed to send offers"))
+    if not offer_name or not frappe.db.exists("Offer Management", offer_name):
+        frappe.throw(_("Offer not found"))
+
+    offer = frappe.get_doc("Offer Management", offer_name)
+    candidate = frappe.get_doc("Candidate", offer.candidate)
+    if not (candidate.email or "").strip():
+        frappe.throw(
+            _("Candidate {0} has no email address — add one to the profile first").format(
+                candidate.candidate_name
+            )
+        )
+
+    job_title = offer.job_title or _get_latest_job_title(candidate.name)
+    context = {
+        "candidate_name": candidate.candidate_name,
+        "job_title": job_title or _("the position"),
+        "company_name": _get_company_name(),
+        "recruiter_name": _get_recruiter_name(),
+        "offer_link": frappe.utils.get_url(
+            "/app/offer-management/{0}".format(offer.name)
+        ),
+    }
+    subject, message = _render_email_template(
+        "Offer Letter", context, "Offer of Employment - {0}".format(job_title)
+    )
+
+    # Offer letter PDF attachment (best effort — never block the email).
+    attachments = []
+    try:
+        html = frappe.get_print(
+            "Offer Management", offer.name, print_format="Offer Letter"
+        )
+        from frappe.utils.pdf import get_pdf
+
+        pdf = get_pdf(html)
+        if pdf:
+            attachments.append({
+                "fname": "Offer-Letter-{0}.pdf".format(offer.name),
+                "fcontent": pdf,
+            })
+    except Exception as e:
+        frappe.log_error(
+            message=f"Offer PDF generation failed for {offer.name}: {str(e)}",
+            title="Offer Email Error",
+        )
+
+    frappe.sendmail(
+        recipients=[candidate.email],
+        cc=_get_cc_emails(offer.owner),
+        subject=subject,
+        message=message,
+        attachments=attachments,
+        reference_doctype="Offer Management",
+        reference_name=offer.name,
+        now=True,
+    )
+
+    if offer.status in ("Draft", "Approval Pending", "Approved"):
+        frappe.db.set_value("Offer Management", offer.name, "status", "Offer Sent")
+
+    frappe.db.commit()
+    return {
+        "status": "success",
+        "message": _("Offer emailed to {0}").format(candidate.email),
+    }
+
+
+@frappe.whitelist()
+def send_interview_invite_email(interview_name=None):
+    """Email the interview invitation to the candidate and the interviewers.
+
+    Uses the 'Interview Invitation' Email Template Config when available.
+    """
+    if not can_write():
+        frappe.throw(_("You are not allowed to send invites"))
+    if not interview_name or not frappe.db.exists("Interview Schedule", interview_name):
+        frappe.throw(_("Interview not found"))
+
+    iv = frappe.get_doc("Interview Schedule", interview_name)
+    candidate = frappe.get_doc("Candidate", iv.candidate)
+    if not (candidate.email or "").strip():
+        frappe.throw(
+            _("Candidate {0} has no email address — add one to the profile first").format(
+                candidate.candidate_name
+            )
+        )
+
+    context = {
+        "candidate_name": candidate.candidate_name,
+        "job_title": iv.job_title or "",
+        "company_name": _get_company_name(),
+        "interviewer_name": _get_first_interviewer_name(iv),
+        "scheduled_date": str(iv.scheduled_date or ""),
+        "scheduled_time": _time_to_string(iv.scheduled_time),
+        "interview_link": iv.location_or_link or "",
+        "recruiter_name": _get_recruiter_name(),
+    }
+    subject, message = _render_email_template(
+        "Interview Invitation",
+        context,
+        "Interview Invitation - {0}".format(iv.candidate_name),
+    )
+
+    recipients = [candidate.email]
+    for row in iv.interviewers or []:
+        if (row.email or "").strip() and row.email not in recipients:
+            recipients.append(row.email)
+
+    frappe.sendmail(
+        recipients=recipients,
+        cc=_get_cc_emails(iv.owner),
+        subject=subject,
+        message=message,
+        reference_doctype="Interview Schedule",
+        reference_name=iv.name,
+        now=True,
+    )
+    frappe.db.commit()
+    return {
+        "status": "success",
+        "message": _("Invite emailed to {0}").format(candidate.email),
+    }
+
+
+# ------------------------------------------
+# Email helpers
+# ------------------------------------------
+
+
+def _render_email_template(template_name, context, fallback_subject):
+    """Render subject + body from an Email Template Config (placeholder fill)."""
+    template_doc = None
+    if frappe.db.exists("Email Template Config", template_name):
+        template_doc = frappe.get_doc("Email Template Config", template_name)
+
+    if template_doc:
+        subject = template_doc.subject or fallback_subject
+        message = (
+            template_doc.message_html
+            if template_doc.use_html
+            else template_doc.message_text
+        )
+    else:
+        subject = fallback_subject
+        message = "<p>{0}</p>".format(fallback_subject)
+
+    for key, value in (context or {}).items():
+        placeholder = "{{ " + key + " }}"
+        subject = subject.replace(placeholder, str(value))
+        message = message.replace(placeholder, str(value))
+    return subject, message
+
+
+def _get_company_name():
+    """Company name from Recruitment Settings (best effort)."""
+    try:
+        return frappe.db.get_single_value("Recruitment Settings", "company_name") or ""
+    except Exception:
+        return ""
+
+
+def _get_recruiter_name():
+    """Display name of the default recruiter, else the current user."""
+    try:
+        recruiter = frappe.db.get_single_value(
+            "Recruitment Settings", "default_recruiter"
+        )
+        if recruiter:
+            user = frappe.get_doc("User", recruiter)
+            return user.full_name or recruiter
+    except Exception:
+        pass
+    try:
+        user = frappe.get_doc("User", frappe.session.user)
+        return user.full_name or frappe.session.user
+    except Exception:
+        return frappe.session.user
+
+
+def _get_cc_emails(owner=None):
+    """Default CC list for candidate emails: recruiter, plus the doc owner."""
+    emails = []
+    try:
+        recruiter = frappe.db.get_single_value(
+            "Recruitment Settings", "default_recruiter"
+        )
+        if recruiter:
+            email = frappe.db.get_value("User", recruiter, "email")
+            if email:
+                emails.append(email)
+    except Exception:
+        pass
+    if owner and owner != frappe.session.user:
+        email = frappe.db.get_value("User", owner, "email")
+        if email and email not in emails:
+            emails.append(email)
+    return emails
+
+
+def _get_latest_job_title(candidate_name):
+    """Latest ranked job title for a candidate (offer fallback)."""
+    try:
+        return (
+            frappe.db.get_value(
+                "Candidate Ranking",
+                {"candidate": candidate_name},
+                "job_title",
+                order_by="evaluation_date desc",
+            )
+            or ""
+        )
+    except Exception:
+        return ""
+
+
+def _get_first_interviewer_name(iv):
+    """Name of the first interviewer row (for the email template)."""
+    try:
+        for row in iv.interviewers or []:
+            if (row.interviewer_name or "").strip():
+                return row.interviewer_name
+            if row.interviewer:
+                return row.interviewer
+    except Exception:
+        pass
+    return ""
+
+
+def _time_to_string(value):
+    """Render a Time value (datetime.time / timedelta / str) as HH:MM."""
+    if value is None:
+        return ""
+    try:
+        if hasattr(value, "hour"):
+            return "{0:02d}:{1:02d}".format(value.hour, value.minute)
+        if isinstance(value, str) and ":" in value:
+            return value[:5]
+        # timedelta (seconds since midnight)
+        total = int(value.total_seconds()) if hasattr(value, "total_seconds") else 0
+        return "{0:02d}:{1:02d}".format(total // 3600, (total % 3600) // 60)
+    except Exception:
+        return str(value)
 
 
 @frappe.whitelist()

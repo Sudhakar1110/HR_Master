@@ -14,6 +14,8 @@ from hr_master.api.portal_actions import (
     set_ranking_status,
     schedule_interview,
     create_offer,
+    send_offer_email,
+    send_interview_invite_email,
     submit_feedback,
     redirect_with_flash,
     render_flash,
@@ -73,6 +75,18 @@ def get_context(context):
                 result = submit_feedback(json.dumps(data))
                 redirect_with_flash(
                     base_path, "Feedback submitted: {0}".format(result.get("name"))
+                )
+            elif action == "send_offer":
+                result = send_offer_email(frappe.form_dict.get("offer"))
+                flash_type = "success" if result.get("status") == "success" else "error"
+                redirect_with_flash(
+                    base_path, result.get("message") or "Offer email sent", flash_type
+                )
+            elif action == "send_invite":
+                result = send_interview_invite_email(frappe.form_dict.get("interview"))
+                flash_type = "success" if result.get("status") == "success" else "error"
+                redirect_with_flash(
+                    base_path, result.get("message") or "Invite emailed", flash_type
                 )
             else:
                 frappe.throw(_("Unknown action"))

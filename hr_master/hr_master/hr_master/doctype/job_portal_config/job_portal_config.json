@@ -62,6 +62,8 @@
   "sb_notifications",
   "notify_on_high_match",
   "notify_on_search_complete",
+  "interview_reminders_enabled",
+  "interview_reminder_hours",
   "notification_recipients",
   "column_break_31",
   "email_notifications",
@@ -382,6 +384,20 @@
    "fieldname": "notify_on_search_complete",
    "fieldtype": "Check",
    "label": "Notify on Search Complete"
+  },
+  {
+   "default": "1",
+   "fieldname": "interview_reminders_enabled",
+   "fieldtype": "Check",
+   "label": "Enable Interview Reminder Emails",
+   "description": "Automatically emails the candidate and interviewers before a scheduled interview (lead time below)."
+  },
+  {
+   "default": "24",
+   "fieldname": "interview_reminder_hours",
+   "fieldtype": "Int",
+   "label": "Reminder Lead Time (hours)",
+   "description": "How many hours before the interview the reminder email is sent (default 24)."
   },
   {
    "fieldname": "notification_recipients",

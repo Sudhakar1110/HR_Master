@@ -46,7 +46,8 @@ scheduler_events = {
     ],
     "hourly": [
         "hr_master.tasks.hourly.auto_rank_pending_candidates",
-        "hr_master.tasks.hourly.process_pending_search_results"
+        "hr_master.tasks.hourly.process_pending_search_results",
+        "hr_master.tasks.hourly.send_interview_reminders"
     ],
     "daily_long": [
         "hr_master.tasks.daily_cleanup.archive_old_searches",

@@ -198,13 +198,23 @@
                     {% if offers %}
                     <div class="hrp-table-wrap">
                         <table class="hrp-table">
-                            <thead><tr><th>Job</th><th>Status</th><th>CTC</th></tr></thead>
+                            <thead><tr><th>Job</th><th>Status</th><th>CTC</th><th></th></tr></thead>
                             <tbody>
                                 {% for o in offers %}
                                 <tr>
                                     <td>{{ o.job_title }}</td>
                                     <td><span class="hrp-badge {{ 'hrp-badge-green' if o.status == 'Accepted' else ('hrp-badge-blue' if o.status in ('Approved', 'Offer Sent') else 'hrp-badge-gray') }}">{{ o.status }}</span></td>
                                     <td>{{ o.total_ctc or '—' }}</td>
+                                    <td>
+                                        {% if can_write and o.status not in ('Accepted', 'Declined', 'Withdrawn') %}
+                                        <form method="post" style="display:inline">
+                                            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                                            <input type="hidden" name="action" value="send_offer">
+                                            <input type="hidden" name="offer" value="{{ o.name }}">
+                                            <button class="hrp-btn hrp-btn-sm hrp-btn-primary" type="submit" data-confirm="Email the offer letter (PDF) to {{ candidate.candidate_name }}?">✉️ Email</button>
+                                        </form>
+                                        {% else %}<span class="hrp-hint">—</span>{% endif %}
+                                    </td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
@@ -246,6 +256,40 @@
                         </div>
                         <button class="hrp-btn hrp-btn-success" type="submit">💌 Create Offer</button>
                     </form>
+                    {% endif %}
+                </div>
+
+                <div class="hrp-card hrp-mt">
+                    <h2 class="hrp-card-title">Interviews</h2>
+                    {% if interviews %}
+                    <div class="hrp-table-wrap">
+                        <table class="hrp-table">
+                            <thead><tr><th>Job</th><th>Date</th><th>Time</th><th>Round</th><th>Status</th><th></th></tr></thead>
+                            <tbody>
+                                {% for i in interviews %}
+                                <tr>
+                                    <td>{{ i.job_title or '—' }}</td>
+                                    <td>{{ i.scheduled_date }}</td>
+                                    <td>{{ i.scheduled_time }}</td>
+                                    <td>{{ i.interview_round or '—' }}</td>
+                                    <td><span class="hrp-badge hrp-badge-blue">{{ i.status }}</span></td>
+                                    <td>
+                                        {% if can_write and i.status in ('Scheduled', 'Rescheduled') %}
+                                        <form method="post" style="display:inline">
+                                            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                                            <input type="hidden" name="action" value="send_invite">
+                                            <input type="hidden" name="interview" value="{{ i.name }}">
+                                            <button class="hrp-btn hrp-btn-sm hrp-btn-primary" type="submit" data-confirm="Email the interview invitation to {{ candidate.candidate_name }}?">✉️ Invite</button>
+                                        </form>
+                                        {% else %}<span class="hrp-hint">—</span>{% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="hrp-empty"><p>No interviews yet.</p></div>
                     {% endif %}
                 </div>
 

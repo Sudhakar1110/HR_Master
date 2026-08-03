@@ -26,6 +26,7 @@
   "column_break_15",
   "feedback_required",
   "send_calendar_invite",
+  "reminder_sent",
   "sb_feedback",
   "feedback",
   "rating",
@@ -161,6 +162,13 @@
    "fieldname": "send_calendar_invite",
    "fieldtype": "Check",
    "label": "Send Calendar Invite"
+  },
+  {
+   "default": "0",
+   "fieldname": "reminder_sent",
+   "fieldtype": "Check",
+   "label": "Reminder Email Sent",
+   "description": "Marked automatically once the 24h-before reminder email has been sent."
   },
   {
    "fieldname": "sb_feedback",
