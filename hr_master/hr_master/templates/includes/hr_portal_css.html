@@ -1106,6 +1106,39 @@ html { scroll-behavior: smooth; }
 /* Results filter bar */
 .hrp-filter-bar { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; margin-bottom: 16px; padding: 14px; background: var(--hrp-bg); border: 1px solid var(--hrp-border); border-radius: 12px; }
 .hrp-filter-bar .hrp-form-row { margin: 0; }
+
+/* Dashboard charts (pure CSS/SVG — no external chart library needed) */
+.hrp-charts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 24px; }
+@media (max-width: 1100px) { .hrp-charts { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 760px) { .hrp-charts { grid-template-columns: 1fr; } }
+.hrp-card-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin-bottom: 16px; }
+.hrp-card-head .hrp-card-title { margin-bottom: 0; }
+
+.hrp-funnel { display: flex; flex-direction: column; gap: 13px; }
+.hrp-funnel-row { display: grid; grid-template-columns: 128px 1fr; align-items: center; gap: 12px; }
+.hrp-funnel-label { display: flex; justify-content: space-between; gap: 8px; font-size: 13px; color: var(--hrp-muted); white-space: nowrap; }
+.hrp-funnel-count { color: var(--hrp-heading); font-weight: 700; }
+.hrp-funnel-track { height: 14px; background: var(--hrp-bg); border: 1px solid var(--hrp-border); border-radius: 999px; overflow: hidden; }
+.hrp-funnel-fill { height: 100%; border-radius: 999px; min-width: 4px; margin: 0 auto; transition: width 0.5s ease, filter 0.2s ease, box-shadow 0.2s ease; box-shadow: 0 1px 5px rgba(0, 0, 0, 0.18); }
+.hrp-funnel-fill.hrp-fill-left { margin-left: 0; }
+.hrp-funnel-fill:hover { filter: brightness(1.18); box-shadow: 0 2px 8px rgba(0, 0, 0, 0.28); }
+.hrp-funnel-row:hover .hrp-funnel-count { color: var(--hrp-primary); }
+
+.hrp-donut-wrap { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+.hrp-donut { width: 148px; height: 148px; flex: none; }
+.hrp-donut-bg { fill: none; stroke: var(--hrp-bg); stroke-width: 14; }
+.hrp-donut-seg { fill: none; stroke-width: 14; cursor: pointer; transition: stroke-width 0.2s ease, opacity 0.2s ease; }
+.hrp-donut-seg:hover { stroke-width: 18; }
+.hrp-donut-center { font-size: 26px; font-weight: 800; fill: var(--hrp-heading); }
+.hrp-donut-center-sub { font-size: 10px; fill: var(--hrp-muted); }
+.hrp-legend { list-style: none; margin: 0; padding: 0; flex: 1; min-width: 150px; display: flex; flex-direction: column; gap: 8px; }
+.hrp-legend-row { display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: default; }
+.hrp-legend-row:hover .hrp-legend-label { color: var(--hrp-heading); }
+.hrp-legend-dot { width: 10px; height: 10px; border-radius: 3px; flex: none; }
+.hrp-legend-label { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--hrp-muted); transition: color 0.2s ease; }
+.hrp-legend-value { font-weight: 700; color: var(--hrp-heading); }
+.hrp-legend-value em { font-style: normal; font-weight: 400; font-size: 11px; color: var(--hrp-muted); margin-left: 4px; }
+html[data-theme="dark"] .hrp-funnel-track { background: #141b31; border-color: var(--hrp-border-strong); }
 </style>
 <script>
 /* Theme init — set before first paint to avoid a light flash.

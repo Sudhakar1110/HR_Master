@@ -59,6 +59,98 @@
             {% endfor %}
         </div>
 
+        {% if funnel or source_segments or offer_pipeline %}
+        <div class="hrp-charts">
+            <div class="hrp-card">
+                <div class="hrp-card-head">
+                    <h2 class="hrp-card-title">Hiring Funnel</h2>
+                    <span class="hrp-hint">pipeline stages</span>
+                </div>
+                {% if funnel %}
+                {% set funnel_max = (funnel|map(attribute='count')|list + [1])|max %}
+                <div class="hrp-funnel">
+                    {% for stage in funnel %}
+                    {% set fpct = (stage.count * 100 / funnel_max)|round %}
+                    <div class="hrp-funnel-row" title="{{ stage.label }} — {{ stage.count }} candidate{{ 's' if stage.count != 1 }} ({{ fpct|int }}% of peak stage)">
+                        <div class="hrp-funnel-label"><span>{{ stage.label }}</span><span class="hrp-funnel-count">{{ stage.count }}</span></div>
+                        <div class="hrp-funnel-track"><div class="hrp-funnel-fill" style="width:{{ fpct }}%;background:{{ stage.color }}"></div></div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="hrp-empty">
+                    <div class="hrp-empty-icon">🥧</div>
+                    <p>No candidates in the pipeline yet.</p>
+                    <p class="hrp-hint">Rank candidates from a JD to populate the funnel.</p>
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="hrp-card">
+                <div class="hrp-card-head">
+                    <h2 class="hrp-card-title">Source Mix</h2>
+                    <span class="hrp-hint">{{ source_total }} candidate{{ 's' if source_total != 1 }}</span>
+                </div>
+                {% if source_segments %}
+                <div class="hrp-donut-wrap">
+                    <svg class="hrp-donut" viewBox="0 0 140 140" role="img" aria-label="Candidate sources breakdown">
+                        <circle class="hrp-donut-bg" cx="70" cy="70" r="52"></circle>
+                        {% for seg in source_segments %}
+                        <circle class="hrp-donut-seg" cx="70" cy="70" r="52" stroke="{{ seg.color }}"
+                                stroke-dasharray="{{ seg.dash }}" stroke-dashoffset="{{ seg.offset }}"
+                                transform="rotate(-90 70 70)">
+                            <title>{{ seg.label }} — {{ seg.count }} ({{ seg.pct }}%)</title>
+                        </circle>
+                        {% endfor %}
+                        <text class="hrp-donut-center" x="70" y="68" text-anchor="middle">{{ source_total }}</text>
+                        <text class="hrp-donut-center-sub" x="70" y="84" text-anchor="middle">candidates</text>
+                    </svg>
+                    <ul class="hrp-legend">
+                        {% for seg in source_segments %}
+                        <li class="hrp-legend-row" title="{{ seg.label }} — {{ seg.count }} ({{ seg.pct }}%)">
+                            <span class="hrp-legend-dot" style="background:{{ seg.color }}"></span>
+                            <span class="hrp-legend-label">{{ seg.label }}</span>
+                            <span class="hrp-legend-value">{{ seg.count }}<em>{{ seg.pct }}%</em></span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% else %}
+                <div class="hrp-empty">
+                    <div class="hrp-empty-icon">📡</div>
+                    <p>No candidates yet.</p>
+                    <p class="hrp-hint">Import candidates from a portal search to see their sources here.</p>
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="hrp-card">
+                <div class="hrp-card-head">
+                    <h2 class="hrp-card-title">Offer Pipeline</h2>
+                    <span class="hrp-hint">offer statuses</span>
+                </div>
+                {% if offer_pipeline %}
+                {% set offer_max = (offer_pipeline|map(attribute='count')|list + [1])|max %}
+                <div class="hrp-funnel">
+                    {% for o in offer_pipeline %}
+                    {% set opct = (o.count * 100 / offer_max)|round %}
+                    <div class="hrp-funnel-row" title="{{ o.status }} — {{ o.count }} offer{{ 's' if o.count != 1 }}">
+                        <div class="hrp-funnel-label"><span>{{ o.status }}</span><span class="hrp-funnel-count">{{ o.count }}</span></div>
+                        <div class="hrp-funnel-track"><div class="hrp-funnel-fill hrp-fill-left" style="width:{{ opct }}%;background:{{ o.color }}"></div></div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="hrp-empty">
+                    <div class="hrp-empty-icon">💼</div>
+                    <p>No offers yet.</p>
+                    <p class="hrp-hint">Create an offer from a candidate's profile to see the pipeline here.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+
         <div class="hrp-grid hrp-grid-2">
             <div class="hrp-card">
                 <h2 class="hrp-card-title">Recent Job Descriptions</h2>
